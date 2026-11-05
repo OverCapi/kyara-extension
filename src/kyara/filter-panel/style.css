@@ -1,0 +1,103 @@
+/* Panneau de filtres de l'extension, dans la barre de filtres de l'onglet Échanges. */
+
+/* Le panneau reprend les pastilles du site : les originales sont cachées tant qu'il est là. */
+.filters[data-kv-panel] > .pills {
+  display: none !important;
+}
+
+.kv-menu {
+  position: relative;
+  display: inline-flex;
+}
+.kv-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--r-pill, 999px);
+  border: 1px solid var(--line2, #2e2b36);
+  background: transparent;
+  color: var(--fg2, #c9c5ce);
+  cursor: pointer;
+}
+.kv-menu-btn:hover {
+  border-color: var(--line3, #3a3742);
+}
+.kv-menu-btn[aria-expanded="true"] {
+  border-color: var(--acc, #ff4d2e);
+  background: var(--acc-soft, #ff4d2e1f);
+  color: var(--fg, #edeae4);
+}
+
+.kv-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0; /* le bouton est au bout de la ligne de recherche : la fenêtre s'ouvre vers la gauche */
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 380px;
+  max-width: 90vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line2, #2e2b36);
+  background: var(--panel, #15141a);
+  box-shadow: var(--sh-1, 0 6px 14px #00000073);
+  color: var(--fg, #edeae4);
+  font-size: 13px;
+}
+.kv-popover[hidden] {
+  display: none;
+}
+.kv-section > h3 {
+  margin: 0 0 10px;
+  color: var(--fg3, #8d8894);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.kv-section + .kv-section {
+  padding-top: 14px;
+  border-top: 1px solid var(--line2, #2e2b36);
+}
+.kv-cat + .kv-cat {
+  margin-top: 12px;
+}
+.kv-cat > h4 {
+  margin: 0 0 6px;
+  color: var(--fg2, #c9c5ce);
+  font-size: 13px;
+  font-weight: 700;
+}
+.kv-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Pastille, au style de celles du site (active = orange). */
+.kv-pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line2, #2e2b36);
+  background: transparent;
+  color: var(--fg2, #c9c5ce);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.kv-pill:hover {
+  border-color: var(--line3, #3a3742);
+}
+.kv-pill[aria-pressed="true"] {
+  border-color: var(--acc, #ff4d2e);
+  background: var(--acc-soft, #ff4d2e1f);
+  color: var(--fg, #edeae4);
+}

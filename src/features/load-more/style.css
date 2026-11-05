@@ -1,0 +1,41 @@
+/* Indicateur de chargement des offres (pastille fixe en bas au centre, à côté de la pastille Rentabilité). */
+.kv-loading {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  z-index: 2147483646;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  transform: translateX(-50%);
+  border-radius: var(--r-pill, 999px);
+  border: 1px solid var(--line2, #2e2b36);
+  background: var(--panel, #15141a);
+  color: var(--fg2, #b7b2bd);
+  font: 500 var(--t-sm, 12px) / 1.4 var(--body, system-ui, sans-serif);
+  box-shadow: var(--sh-1, 0 6px 14px #00000073);
+  pointer-events: none;
+}
+.kv-loading[hidden] {
+  display: none;
+}
+.kv-spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--line3, #3a3742);
+  border-top-color: var(--acc, #ff4d2e);
+  animation: kv-spin 0.8s linear infinite;
+}
+@keyframes kv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Mouvement réduit : l'anneau reste fixe, le texte suffit. */
+@media (prefers-reduced-motion: reduce) {
+  .kv-spinner {
+    animation: none;
+  }
+}

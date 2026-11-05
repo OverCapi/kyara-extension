@@ -4,10 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "wxt -b firefox --mv2",
+    "dev": "mkdir -p .firefox-profile && wxt -b firefox --mv2",
     "build": "wxt build -b firefox --mv2",
     "build:debug": "wxt build -b firefox --mv2 --mode development",
     "zip": "wxt zip -b firefox --mv2",
+    "dev:chrome": "wxt -b chrome",
+    "build:chrome": "wxt build -b chrome",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "check": "biome check . && wxt prepare && tsc --noEmit",

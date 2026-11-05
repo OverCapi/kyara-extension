@@ -3,6 +3,8 @@
 //   "f:<id>"  prix fair-play    (FairEntry)
 //   "owned"   cartes possédées  (OwnedCards)
 //   "noTint"  préférence "couleurs de rentabilité off" (boolean)
+//   "minGain" filtre "gain minimum" (GainFilter ; ancien format : nombre de %, > 0 = actif)
+//   "rarities" raretés affichées (liste de textes ; vide = toutes)
 // Ces clés sont identiques à celles de l'ancienne version : le cache déjà rempli reste valide.
 // Les lectures valident la forme des données : une valeur corrompue est ignorée, jamais propagée.
 import { browser } from "wxt/browser";
@@ -32,6 +34,8 @@ export interface PriceStore {
 
 export const OWNED_KEY = "owned";
 const NO_TINT_KEY = "noTint";
+const MIN_GAIN_KEY = "minGain";
+const RARITIES_KEY = "rarities";
 export const priceKey = (id: number): string => `p:${id}`;
 export const fairKey = (id: number): string => `f:${id}`;
 
@@ -87,11 +91,75 @@ export function onStorageChange(cb: () => void): () => void {
   return () => browser.storage.onChanged.removeListener(cb);
 }
 
-/** Appelle `cb(valeur)` quand la préférence noTint change (autre onglet inclus). */
-export function onNoTintChange(cb: (noTint: boolean) => void): () => void {
+/** Appelle `cb(newValue)` quand cette clé change (autre onglet inclus). */
+function onKeyChange(key: string, cb: (value: unknown) => void): () => void {
   const listener = (changes: Record<string, { newValue?: unknown }>) => {
-    if (NO_TINT_KEY in changes) cb(changes[NO_TINT_KEY]?.newValue === true);
+    if (key in changes) cb(changes[key]?.newValue);
   };
   browser.storage.onChanged.addListener(listener);
   return () => browser.storage.onChanged.removeListener(listener);
+}
+
+/** Appelle `cb(valeur)` quand la préférence noTint change (autre onglet inclus). */
+export function onNoTintChange(cb: (noTint: boolean) => void): () => void {
+  return onKeyChange(NO_TINT_KEY, (v) => cb(v === true));
+}
+
+/** Mode du filtre "gain minimum" : coupé, neutres et rentables, ou rentables seulement. */
+export type GainMode = "off" | "neutral" | "positive";
+export const GAIN_MODES: readonly GainMode[] = ["off", "neutral", "positive"];
+
+/**
+ * Réglage de l'onglet Échanges : filtre "gain minimum" (`mode` + `pct` = seuil en %, 0 = pas de seuil
+ * en plus du mode) et `sort` = offres triées de la plus rentable à la moins rentable.
+ */
+export interface GainFilter {
+  mode: GainMode;
+  pct: number;
+  sort: boolean;
+}
+
+const isPct = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v) && v >= 0;
+const isMode = (v: unknown): v is GainMode => GAIN_MODES.includes(v as GainMode);
+
+function toGainFilter(v: unknown): GainFilter {
+  // anciens formats : un nombre (> 0 = actif), puis { on, pct }, puis { mode, pct } (sans tri)
+  if (isPct(v)) return { mode: v > 0 ? "neutral" : "off", pct: v, sort: true };
+  if (!isObject(v) || !isPct(v.pct)) return { mode: "off", pct: 0, sort: true };
+  const sort = v.sort !== false; // tri actif par défaut
+  if (isMode(v.mode)) return { mode: v.mode, pct: v.pct, sort };
+  return { mode: v.on === true ? "neutral" : "off", pct: v.pct, sort };
+}
+
+/** Filtre "gain minimum" mémorisé. Coupé à 0 % par défaut ou si la valeur est corrompue. */
+export async function readGainFilter(): Promise<GainFilter> {
+  const { [MIN_GAIN_KEY]: v } = await browser.storage.local.get(MIN_GAIN_KEY);
+  return toGainFilter(v);
+}
+
+export async function writeGainFilter(value: GainFilter): Promise<void> {
+  await browser.storage.local.set({ [MIN_GAIN_KEY]: value });
+}
+
+/** Appelle `cb(filtre)` quand le filtre "gain minimum" change (autre onglet inclus). */
+export function onGainFilterChange(cb: (filter: GainFilter) => void): () => void {
+  return onKeyChange(MIN_GAIN_KEY, (v) => cb(toGainFilter(v)));
+}
+
+const toStrings = (v: unknown): string[] =>
+  Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+
+/** Raretés choisies pour le filtre (liste vide = toutes). Les valeurs invalides sont ignorées. */
+export async function readRarities(): Promise<string[]> {
+  const { [RARITIES_KEY]: v } = await browser.storage.local.get(RARITIES_KEY);
+  return toStrings(v);
+}
+
+export async function writeRarities(value: string[]): Promise<void> {
+  await browser.storage.local.set({ [RARITIES_KEY]: value });
+}
+
+/** Appelle `cb(raretés)` quand le filtre de rareté change (autre onglet inclus). */
+export function onRaritiesChange(cb: (rarities: string[]) => void): () => void {
+  return onKeyChange(RARITIES_KEY, (v) => cb(toStrings(v)));
 }

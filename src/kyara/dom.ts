@@ -37,6 +37,17 @@ export function readOffer(li: HTMLElement): Offer {
   return { li, give, wants: wants.filter((c): c is Card => c !== null) };
 }
 
+/** Barre de filtres de l'onglet Échanges (recherche + pastilles), en flex avec retour à la ligne. `null` si absente. */
+export function findOfferFilters(root: ParentNode = document): HTMLElement | null {
+  // pas de :has() : Firefox 115 (version minimale) ne le connaît pas
+  return root.querySelector(".filters > .pills")?.parentElement ?? null;
+}
+
+/** Bouton « Voir plus d'offres » sous la liste des offres, `null` s'il n'y a plus rien à charger. */
+export function findLoadMore(root: ParentNode = document): HTMLButtonElement | null {
+  return root.querySelector<HTMLButtonElement>(".board > button.more");
+}
+
 /** Toutes les offres affichées dans la page. */
 export function readOffers(root: ParentNode = document): Offer[] {
   return [...root.querySelectorAll<HTMLElement>(OFFER_SELECTOR)].map(readOffer);

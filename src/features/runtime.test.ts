@@ -26,6 +26,24 @@ describe("startFeatures", () => {
     expect(seen.mock.calls[0]?.[0].offers).toHaveLength(1);
   });
 
+  it("marque chaque offre comme traitée (data-kv-seen) une fois les features passées", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const [li] = renderOffers([{ give: 1, wants: [2] }]);
+    mockFetch({});
+    const seenDuring: boolean[] = [];
+    const feature: Feature = {
+      name: "t",
+      setup: (ctx) =>
+        ctx.onOffers(({ offers }) => {
+          for (const o of offers) seenDuring.push(o.li.hasAttribute("data-kv-seen"));
+        }),
+    };
+    startFeatures(fakeCtx(), [feature]);
+    await settle();
+    expect(seenDuring).toEqual([false]);
+    expect(li?.hasAttribute("data-kv-seen")).toBe(true);
+  });
+
   it("une feature qui plante (setup ou rendu) n'arrête pas les autres", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     mockFetch({});

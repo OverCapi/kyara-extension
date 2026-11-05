@@ -15,12 +15,13 @@ Ce fichier sert de référence pour toute modification du projet. Claude Code le
 | Lint + format | **Biome** | Remplace ESLint et Prettier en un seul outil, 10 à 100 fois plus rapide. |
 | Gestionnaire de paquets | **pnpm** | Rapide, économe en disque, recommandé par la doc WXT. |
 
-### Contrainte importante : Firefox uniquement (pour l'instant)
+### Firefox complet, Chrome partiel
 
 L'extension lit les réponses de l'API Kyara avec `webRequest.filterResponseData` (mode `blocking`), et fait ses requêtes avec `content.fetch`. **Ces deux API n'existent que sur Firefox**, en Manifest V2.
 
-- Cible du build : `firefox`, en MV2 (c'est le défaut de WXT pour Firefox).
-- Pour supporter Chrome plus tard, il faudra remplacer le cache passif. Chrome MV3 interdit `webRequestBlocking`. L'alternative : un script injecté dans la page (`world: "MAIN"`) qui intercepte `fetch` et transmet les réponses au content script. WXT gère ce cas, mais c'est un vrai chantier : ne pas le faire sans besoin.
+- Firefox : `pnpm build`, en MV2. Tout fonctionne.
+- Chrome : `pnpm build:chrome`, en MV3. Le cache passif est coupé (`import.meta.env.FIREFOX` dans `background.ts`), et `pageFetch` retombe sur le `fetch` normal. Les prix viennent seulement des requêtes fair-play et de la collection : plus de `?` que sur Firefox.
+- Pour un cache passif sur Chrome : un script injecté dans la page (`world: "MAIN"`) qui intercepte `fetch` et transmet les réponses au content script. WXT gère ce cas, mais c'est un vrai chantier : ne pas le faire sans besoin.
 
 ### Alternatives écartées
 
@@ -55,6 +56,9 @@ kyara-extension/
     │   ├── trade-badges/    # Badges "≈ G◆" et "G − W" sur les offres
     │   ├── profit-tint/     # Fond coloré de l'offre + pastille on/off
     │   ├── rarity-ring/     # Anneau couleur de rareté
+    │   ├── gain-filter/     # Filtre "Gain min" (Off / Neutre et + / Positif + curseur) et tri par rentabilité
+    │   ├── rarity-filter/   # Filtre par rareté de la carte proposée (puces multi-sélection)
+    │   ├── load-more/       # Clique « Voir plus d'offres » tant qu'un filtre laisse trop peu d'offres visibles, avec un indicateur de chargement
     │   └── market-tooltip/  # Infobulle "Min marché" au survol
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)
@@ -63,12 +67,18 @@ kyara-extension/
     │   ├── dom.ts           # Sélecteurs CSS du site et lecture des cartes d'une offre
     │   ├── prices.ts        # Valeur d'une carte et analyse de rentabilité d'une offre
     │   ├── collection.ts    # Cartes possédées (stockage, sinon une requête de rattrapage)
+    │   ├── rarity.ts        # Raretés : retrouvées d'après la couleur du box-shadow des cartes
+    │   ├── filter-panel/    # Bouton "filtre" + fenêtre à 2 sections (Kyara / extension), catégories
     │   ├── offers.ts        # Instantané partagé : offres + prix + cartes possédées
     │   ├── fair-play.ts     # Demande les prix fair-play manquants (lots, TTL, réessais)
     │   └── passive-cache.ts # Lit les réponses de l'API que le site charge déjà (background)
     │
+    ├── locales/             # en.json, fr.json : TOUS les textes affichés (voir §6 bis)
+    │
     ├── core/                # Outils génériques, sans rien de spécifique à Kyara
+    │   ├── i18n.ts          # t() / tn() : lit les textes de locales/*.json selon la langue du navigateur
     │   ├── storage.ts       # Accès typé à browser.storage (clés, types, TTL)
+    │   ├── storage-sync.ts  # Écriture d'un réglage + tri des échos de storage.onChanged (curseur, puces)
     │   ├── page.ts          # UN MutationObserver partagé + debounce, éléments flottants ajoutés à <html>
     │   ├── html.ts          # Échappement HTML
     │   ├── errors.ts        # safe() / safeAsync() : barrière anti-crash
@@ -127,7 +137,11 @@ export interface Feature {
 }
 ```
 
-`FeatureContext` fournit les services partagés : `onOffers(cb)` (appelé à chaque mise à jour de la page avec offres, prix et cartes possédées) et `page` (le contexte WXT : `page.onInvalidated` pour tout nettoyer quand l'extension est rechargée).
+`FeatureContext` fournit les services partagés : `onOffers(cb)` (appelé à chaque mise à jour de la page avec offres, prix et cartes possédées), `page` (le contexte WXT : `page.onInvalidated` pour tout nettoyer quand l'extension est rechargée) et `filters` (le panneau de filtres : `filters.addCategory(titre, élément)` range les réglages de la feature dans la section « Filtres de l'extension », sous une catégorie).
+
+**Filtres** : une feature qui masque des offres pose son propre attribut (`data-kv-hide-<nom>`) et son propre CSS. Ainsi deux filtres se combinent (une offre est cachée dès qu'un filtre la cache) sans jamais défaire le travail l'un de l'autre.
+
+**Pas de clignotement** : quand le site ajoute des offres (« Voir plus »), elles ne doivent jamais s'afficher avant d'être filtrées / triées. Le runtime pose `data-kv-seen` sur chaque offre une fois les features passées ; un filtre actif pose `data-kv-hold-<nom>` (ou `data-kv-filter-<nom>`) sur `<html>`, et son CSS cache les offres sans `data-kv-seen`. `data-kv-filter-<nom>` signale en plus un vrai filtre à la feature `load-more`, qui charge d'autres offres tant que trop peu restent visibles (minimum, plafond et délai : constantes de `load-more/index.ts`).
 
 **Ajouter une feature = 2 étapes :**
 1. Créer `src/features/ma-feature/index.ts` qui exporte un objet `Feature`.
@@ -157,6 +171,7 @@ L'extension tourne sur chaque page de kyara.games. Elle ne doit jamais ralentir 
 - **Pas de dépendance npm dans le content script** sans raison forte. Vérifier la taille du bundle après chaque `pnpm build`.
 - **Un seul `MutationObserver`**, avec debounce (≈300 ms) : on ne recalcule pas à chaque mutation du DOM.
 - **Ne jamais ajouter de nœuds dans l'arbre DOM géré par le site.** On pose des attributs `data-kv-*`, et le CSS les affiche. Les éléments flottants (pastille, infobulle) sont ajoutés à `<html>`, hors de l'arbre du site.
+  - Seule exception voulue : le bouton du panneau de filtres (`kyara/filter-panel/`), placé dans la barre de filtres du site. Il est réinséré à chaque rendu si le site le retire. Les pastilles d'origine du site sont cachées par CSS (attribut `data-kv-panel` sur la barre) et reflétées dans le panneau : un clic sur la copie clique l'original, rien n'est déplacé.
 - **Requêtes réseau minimales** : lire d'abord le cache passif, regrouper les requêtes (max 200 ids, comme le site), ne pas réessayer un id en échec avant un délai, ne rien demander si l'onglet est caché.
 - **Lectures de stockage groupées** : un seul `storage.get([...clés])` par rendu, pas un appel par carte.
 - Écouteurs `scroll` et `mouseover` : `passive: true`, et le travail coûteux est différé (`setTimeout`).
@@ -178,7 +193,7 @@ Objectif : **zéro crash, zéro erreur, zéro warning** dans la console de la pa
 
 | Cas | Comportement |
 |---|---|
-| Réponse HTTP non OK (401, 429, 500…) | Pas de réessai immédiat, délai avant le prochain essai. Le badge affiche `?`. |
+| Réponse HTTP non OK (401, 429, 500…) | Pas de réessai immédiat, délai avant le prochain essai. Pas de badge (jamais de `?` : valeur inconnue = rien d'affiché). |
 | Réseau coupé, `fetch` rejeté | Idem, sans exception non attrapée. |
 | JSON invalide ou de forme inattendue | Les fonctions de `kyara/parse.ts` **valident** la forme et renvoient un résultat vide. Elles ne lèvent jamais d'exception. |
 | Élément du site introuvable (le site a changé) | On ignore l'offre ou la carte, sans erreur (`?.` et retour anticipé). |
@@ -203,6 +218,18 @@ But : comprendre un fichier **sans lire son code**. Les commentaires sont en **f
 - **Dans le code**, on commente le *pourquoi*, pas le *quoi*. Exemple : `// le site met toujours l'anneau en vert, on reprend la vraie couleur de rareté`, et non `// on change la couleur`.
 - Les simplifications volontaires sont marquées `// ponytail: <limite> ; <quand l'améliorer>`.
 - Les types TypeScript nomment les formes de données (`FairPrices`, `OwnedCards`…) : ils font partie de la documentation.
+
+---
+
+## 6 bis. Textes affichés (i18n)
+
+- **Aucun texte visible dans le code.** Tout ce que l'utilisateur lit (boutons, infobulles, `title`, `aria-label`, nom et description du manifest) vit dans `src/locales/en.json` et `src/locales/fr.json`, et s'obtient avec `t("clé")` ou `tn("clé", n)` (`core/i18n.ts`).
+- Les deux fichiers ont **exactement les mêmes clés et les mêmes `{paramètres}`** (un test le vérifie). Une clé ajoutée dans l'un l'est dans l'autre.
+- Clés plates, `zone.nom` (ex. `gauge.mode.off`). Pluriel : `clé_one` et `clé_other`, appelés par `tn("clé", n)`.
+- Langue : celle du navigateur (`navigator.language`), anglais si inconnue. Les tests forcent le français (`src/test/setup.ts`).
+- Ne sont pas concernés : logs de dev (`log.debug`), commentaires, noms de clés de stockage.
+- Nouvelle langue : un JSON de plus, une ligne dans `catalogs` (`core/i18n.ts`).
+- Le manifest (`wxt.config.ts`) lit `en.json` : nom et description ne sont pas traduits selon la langue.
 
 ---
 
@@ -243,9 +270,11 @@ Les tests doivent être **complets** : chaque module de `core/`, `kyara/` et `fe
 ## 8. Commandes
 
 ```bash
-pnpm dev        # Lance Firefox avec l'extension, rechargement auto, logs actifs
+pnpm dev        # Lance Firefox (profil gardé dans .firefox-profile/, connexion conservée) sur les Échanges, rechargement auto, logs actifs
 pnpm build      # Build de production dans .output/, sans logs
 pnpm build:debug # Build non minifié avec logs, dans .output/firefox-mv2-dev/
+pnpm build:chrome # Build Chrome MV3 (sans cache passif), dans .output/chrome-mv3/
+pnpm dev:chrome   # Lance Chrome avec l'extension, rechargement auto
 pnpm zip        # Archive prête pour addons.mozilla.org
 pnpm test       # Tests Vitest
 pnpm test:coverage  # Tests + rapport de couverture (échoue sous les seuils)
