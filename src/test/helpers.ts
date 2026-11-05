@@ -24,3 +24,26 @@ export function mockFetch(body: unknown, status = 200) {
   vi.stubGlobal("fetch", fn);
   return fn;
 }
+
+export interface OfferSpec {
+  /** Id de la carte proposée (omis = offre sans carte proposée). */
+  give?: number;
+  wants?: number[];
+  /** `box-shadow` inline de l'image de la carte proposée (couleur de rareté du site). */
+  shadow?: string;
+}
+
+/** Ajoute à la page des offres avec la même structure que kyara.games. Renvoie les <li>. */
+export function renderOffers(specs: OfferSpec[]): HTMLElement[] {
+  const card = (id: number, shadow = "") =>
+    `<a href="/wiki/${id}" title="Carte ${id}"><img style="box-shadow:${shadow}"></a>`;
+  return specs.map((s, i) => {
+    const li = document.createElement("li");
+    li.id = `offre-${i + 1}`;
+    li.innerHTML =
+      `<div class="thumbs"><div class="give">${s.give ? card(s.give, s.shadow) : ""}</div>` +
+      `<div class="want">${(s.wants ?? []).map((id) => card(id)).join("")}</div></div>`;
+    document.body.append(li);
+    return li;
+  });
+}
