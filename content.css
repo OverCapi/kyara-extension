@@ -1,0 +1,124 @@
+a[data-kv] {
+  position: relative;
+}
+a[data-kv]::after {
+  content: attr(data-kv);
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  padding: 0 4px;
+  border-radius: 4px;
+  font: 700 11px/16px system-ui, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ddd;
+}
+a[data-kv-sign="1"]::after {
+  background: #1f9d55;
+  color: #fff;
+}
+a[data-kv-sign="-1"]::after {
+  background: #c0392b;
+  color: #fff;
+}
+/* Teinte de l'offre selon le gain (calculée dans content.js), superposée au fond du site. */
+li[id^="offre-"] {
+  background-image: linear-gradient(var(--kv-bg, transparent), var(--kv-bg, transparent)) !important;
+  transition: background-image 0.3s;
+}
+
+/* Box au survol : reprend les variables du site (:root de kyara.games). */
+.kv-tip {
+  position: fixed;
+  z-index: 2147483647;
+  min-width: 150px;
+  padding: var(--s-2, 8px) var(--s-3, 12px);
+  background: var(--raise, #1e1c26);
+  border: 1px solid var(--line2, #2e2b36);
+  border-radius: var(--r-md, 10px);
+  box-shadow: var(--sh-2, 0 18px 40px #0000008c);
+  color: var(--fg, #edeae4);
+  font: var(--t-sm, 12px) / 1.4 var(--body, system-ui, sans-serif);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.kv-tip[hidden] {
+  display: none;
+}
+.kv-tip b {
+  font-size: var(--t-base, 14px);
+  margin-bottom: 2px;
+}
+.kv-tip .kv-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3, 12px);
+  color: var(--mut, #8a8590);
+}
+.kv-tip .kv-v {
+  color: var(--fg, #edeae4);
+  font-family: var(--mono, ui-monospace, monospace);
+  font-weight: 700;
+}
+.kv-tip .kv-v i {
+  font-style: normal;
+  color: var(--cyan, #4dd6ff);
+  margin-left: 2px;
+}
+.kv-tip .kv-mut {
+  color: var(--dim, #5a5662);
+  font-family: inherit;
+  font-weight: 400;
+}
+.kv-tip .kv-sub {
+  color: var(--dim, #5a5662);
+  font-size: var(--t-meta, 11px);
+}
+
+/* Anneau autour de chaque carte, couleur de rareté du site (au lieu du vert "possédée"). */
+li[id^="offre-"] a[data-kv-rar] img {
+  outline: 2px solid var(--kv-rar) !important;
+  outline-offset: 1px;
+}
+/* L'anneau déborde de 3px de chaque côté : on élargit l'écart du site (6px) pour qu'ils ne se touchent pas. */
+li[id^="offre-"] .thumbs {
+  gap: 12px !important;
+}
+/* Bouton de l'extension = off : plus de fond coloré (badges et anneaux restent). */
+html.kv-no-tint li[id^="offre-"] {
+  background-image: none !important;
+}
+
+/* Pastille on/off, style des filtres du site (pill, bordure, état actif orange). */
+.kv-toggle {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 2147483646;
+  padding: 6px 14px;
+  border-radius: var(--r-pill, 999px);
+  border: 1px solid var(--line2, #2e2b36);
+  background: var(--panel, #15141a);
+  color: var(--fg2, #b7b2bd);
+  font: 500 var(--t-sm, 12px) / 1.4 var(--body, system-ui, sans-serif);
+  box-shadow: var(--sh-1, 0 6px 14px #00000073);
+  cursor: pointer;
+}
+.kv-toggle[hidden] {
+  display: none;
+}
+.kv-toggle[aria-pressed="true"] {
+  border-color: var(--acc, #ff4d2e);
+  background: var(--acc-soft, #ff4d2e1f);
+  color: var(--fg, #edeae4);
+}
+.kv-toggle:hover {
+  border-color: var(--line3, #3a3742);
+}
+.kv-toggle[aria-pressed="true"]:hover {
+  border-color: var(--acc2, #ff6a4d);
+}

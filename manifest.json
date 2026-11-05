@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Kyara Extension",
+  "version": "0.1.0",
+  "description": "Affiche la valeur des cartes et la rentabilité des échanges sur kyara.games.",
+  "permissions": ["webRequest", "webRequestBlocking", "storage", "https://kyara.games/*"],
+  "background": { "scripts": ["background.js"] },  "content_scripts": [
+    {
+      "matches": ["https://kyara.games/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": { "id": "kyara-extension@local", "strict_min_version": "115.0" }
+  }
+}
