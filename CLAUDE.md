@@ -43,14 +43,15 @@ kyara-extension/
 ├── biome.json
 ├── tsconfig.json
 ├── package.json
-├── public/                  # Fichiers copiés tels quels (icônes)
 └── src/
     ├── entrypoints/         # Points d'entrée UNIQUEMENT : ils branchent, ils ne contiennent pas de logique
     │   ├── background.ts    # Démarre le cache passif
-    │   └── content.ts       # Démarre les features de la page (liste dans features/index.ts)
+    │   └── content.ts       # Démarre les features de la page
     │
     ├── features/            # Une feature = un dossier. Ce que l'utilisateur voit.
     │   ├── index.ts         # Liste des features actives (la seule ligne à ajouter pour une nouvelle feature)
+    │   ├── types.ts         # Contrat Feature / FeatureContext
+    │   ├── runtime.ts       # Lance les features, construit l'instantané des offres une fois par rendu
     │   ├── trade-badges/    # Badges "≈ G◆" et "G − W" sur les offres
     │   ├── profit-tint/     # Fond coloré de l'offre + pastille on/off
     │   ├── rarity-ring/     # Anneau couleur de rareté
@@ -58,16 +59,23 @@ kyara-extension/
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)
     │   ├── api.ts           # Appels à /api avec le jeton et le device id du site
-    │   ├── parse.ts         # Lecture des réponses JSON (prix, fair-play, collection)
+    │   ├── parse.ts         # Lecture des réponses JSON (prix, fair-play, collection, annonces)
     │   ├── dom.ts           # Sélecteurs CSS du site et lecture des cartes d'une offre
-    │   └── prices.ts        # Calcul de la valeur d'une carte (fair-play, sinon médiane)
+    │   ├── prices.ts        # Valeur d'une carte et analyse de rentabilité d'une offre
+    │   ├── collection.ts    # Cartes possédées (stockage, sinon une requête de rattrapage)
+    │   ├── offers.ts        # Instantané partagé : offres + prix + cartes possédées
+    │   ├── fair-play.ts     # Demande les prix fair-play manquants (lots, TTL, réessais)
+    │   └── passive-cache.ts # Lit les réponses de l'API que le site charge déjà (background)
     │
-    └── core/                # Outils génériques, sans rien de spécifique à Kyara
-        ├── storage.ts       # Accès typé à browser.storage (clés, types, TTL)
-        ├── page.ts          # UN MutationObserver partagé + debounce, éléments flottants ajoutés à <html>
-        ├── html.ts          # Échappement HTML
-        ├── errors.ts        # safe() / safeAsync() : barrière anti-crash autour du code des features
-        └── log.ts           # Logs de dev préfixés [kyara-extension], supprimés du build de prod
+    ├── core/                # Outils génériques, sans rien de spécifique à Kyara
+    │   ├── storage.ts       # Accès typé à browser.storage (clés, types, TTL)
+    │   ├── page.ts          # UN MutationObserver partagé + debounce, éléments flottants ajoutés à <html>
+    │   ├── html.ts          # Échappement HTML
+    │   ├── errors.ts        # safe() / safeAsync() : barrière anti-crash
+    │   ├── firefox.ts       # API propres à Firefox (filterResponseData, content.fetch)
+    │   └── log.ts           # Logs de dev préfixés [kyara-extension:<module>], supprimés du build de prod
+    │
+    └── test/                # setup.ts (garde-fous communs) et helpers.ts (faux DOM, faux contexte) pour les tests
 ```
 
 ### Qui a le droit d'importer quoi
