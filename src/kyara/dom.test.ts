@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { renderOffers } from "../test/helpers";
-import { cardId, offerCards, offerIds, readOffer, readOffers } from "./dom";
+import { cardId, findLoadMore, findOfferFilters, offerCards, offerIds, readOffer, readOffers } from "./dom";
 
 describe("cardId", () => {
   it("lit le dernier segment de /wiki/<id>", () => {
@@ -41,5 +41,30 @@ describe("readOffer / readOffers", () => {
     expect(readOffers()).toEqual([]);
     renderOffers([{ give: 1 }, { give: 2 }]);
     expect(readOffers()).toHaveLength(2);
+  });
+});
+
+describe("findOfferFilters", () => {
+  it("trouve la barre qui contient les pastilles, ignore les autres .filters", () => {
+    document.body.innerHTML =
+      '<div class="filters"><input></div><div class="filters"><input><div class="pills"></div></div>';
+    expect(findOfferFilters()).toBe(document.querySelectorAll(".filters")[1]);
+  });
+  it("absente : null", () => {
+    document.body.innerHTML = "";
+    expect(findOfferFilters()).toBeNull();
+  });
+});
+
+describe("findLoadMore", () => {
+  it("trouve le bouton sous la liste des offres", () => {
+    document.body.innerHTML =
+      '<section class="board"><ul class="offers"></ul><button class="btn more">Voir plus</button></section>';
+    expect(findLoadMore()?.textContent).toBe("Voir plus");
+  });
+  it("absent (plus d'offres à charger) : null", () => {
+    document.body.innerHTML =
+      '<section class="board"><ul class="offers"></ul></section><button class="more">autre</button>';
+    expect(findLoadMore()).toBeNull();
   });
 });

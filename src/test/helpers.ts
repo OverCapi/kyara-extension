@@ -3,6 +3,7 @@ import { vi } from "vitest";
 import type { PageContext } from "../core/page";
 import type { Feature } from "../features/types";
 import { readOffers } from "../kyara/dom";
+import type { FilterPanel } from "../kyara/filter-panel";
 import type { OffersSnapshot } from "../kyara/offers";
 
 /** Faux contexte de page : `invalidate()` simule le rechargement de l'extension. */
@@ -68,14 +69,29 @@ export function stopAllFeatures(): void {
   for (const page of startedPages.splice(0)) page.invalidate();
 }
 
+/** Faux panneau de filtres : range les catégories directement dans la page (les tests les y retrouvent). */
+export function fakePanel(): FilterPanel & { categories: Array<{ title: string; el: HTMLElement }> } {
+  const categories: Array<{ title: string; el: HTMLElement }> = [];
+  return {
+    categories,
+    attach() {},
+    addCategory(title, el) {
+      categories.push({ title, el });
+      document.body.append(el);
+    },
+  };
+}
+
 /** Démarre une feature avec un faux contexte. `emit(snapshot)` simule une mise à jour de la page. */
 export function startFeature(feature: Feature) {
   const page = fakeCtx();
   startedPages.push(page);
   const listeners: Array<(snapshot: OffersSnapshot) => void> = [];
-  feature.setup({ page, onOffers: (cb) => void listeners.push(cb) });
+  const filters = fakePanel();
+  feature.setup({ page, filters, onOffers: (cb) => void listeners.push(cb) });
   return {
     page,
+    filters,
     emit(snapshot: OffersSnapshot) {
       for (const listener of listeners) listener(snapshot);
     },

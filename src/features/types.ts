@@ -2,11 +2,14 @@
 // enregistré dans features/index.ts. Elle ne connaît ni les autres features ni le réseau :
 // elle reçoit l'instantané des offres et se contente de peindre / réagir.
 import type { PageContext } from "../core/page";
+import type { FilterPanel } from "../kyara/filter-panel";
 import type { OffersSnapshot } from "../kyara/offers";
 
 export interface FeatureContext {
   /** Contexte de la page : sert à retirer écouteurs et éléments quand l'extension est rechargée. */
   page: PageContext;
+  /** Panneau de filtres de l'onglet Échanges : `addCategory(titre, élément)` y range les réglages de la feature. */
+  filters: FilterPanel;
   /** Appelle `cb` à chaque mise à jour de la page, avec offres, prix et cartes possédées. */
   onOffers(cb: (snapshot: OffersSnapshot) => void): void;
 }

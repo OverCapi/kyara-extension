@@ -1,0 +1,25 @@
+/* Offre dont la carte proposée n'a pas une rareté choisie (attribut posé par la feature rarity-filter). */
+li[data-kv-hide-rarity] {
+  display: none !important;
+}
+
+/* Offres pas encore filtrées (le runtime pose data-kv-seen quand c'est fait) : cachées, sans clignotement. */
+html[data-kv-filter-rarity] li[id^="offre-"]:not([data-kv-seen]) {
+  display: none !important;
+}
+
+/* Puce de rareté : pastille ronde de la couleur de la rareté devant le nom. */
+.kv-chip::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--kv-rar);
+}
+.kv-hint {
+  margin: 8px 0 0;
+  color: var(--fg3, #8d8894);
+  font-size: 12px;
+}

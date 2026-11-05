@@ -1,20 +1,22 @@
 // Affichage de l'infobulle : texte (HTML échappé) et position. Aucune logique réseau.
 import { escapeHtml } from "../../core/html";
+import { t, tn } from "../../core/i18n";
 import type { MarketMin } from "./market-min";
 
 /** État de l'infobulle : chargement, résultat, ou échec. */
 export type TipState = { kind: "loading" } | { kind: "error" } | { kind: "result"; data: MarketMin };
 
-const row = (value: string) => `<span class="kv-row"><span>Min marché</span>${value}</span>`;
+const row = (value: string) => `<span class="kv-row"><span>${t("tooltip.market_min")}</span>${value}</span>`;
 
 /** HTML de l'infobulle pour une carte. Le nom vient du site : il est échappé. */
 export function tipHtml(name: string, state: TipState): string {
   const title = `<b>${escapeHtml(name)}</b>`;
   if (state.kind === "loading") return title + row('<span class="kv-v">…</span>');
-  if (state.kind === "error") return title + row('<span class="kv-v kv-mut">indisponible</span>');
+  if (state.kind === "error")
+    return title + row(`<span class="kv-v kv-mut">${t("tooltip.unavailable")}</span>`);
   const { min, count } = state.data;
-  if (min === null) return title + row('<span class="kv-v kv-mut">aucune annonce</span>');
-  const sub = `<span class="kv-sub">${count} annonce${count > 1 ? "s" : ""}</span>`;
+  if (min === null) return title + row(`<span class="kv-v kv-mut">${t("tooltip.no_listing")}</span>`);
+  const sub = `<span class="kv-sub">${tn("tooltip.listing", count)}</span>`;
   return title + row(`<span class="kv-v">${min}<i>◆</i></span>`) + sub;
 }
 

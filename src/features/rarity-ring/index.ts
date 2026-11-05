@@ -4,15 +4,9 @@
 // Effet DOM : attribut data-kv-rar + variable CSS --kv-rar sur le lien de la carte.
 import type { Card } from "../../kyara/dom";
 import { offerCards } from "../../kyara/dom";
+import { rarityColor } from "../../kyara/rarity";
 import type { Feature } from "../types";
 import "./style.css";
-
-const COLOR = /rgba?\([^)]*\)|#[0-9a-f]{3,8}/i;
-
-/** Première couleur (rgb/rgba/hex) d'une valeur `box-shadow`, ou `null`. */
-export function rarityColor(boxShadow: string): string | null {
-  return boxShadow.match(COLOR)?.[0] ?? null;
-}
 
 function paintRing({ el }: Card): void {
   const color = rarityColor(el.querySelector("img")?.style.boxShadow ?? "");

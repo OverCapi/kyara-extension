@@ -1,20 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makeSnapshot, startFeature } from "../../test/helpers";
-import { rarityColor, rarityRing } from "./index";
-
-describe("rarityColor", () => {
-  it.each([
-    ["rgb(1, 2, 3) 0px 0px 0px 2px", "rgb(1, 2, 3)"],
-    ["0 0 0 2px rgba(10,20,30,0.5)", "rgba(10,20,30,0.5)"],
-    ["#ffaa00 0 0 4px", "#ffaa00"],
-  ])("lit la couleur de %s", (shadow, color) => {
-    expect(rarityColor(shadow)).toBe(color);
-  });
-  it("null sans couleur", () => {
-    expect(rarityColor("")).toBeNull();
-    expect(rarityColor("none")).toBeNull();
-  });
-});
+import { rarityRing } from "./index";
 
 describe("rarity-ring", () => {
   it("pose couleur et attribut sur la carte proposée", () => {
