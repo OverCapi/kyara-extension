@@ -13,13 +13,34 @@
       "!node_modules"
     ]
   },
-  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 110 },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110
+  },
   "linter": {
     "rules": {
       "preset": "recommended",
-      "suspicious": { "noConsole": "error", "noExplicitAny": "error" },
-      "nursery": { "noFloatingPromises": "error" }
+      "suspicious": {
+        "noConsole": "error",
+        "noExplicitAny": "error"
+      },
+      "nursery": {
+        "noFloatingPromises": "error"
+      }
     },
     "includes": ["**", "!src/core/log.ts"]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/test/**", "**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ]
 }
