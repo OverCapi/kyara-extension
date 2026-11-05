@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "wxt -b firefox --mv2",
     "build": "wxt build -b firefox --mv2",
+    "build:debug": "wxt build -b firefox --mv2 --mode development",
     "zip": "wxt zip -b firefox --mv2",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

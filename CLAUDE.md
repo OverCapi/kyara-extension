@@ -127,7 +127,7 @@ export interface Feature {
 }
 ```
 
-`FeatureContext` fournit les services partagés : `onPageChange(cb)` (l'observer commun), le contexte WXT (`ctx.onInvalidated` pour tout nettoyer quand l'extension est rechargée), etc.
+`FeatureContext` fournit les services partagés : `onOffers(cb)` (appelé à chaque mise à jour de la page avec offres, prix et cartes possédées) et `page` (le contexte WXT : `page.onInvalidated` pour tout nettoyer quand l'extension est rechargée).
 
 **Ajouter une feature = 2 étapes :**
 1. Créer `src/features/ma-feature/index.ts` qui exporte un objet `Feature`.
@@ -140,11 +140,11 @@ Aucune autre modification ne doit être nécessaire. Si une feature oblige à mo
 ## 4. Zéro duplication
 
 - **Jamais de code copié-collé.** Si un bout de code sert deux fois, il devient une fonction dans le bon dossier (`kyara/` ou `core/`).
-- Exemples dans le code actuel, à corriger pendant la migration :
-  - Le format fair-play (`{ "<id>": prix }`) est lu deux fois : `extractFair` dans `background.js`, et à nouveau dans `fetchFair` de `content.js`. Il faut une seule fonction dans `kyara/parse.ts`.
-  - La collection (`qty > 0`) est lue deux fois : `extractOwned` et `loadOwned`. Il faut une seule fonction dans `kyara/parse.ts`.
-  - Deux `MutationObserver` surveillent tout `document.body`. Il en faut un seul, dans `core/page.ts`, partagé par toutes les features.
-  - Les clés de stockage (`"f:" + id`, `"p:" + id`) sont construites à plusieurs endroits. Il faut les centraliser dans `core/storage.ts`.
+- Points de partage déjà en place, à réutiliser plutôt que recréer :
+  - lecture des réponses API (prix, fair-play, collection, annonces) : `kyara/parse.ts`, utilisé par le background et le content script ;
+  - surveillance de la page : un seul `MutationObserver`, dans `core/page.ts` ;
+  - clés de stockage : `core/storage.ts` uniquement ;
+  - calcul de valeur et de gain d'une offre : `kyara/prices.ts`, utilisé par plusieurs features.
 - Les constantes (TTL, taille des lots, délais) sont définies une seule fois, en haut du module qui les utilise. Elles sont exportées si un autre module en a besoin.
 - Mais : **pas d'abstraction « au cas où ».** On factorise du code qui est vraiment réutilisé, pas du code qui pourrait l'être un jour.
 
@@ -245,6 +245,7 @@ Les tests doivent être **complets** : chaque module de `core/`, `kyara/` et `fe
 ```bash
 pnpm dev        # Lance Firefox avec l'extension, rechargement auto, logs actifs
 pnpm build      # Build de production dans .output/, sans logs
+pnpm build:debug # Build non minifié avec logs, dans .output/firefox-mv2-dev/
 pnpm zip        # Archive prête pour addons.mozilla.org
 pnpm test       # Tests Vitest
 pnpm test:coverage  # Tests + rapport de couverture (échoue sous les seuils)
