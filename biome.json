@@ -27,6 +27,9 @@
       },
       "nursery": {
         "noFloatingPromises": "error"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
       }
     },
     "includes": ["**", "!src/core/log.ts"]

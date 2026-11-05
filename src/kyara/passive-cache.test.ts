@@ -8,6 +8,7 @@ import { interceptResponse, startPassiveCache, storeBody, WATCHED_URLS } from ".
 beforeEach(() => fakeBrowser.reset());
 
 const K = "https://kyara.games";
+const firefoxApi = () => browser.webRequest as unknown as { filterResponseData: ReturnType<typeof vi.fn> };
 const bytes = (s: string) => new TextEncoder().encode(s).buffer as ArrayBuffer;
 
 function fakeFilter() {
@@ -83,9 +84,9 @@ describe("startPassiveCache", () => {
     const filterFn = fakeFilter();
     const handler = listener().mock.calls[0]?.[0];
     handler({ method: "POST", url: `${K}/api/me/collection`, requestId: "1" });
-    expect(browser.webRequest.filterResponseData).not.toHaveBeenCalled();
+    expect(firefoxApi().filterResponseData).not.toHaveBeenCalled();
     handler({ method: "GET", url: `${K}/api/me/collection`, requestId: "1" });
-    expect(browser.webRequest.filterResponseData).toHaveBeenCalledWith("1");
+    expect(firefoxApi().filterResponseData).toHaveBeenCalledWith("1");
     expect(filterFn.ondata).toBeTypeOf("function");
   });
 

@@ -1,6 +1,9 @@
 import { vi } from "vitest";
 // Outils de test partagés.
 import type { PageContext } from "../core/page";
+import type { Feature } from "../features/types";
+import { readOffers } from "../kyara/dom";
+import type { OffersSnapshot } from "../kyara/offers";
 
 /** Faux contexte de page : `invalidate()` simule le rechargement de l'extension. */
 export function fakeCtx(): PageContext & { invalidate(): void } {
@@ -20,7 +23,7 @@ export function fakeCtx(): PageContext & { invalidate(): void } {
 
 /** Remplace `fetch` par un faux qui renvoie `body` en JSON avec ce statut. */
 export function mockFetch(body: unknown, status = 200) {
-  const fn = vi.fn(async () => new Response(JSON.stringify(body), { status }));
+  const fn = vi.fn(async (..._args: unknown[]) => new Response(JSON.stringify(body), { status }));
   vi.stubGlobal("fetch", fn);
   return fn;
 }
@@ -46,4 +49,35 @@ export function renderOffers(specs: OfferSpec[]): HTMLElement[] {
     document.body.append(li);
     return li;
   });
+}
+
+/** Instantané d'offres prêt à l'emploi : rend les offres dans la page et fixe prix fair-play et collection. */
+export function makeSnapshot(
+  specs: OfferSpec[],
+  opts: { fair?: Record<number, number>; owned?: Record<number, number> | null } = {},
+): OffersSnapshot {
+  renderOffers(specs);
+  const fair = Object.fromEntries(Object.entries(opts.fair ?? {}).map(([id, v]) => [id, { v, t: 0 }]));
+  return { offers: readOffers(), store: { fair, market: {} }, owned: opts.owned ?? null };
+}
+
+const startedPages: Array<ReturnType<typeof fakeCtx>> = [];
+
+/** Invalide les contextes de toutes les features démarrées par un test (retire leurs écouteurs). */
+export function stopAllFeatures(): void {
+  for (const page of startedPages.splice(0)) page.invalidate();
+}
+
+/** Démarre une feature avec un faux contexte. `emit(snapshot)` simule une mise à jour de la page. */
+export function startFeature(feature: Feature) {
+  const page = fakeCtx();
+  startedPages.push(page);
+  const listeners: Array<(snapshot: OffersSnapshot) => void> = [];
+  feature.setup({ page, onOffers: (cb) => void listeners.push(cb) });
+  return {
+    page,
+    emit(snapshot: OffersSnapshot) {
+      for (const listener of listeners) listener(snapshot);
+    },
+  };
 }
