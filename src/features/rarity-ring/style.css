@@ -1,0 +1,9 @@
+/* Anneau autour de chaque carte, couleur de rareté du site (au lieu du vert "possédée"). */
+li[id^="offre-"] a[data-kv-rar] img {
+  outline: 2px solid var(--kv-rar) !important;
+  outline-offset: 1px;
+}
+/* L'anneau déborde de 3px de chaque côté : on élargit l'écart du site (6px) pour qu'ils ne se touchent pas. */
+li[id^="offre-"] .thumbs {
+  gap: 12px !important;
+}

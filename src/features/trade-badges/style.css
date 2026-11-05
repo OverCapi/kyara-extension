@@ -1,0 +1,27 @@
+a[data-kv] {
+  position: relative;
+}
+a[data-kv]::after {
+  content: attr(data-kv);
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  padding: 0 4px;
+  border-radius: 4px;
+  font:
+    700 11px / 16px system-ui,
+    sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ddd;
+}
+a[data-kv-sign="1"]::after {
+  background: #1f9d55;
+  color: #fff;
+}
+a[data-kv-sign="-1"]::after {
+  background: #c0392b;
+  color: #fff;
+}

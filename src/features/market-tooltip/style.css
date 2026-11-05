@@ -1,0 +1,49 @@
+/* Box au survol : reprend les variables du site (:root de kyara.games). */
+.kv-tip {
+  position: fixed;
+  z-index: 2147483647;
+  min-width: 150px;
+  padding: var(--s-2, 8px) var(--s-3, 12px);
+  background: var(--raise, #1e1c26);
+  border: 1px solid var(--line2, #2e2b36);
+  border-radius: var(--r-md, 10px);
+  box-shadow: var(--sh-2, 0 18px 40px #0000008c);
+  color: var(--fg, #edeae4);
+  font: var(--t-sm, 12px) / 1.4 var(--body, system-ui, sans-serif);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.kv-tip[hidden] {
+  display: none;
+}
+.kv-tip b {
+  font-size: var(--t-base, 14px);
+  margin-bottom: 2px;
+}
+.kv-tip .kv-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3, 12px);
+  color: var(--mut, #8a8590);
+}
+.kv-tip .kv-v {
+  color: var(--fg, #edeae4);
+  font-family: var(--mono, ui-monospace, monospace);
+  font-weight: 700;
+}
+.kv-tip .kv-v i {
+  font-style: normal;
+  color: var(--cyan, #4dd6ff);
+  margin-left: 2px;
+}
+.kv-tip .kv-mut {
+  color: var(--dim, #5a5662);
+  font-family: inherit;
+  font-weight: 400;
+}
+.kv-tip .kv-sub {
+  color: var(--dim, #5a5662);
+  font-size: var(--t-meta, 11px);
+}

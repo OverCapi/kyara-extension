@@ -1,0 +1,40 @@
+/* Teinte de l'offre selon le gain (calculée par la feature profit-tint), superposée au fond du site. */
+li[id^="offre-"] {
+  background-image: linear-gradient(var(--kv-bg, transparent), var(--kv-bg, transparent)) !important;
+  transition: background-image 0.3s;
+}
+
+/* Bouton de l'extension = off : plus de fond coloré (badges et anneaux restent). */
+html.kv-no-tint li[id^="offre-"] {
+  background-image: none !important;
+}
+
+/* Pastille on/off, style des filtres du site (pill, bordure, état actif orange). */
+.kv-toggle {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 2147483646;
+  padding: 6px 14px;
+  border-radius: var(--r-pill, 999px);
+  border: 1px solid var(--line2, #2e2b36);
+  background: var(--panel, #15141a);
+  color: var(--fg2, #b7b2bd);
+  font: 500 var(--t-sm, 12px) / 1.4 var(--body, system-ui, sans-serif);
+  box-shadow: var(--sh-1, 0 6px 14px #00000073);
+  cursor: pointer;
+}
+.kv-toggle[hidden] {
+  display: none;
+}
+.kv-toggle[aria-pressed="true"] {
+  border-color: var(--acc, #ff4d2e);
+  background: var(--acc-soft, #ff4d2e1f);
+  color: var(--fg, #edeae4);
+}
+.kv-toggle:hover {
+  border-color: var(--line3, #3a3742);
+}
+.kv-toggle[aria-pressed="true"]:hover {
+  border-color: var(--acc2, #ff6a4d);
+}

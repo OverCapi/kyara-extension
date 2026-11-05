@@ -1,0 +1,24 @@
+{
+  "name": "kyara-extension",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt -b firefox --mv2",
+    "build": "wxt build -b firefox --mv2",
+    "build:debug": "wxt build -b firefox --mv2 --mode development",
+    "zip": "wxt zip -b firefox --mv2",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "check": "biome check . && wxt prepare && tsc --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.5",
+    "@vitest/coverage-v8": "^5.1.0",
+    "happy-dom": "^21.0.4",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0",
+    "wxt": "^0.21.5"
+  }
+}
