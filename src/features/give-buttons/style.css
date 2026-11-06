@@ -13,30 +13,30 @@ li[id^="offre-"] :has(> [data-kv-give]) > :not([data-kv-give]) {
 li[id^="offre-"] [data-kv-give] {
   display: inline-flex !important;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 0 !important;
   height: auto !important;
-  padding: 4px 10px !important;
+  padding: 5px 10px !important;
+  border: 1px solid var(--acc, #ff4d2e) !important;
   border-radius: 8px !important;
+  background: #24222b !important;
+  color: var(--fg, #edeae4) !important;
   font-size: 13px !important;
   line-height: 1.3 !important;
   white-space: nowrap;
 }
+li[id^="offre-"] [data-kv-give]:hover {
+  background: var(--acc-soft, #ff4d2e1f) !important;
+}
+/* Gain as colored text, no pill: green = you gain, red = you lose, gray = even. */
 li[id^="offre-"] [data-kv-give][data-kv-gain]::after {
   content: attr(data-kv-gain);
-  padding: 0 5px;
-  border-radius: 4px;
-  font:
-    700 11px / 16px system-ui,
-    sans-serif;
-  background: rgba(0, 0, 0, 0.75);
-  color: #ddd;
+  font-weight: 700;
+  color: var(--fg3, #8d8894);
 }
 li[id^="offre-"] [data-kv-give][data-kv-sign="1"]::after {
-  background: #1f9d55;
-  color: #fff;
+  color: #4ade80;
 }
 li[id^="offre-"] [data-kv-give][data-kv-sign="-1"]::after {
-  background: #c0392b;
-  color: #fff;
+  color: #f87171;
 }

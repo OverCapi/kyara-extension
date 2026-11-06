@@ -14,7 +14,7 @@
   "badge.give": "≈ {value}◆",
   "badge.value": "{value}◆",
   "badge.pct": "{pct} %",
-  "badge.gain": "{diff}◆ · {pct}",
+  "badge.gain": "{diff}◆ {pct}",
   "tooltip.market_min": "Min marché",
   "tooltip.unavailable": "indisponible",
   "tooltip.no_listing": "aucune annonce",

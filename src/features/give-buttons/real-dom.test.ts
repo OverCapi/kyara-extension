@@ -21,8 +21,8 @@ describe("give-buttons on the real site's DOM", () => {
     const fair = { 1: { v: 10, t: 0 }, 2: { v: 15, t: 0 }, 3: { v: 5, t: 0 } };
     startFeature(giveButtons).emit({ offers: readOffers(), store: { fair, market: {} }, owned: null });
     const [suzaku, sagittarius, other] = [...document.querySelectorAll<HTMLElement>(".acts button")];
-    expect(suzaku?.dataset.kvGain).toBe("-5◆ · -33 %");
-    expect(sagittarius?.dataset.kvGain).toBe("+5◆ · +100 %");
+    expect(suzaku?.dataset.kvGain).toBe("-5◆ -33 %");
+    expect(sagittarius?.dataset.kvGain).toBe("+5◆ +100 %");
     expect([sagittarius?.style.order, suzaku?.style.order]).toEqual(["0", "1"]);
     expect(other?.hasAttribute("data-kv-give")).toBe(false);
   });

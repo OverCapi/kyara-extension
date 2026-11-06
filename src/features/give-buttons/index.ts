@@ -9,7 +9,7 @@ import { analyzeOffer, pctText, signed, type WantAnalysis } from "../../kyara/pr
 import type { Feature } from "../types";
 import "./style.css";
 
-/** Label of a give button ("+2◆ · +40 %"). Empty if the gain is unknown. */
+/** Label of a give button ("+2◆ +40 %"). Empty if the gain is unknown. */
 export function gainLabel(want: WantAnalysis | undefined): string {
   if (want?.diff == null || want.ratio === null) return "";
   return t("badge.gain", { diff: signed(want.diff), pct: pctText(want.ratio) });

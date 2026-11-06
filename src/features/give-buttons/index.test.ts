@@ -7,7 +7,7 @@ const buttonEls = () => [...document.querySelectorAll<HTMLButtonElement>(".acts 
 
 describe("gainLabel", () => {
   it("gain in ◆ and %, empty when unknown", () => {
-    expect(gainLabel({ card: {} as never, value: 5, diff: 2, ratio: 0.4 })).toBe("+2◆ · +40 %");
+    expect(gainLabel({ card: {} as never, value: 5, diff: 2, ratio: 0.4 })).toBe("+2◆ +40 %");
     expect(gainLabel({ card: {} as never, value: null, diff: null, ratio: null })).toBe("");
     expect(gainLabel(undefined)).toBe("");
   });
@@ -19,9 +19,9 @@ describe("give-buttons", () => {
     const before = document.body.querySelectorAll("*").length;
     startFeature(giveButtons).emit(snap);
     const [b2, b3, b4, other] = buttonEls();
-    expect(b2?.dataset.kvGain).toBe("-5◆ · -33 %");
+    expect(b2?.dataset.kvGain).toBe("-5◆ -33 %");
     expect(b2?.dataset.kvSign).toBe("-1");
-    expect(b3?.dataset.kvGain).toBe("+5◆ · +100 %");
+    expect(b3?.dataset.kvGain).toBe("+5◆ +100 %");
     expect(b3?.dataset.kvSign).toBe("1");
     expect(b4?.dataset.kvGain).toBeUndefined(); // unknown value: no label
     expect([b3, b2, b4].map((b) => b?.style.order)).toEqual(["0", "1", "2"]);
