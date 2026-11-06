@@ -74,6 +74,17 @@ describe("load-more", () => {
     expect(clicked).toHaveBeenCalledTimes(2);
   });
 
+  it("prices on their way: waits for them before loading more", () => {
+    filtering();
+    const { emit, prices } = startFeature(loadMore);
+    prices.pending = true;
+    emit(snap(20, 20));
+    expect(clicked).not.toHaveBeenCalled();
+    prices.pending = false; // the fair-play reply re-renders
+    emit(snap(20, 20));
+    expect(clicked).toHaveBeenCalledTimes(1);
+  });
+
   it("cap on consecutive automatic clicks", () => {
     filtering();
     const { emit } = startFeature(loadMore);

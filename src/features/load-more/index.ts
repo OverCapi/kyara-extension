@@ -3,6 +3,7 @@
 // - after each user click on the button, until MIN_VISIBLE NEW offers are visible.
 // One click per page update, until the goal is reached, nothing is left to load, or MAX_AUTO_LOADS.
 // When such a round ends without any new visible offer, a "no offer matches" notice shows under the list.
+// Waits for the fair-play prices of the offers already there before loading more.
 // The button shows a loading text during each load (label.ts).
 // Register AFTER the filter features: it counts what they hid.
 // DOM effect: clicks on the site's button, button text while loading, data-kv-empty on the offer board.
@@ -70,7 +71,9 @@ export const loadMore: Feature = {
         return;
       }
       const waiting = pending && offers.length === pending.total && Date.now() - pending.at < LOAD_TIMEOUT;
-      if (waiting || document.visibilityState !== "visible") return; // loading in progress, or tab hidden
+      // loading in progress, tab hidden, or prices on their way: offers hidden for lack of a price may
+      // show up once priced, so loading more now would load too much (the fair-play reply re-renders)
+      if (waiting || document.visibilityState !== "visible" || ctx.pricesPending()) return;
       const more = findLoadMore();
       if (!more || round.loads >= MAX_AUTO_LOADS) {
         pending = null;

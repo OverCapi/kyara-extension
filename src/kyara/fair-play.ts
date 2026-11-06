@@ -58,6 +58,8 @@ export function findMissing(
 export interface FairPlayRequester {
   /** Starts the requests for this snapshot if needed. `onDone` is called when they are finished. */
   request(snapshot: OffersSnapshot, onDone: () => void): void;
+  /** `true` while prices of this snapshot are being fetched or about to be (not when paused or tab hidden). */
+  pending(snapshot: OffersSnapshot): boolean;
 }
 
 export function createFairPlayRequester(): FairPlayRequester {
@@ -79,7 +81,12 @@ export function createFairPlayRequester(): FairPlayRequester {
     }
   }
 
+  const canRequest = () => Date.now() >= pausedUntil && document.visibilityState === "visible";
+
   return {
+    pending({ offers, owned, store }) {
+      return inflight || (canRequest() && findMissing(offers, owned, store, tried).need.size > 0);
+    },
     request({ offers, owned, store }, onDone) {
       const { need, acceptable } = findMissing(offers, owned, store, tried);
       log.debug(`${offers.length} offers, ${acceptable} acceptable, ${need.size} prices to request`);

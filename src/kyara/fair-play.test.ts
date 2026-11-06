@@ -154,6 +154,21 @@ describe("createFairPlayRequester", () => {
     vi.useRealTimers();
   });
 
+  it("pending: missing prices or request in flight; not when paused or tab hidden", async () => {
+    mockFetch({ 1: 10, 2: 4 });
+    const requester = createFairPlayRequester();
+    const snap = snapshot([{ give: 1, wants: [2] }], { 2: 1 });
+    expect(requester.pending(snap)).toBe(true);
+    const onDone = vi.fn();
+    requester.request(snap, onDone);
+    expect(requester.pending({ ...snap, owned: {} })).toBe(true); // in flight
+    await vi.waitFor(() => expect(onDone).toHaveBeenCalled());
+    expect(requester.pending(snap)).toBe(false); // ids just tried
+    expect(createFairPlayRequester().pending({ ...snap, owned: {} })).toBe(false);
+    vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+    expect(createFairPlayRequester().pending(snap)).toBe(false);
+  });
+
   it("storage error: caught, onDone called", async () => {
     mockFetch({ 1: 10 });
     vi.spyOn(fakeBrowser.storage.local, "set").mockRejectedValue(new Error("context invalidated"));

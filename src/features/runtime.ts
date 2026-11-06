@@ -22,20 +22,24 @@ export function startFeatures(page: PageContext, features: Feature[]): void {
   const watcher = createPageWatcher(page);
   const listeners: Array<(snapshot: OffersSnapshot) => void> = [];
   const filters = createFilterPanel(page);
+  const collection = createCollectionLoader();
+  const fairPlay = createFairPlayRequester();
+  let current: OffersSnapshot | null = null;
 
   for (const feature of features) {
     const ctx: FeatureContext = {
       page,
       filters,
       onOffers: (cb) => void listeners.push(safe(`feature:${feature.name}`, cb)),
+      // read during a render: the filters registered before have already marked the offers
+      pricesPending: () => current !== null && fairPlay.pending(current),
     };
     safe(`feature:${feature.name}:setup`, feature.setup)(ctx);
   }
 
-  const collection = createCollectionLoader();
-  const fairPlay = createFairPlayRequester();
   watcher.subscribe(async () => {
     const snapshot = await buildSnapshot(collection);
+    current = snapshot;
     safe("runtime:panel", filters.attach)(findOfferFilters());
     for (const listener of listeners) listener(snapshot);
     // filters and sorting are done: the offers can show (see data-kv-hold-* / data-kv-filter-*)

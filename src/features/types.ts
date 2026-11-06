@@ -12,6 +12,8 @@ export interface FeatureContext {
   filters: FilterPanel;
   /** Calls `cb` on every page update, with offers, prices and owned cards. */
   onOffers(cb: (snapshot: OffersSnapshot) => void): void;
+  /** `true` while fair-play prices of the current offers are being fetched (filters may still change). */
+  pricesPending(): boolean;
 }
 
 export interface Feature {

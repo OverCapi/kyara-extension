@@ -91,10 +91,18 @@ export function startFeature(feature: Feature) {
   startedPages.push(page);
   const listeners: Array<(snapshot: OffersSnapshot) => void> = [];
   const filters = fakePanel();
-  feature.setup({ page, filters, onOffers: (cb) => void listeners.push(cb) });
+  const prices = { pending: false };
+  feature.setup({
+    page,
+    filters,
+    onOffers: (cb) => void listeners.push(cb),
+    pricesPending: () => prices.pending,
+  });
   return {
     page,
     filters,
+    /** Set `prices.pending = true` to simulate fair-play prices being fetched. */
+    prices,
     emit(snapshot: OffersSnapshot) {
       for (const listener of listeners) listener(snapshot);
     },
