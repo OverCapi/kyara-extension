@@ -5,7 +5,6 @@
 import { safe } from "../core/errors";
 import { createLogger } from "../core/log";
 import { createPageWatcher, type PageContext } from "../core/page";
-import { createCollectionLoader } from "../kyara/collection";
 import { findOfferFilters } from "../kyara/dom";
 import { createFairPlayRequester } from "../kyara/fair-play";
 import { createFilterPanel } from "../kyara/filter-panel";
@@ -22,7 +21,6 @@ export function startFeatures(page: PageContext, features: Feature[]): void {
   const watcher = createPageWatcher(page);
   const listeners: Array<(snapshot: OffersSnapshot) => void> = [];
   const filters = createFilterPanel(page);
-  const collection = createCollectionLoader();
   const fairPlay = createFairPlayRequester();
   let current: OffersSnapshot | null = null;
 
@@ -38,7 +36,7 @@ export function startFeatures(page: PageContext, features: Feature[]): void {
   }
 
   watcher.subscribe(async () => {
-    const snapshot = await buildSnapshot(collection);
+    const snapshot = await buildSnapshot();
     current = snapshot;
     safe("runtime:panel", filters.attach)(findOfferFilters());
     for (const listener of listeners) listener(snapshot);

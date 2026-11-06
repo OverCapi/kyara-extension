@@ -142,3 +142,13 @@ describe("findOfferBoard", () => {
     expect(findOfferBoard()).toBeNull();
   });
 });
+
+describe("readOffer: free cards", () => {
+  it("only wanted cards with a Donner button; owned but locked cards (no button) are not free", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2, 3, 4], free: [3] }]);
+    if (!li) throw new Error("no offer");
+    li.querySelector('a[href="/wiki/2"]')?.setAttribute("title", "Carte 2 (tu l’as)"); // owned, locked
+    li.querySelector(".acts")?.append("Tu n’as aucune de ces cartes libre.");
+    expect(readOffer(li).free.map((c) => c.id)).toEqual([3]);
+  });
+});

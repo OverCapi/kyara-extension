@@ -25,7 +25,7 @@ const specs = [
   { give: 4, wants: [2] },
   { give: 5, wants: [2] },
 ];
-const opts = { fair: { 1: 10, 2: 5, 3: 6, 4: 5, 5: 4 }, owned: { 2: 1 } };
+const opts = { fair: { 1: 10, 2: 5, 3: 6, 4: 5, 5: 4 }, free: [2] };
 
 async function setSlider(value: string) {
   const el = input();

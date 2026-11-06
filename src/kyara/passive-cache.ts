@@ -16,7 +16,6 @@ export const WATCHED_URLS = [
   "https://kyara.games/api/market/prices/*",
   "https://kyara.games/api/characters/*",
   "https://kyara.games/api/fair-play/prices*",
-  "https://kyara.games/api/me/collection*",
 ];
 
 /** Parses a response body and stores what it contains. Never throws. */

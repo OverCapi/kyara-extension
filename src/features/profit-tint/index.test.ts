@@ -13,12 +13,12 @@ const button = () => document.querySelector<HTMLButtonElement>(".kv-toggle");
 
 describe("profit-tint: offer background", () => {
   it("tints from the best gain among my cards", () => {
-    const snap = makeSnapshot([{ give: 1, wants: [2] }], { fair: { 1: 10, 2: 5 }, owned: { 2: 1 } });
+    const snap = makeSnapshot([{ give: 1, wants: [2] }], { fair: { 1: 10, 2: 5 }, free: [2] });
     startFeature(profitTint).emit(snap);
     expect(snap.offers[0]?.li.style.getPropertyValue("--kv-bg")).toBe("rgba(90, 190, 255, 0.45)");
   });
   it("transparent if the gain is unknown", () => {
-    const snap = makeSnapshot([{ give: 1, wants: [2] }], { owned: {} });
+    const snap = makeSnapshot([{ give: 1, wants: [2] }], { free: [] });
     startFeature(profitTint).emit(snap);
     expect(snap.offers[0]?.li.style.getPropertyValue("--kv-bg")).toBe("transparent");
   });
@@ -36,7 +36,7 @@ describe("profit-tint: pill", () => {
     emit(makeSnapshot([{ give: 1 }]));
     expect(button()?.hidden).toBe(false);
     document.body.replaceChildren(button() as Node);
-    emit({ offers: [], store: { fair: {}, market: {} }, owned: null });
+    emit({ offers: [], store: { fair: {}, market: {} } });
     expect(button()?.hidden).toBe(true);
   });
 

@@ -35,7 +35,9 @@ export interface OfferSpec {
   wants?: number[];
   /** Inline `box-shadow` of the offered card's image (the site's rarity color). */
   shadow?: string;
-  /** Texts of the buttons under the offer (e.g. "Donner Carte 2 ×1", "Proposer autre chose"). */
+  /** Wanted cards you can give: a "Donner Carte <id> ×1" button is added for each. */
+  free?: number[];
+  /** Other buttons under the offer (e.g. "Proposer autre chose"). */
   buttons?: string[];
 }
 
@@ -49,20 +51,23 @@ export function renderOffers(specs: OfferSpec[]): HTMLElement[] {
     li.innerHTML =
       `<div class="thumbs"><div class="give">${s.give ? card(s.give, s.shadow) : ""}</div>` +
       `<div class="arrow">⇄</div><div class="want">${(s.wants ?? []).map((id) => card(id)).join("")}</div></div>` +
-      `<div class="acts">${(s.buttons ?? []).map((b) => `<button>${b}</button>`).join("")}</div>`;
+      `<div class="acts">${[...(s.free ?? []).map((id) => `Donner Carte ${id} ×1`), ...(s.buttons ?? [])]
+        .map((b) => `<button>${b}</button>`)
+        .join("")}</div>`;
     document.body.append(li);
     return li;
   });
 }
 
-/** Ready-to-use offers snapshot: renders the offers in the page and sets fair-play prices and collection. */
+/** Ready-to-use offers snapshot: renders the offers in the page and sets fair-play prices.
+ * `free`: cards you can give, added as "Donner" buttons to every offer that wants them. */
 export function makeSnapshot(
   specs: OfferSpec[],
-  opts: { fair?: Record<number, number>; owned?: Record<number, number> | null } = {},
+  opts: { fair?: Record<number, number>; free?: number[] } = {},
 ): OffersSnapshot {
-  renderOffers(specs);
+  renderOffers(specs.map((s) => ({ ...s, free: (opts.free ?? []).filter((id) => s.wants?.includes(id)) })));
   const fair = Object.fromEntries(Object.entries(opts.fair ?? {}).map(([id, v]) => [id, { v, t: 0 }]));
-  return { offers: readOffers(), store: { fair, market: {} }, owned: opts.owned ?? null };
+  return { offers: readOffers(), store: { fair, market: {} } };
 }
 
 const startedPages: Array<ReturnType<typeof fakeCtx>> = [];

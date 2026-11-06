@@ -15,11 +15,16 @@ const store = (fair: Record<number, number>, market: PriceStore["market"] = {}):
   market,
 });
 const card = (id: number): Card => ({ el: document.createElement("a"), id });
-const offer = (give: number | null, wants: number[]): Offer => ({
-  li: document.createElement("li"),
-  give: give === null ? null : card(give),
-  wants: wants.map(card),
-});
+/** Offer; `free` = ids of the wanted cards you can give. */
+const offer = (give: number | null, wants: number[], free: number[] = []): Offer => {
+  const cards = wants.map(card);
+  return {
+    li: document.createElement("li"),
+    give: give === null ? null : card(give),
+    wants: cards,
+    free: cards.filter((c) => free.includes(c.id)),
+  };
+};
 
 describe("cardValue", () => {
   it("fair-play first (0 included)", () => {
@@ -38,7 +43,7 @@ describe("cardValue", () => {
 
 describe("analyzeOffer", () => {
   it("computes G, W and G - W", () => {
-    const a = analyzeOffer(offer(1, [2, 3]), store({ 1: 10, 2: 4, 3: 12 }), null);
+    const a = analyzeOffer(offer(1, [2, 3]), store({ 1: 10, 2: 4, 3: 12 }));
     expect(a.give).toBe(10);
     expect(a.wants.map((w) => [w.value, w.diff, w.ratio])).toEqual([
       [4, 6, 1.5],
@@ -46,29 +51,28 @@ describe("analyzeOffer", () => {
     ]);
   });
   it("diff null if G or W is unknown", () => {
-    expect(analyzeOffer(offer(1, [2]), store({ 2: 4 }), null).wants[0]).toMatchObject({
+    expect(analyzeOffer(offer(1, [2]), store({ 2: 4 })).wants[0]).toMatchObject({
       value: 4,
       diff: null,
       ratio: null,
     });
-    expect(analyzeOffer(offer(1, [2]), store({ 1: 4 }), null).wants[0]).toMatchObject({
+    expect(analyzeOffer(offer(1, [2]), store({ 1: 4 })).wants[0]).toMatchObject({
       value: null,
       diff: null,
     });
   });
   it("offer without an offered card", () => {
-    expect(analyzeOffer(offer(null, [2]), store({ 2: 4 }), null).give).toBeNull();
+    expect(analyzeOffer(offer(null, [2]), store({ 2: 4 })).give).toBeNull();
   });
-  it("best ratio: only cards I own, W floored at 1", () => {
+  it("best ratio: only cards I can give (owned and not locked), W floored at 1", () => {
     const s = store({ 1: 10, 2: 5, 3: 0 });
-    expect(analyzeOffer(offer(1, [2, 3]), s, { 2: 1 }).bestRatio).toBe(1); // (10-5)/5
-    expect(analyzeOffer(offer(1, [2, 3]), s, { 2: 1, 3: 1 }).bestRatio).toBe(10); // (10-0)/max(0,1)
+    expect(analyzeOffer(offer(1, [2, 3], [2]), s).bestRatio).toBe(1); // (10-5)/5
+    expect(analyzeOffer(offer(1, [2, 3], [2, 3]), s).bestRatio).toBe(10); // (10-0)/max(0,1)
   });
-  it("negative ratio kept, null without an owned card or with an unknown collection", () => {
+  it("negative ratio kept, null without a card I can give", () => {
     const s = store({ 1: 5, 2: 10 });
-    expect(analyzeOffer(offer(1, [2]), s, { 2: 1 }).bestRatio).toBe(-0.5);
-    expect(analyzeOffer(offer(1, [2]), s, {}).bestRatio).toBeNull();
-    expect(analyzeOffer(offer(1, [2]), s, null).bestRatio).toBeNull();
+    expect(analyzeOffer(offer(1, [2], [2]), s).bestRatio).toBe(-0.5);
+    expect(analyzeOffer(offer(1, [2]), s).bestRatio).toBeNull();
   });
 });
 

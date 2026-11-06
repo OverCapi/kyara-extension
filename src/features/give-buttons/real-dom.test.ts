@@ -19,7 +19,7 @@ describe("give-buttons on the real site's DOM", () => {
   it("labels and sorts the give buttons", () => {
     document.body.innerHTML = `<ul>${HTML}</ul>`;
     const fair = { 1: { v: 10, t: 0 }, 2: { v: 15, t: 0 }, 3: { v: 5, t: 0 } };
-    startFeature(giveButtons).emit({ offers: readOffers(), store: { fair, market: {} }, owned: null });
+    startFeature(giveButtons).emit({ offers: readOffers(), store: { fair, market: {} } });
     const [suzaku, sagittarius, other] = [...document.querySelectorAll<HTMLElement>(".acts button")];
     expect(suzaku?.dataset.kvGain).toBe("-5◆ -33 %");
     expect(sagittarius?.dataset.kvGain).toBe("+5◆ +100 %");

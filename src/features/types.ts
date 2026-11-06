@@ -10,7 +10,7 @@ export interface FeatureContext {
   page: PageContext;
   /** Filter panel of the Trades tab: `addCategory(title, element)` puts the feature's settings in it. */
   filters: FilterPanel;
-  /** Calls `cb` on every page update, with offers, prices and owned cards. */
+  /** Calls `cb` on every page update, with offers and prices. */
   onOffers(cb: (snapshot: OffersSnapshot) => void): void;
   /** `true` while fair-play prices of the current offers are being fetched (filters may still change). */
   pricesPending(): boolean;

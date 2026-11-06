@@ -23,8 +23,8 @@ export const gainFilter: Feature = {
     let filter: GainFilter = { mode: "off", pct: 0, sort: true };
     const render = () => {
       if (!snapshot) return;
-      const { offers, store, owned } = snapshot;
-      const ratios = offers.map((o) => (o.give ? analyzeOffer(o, store, owned).bestRatio : null));
+      const { offers, store } = snapshot;
+      const ratios = offers.map((o) => (o.give ? analyzeOffer(o, store).bestRatio : null));
       const rank = rankByGain(ratios);
       offers.forEach((offer, i) => {
         if (!offer.give) return;

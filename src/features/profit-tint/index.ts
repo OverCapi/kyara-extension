@@ -10,11 +10,11 @@ export const profitTint: Feature = {
   name: "profit-tint",
   setup(ctx) {
     const toggle = createToggle(ctx.page);
-    ctx.onOffers(({ offers, store, owned }) => {
+    ctx.onOffers(({ offers, store }) => {
       toggle.setVisible(offers.length > 0);
       for (const offer of offers) {
         if (!offer.give) continue;
-        const { bestRatio } = analyzeOffer(offer, store, owned);
+        const { bestRatio } = analyzeOffer(offer, store);
         offer.li.style.setProperty("--kv-bg", tintColor(bestRatio));
       }
     });

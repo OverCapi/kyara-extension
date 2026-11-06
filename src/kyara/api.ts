@@ -29,7 +29,7 @@ export function authHeaders(): Record<string, string> {
   return headers;
 }
 
-/** GET `/api<path>` (e.g. "/me/collection?lean=1"). */
+/** GET `/api<path>` (e.g. "/fair-play/prices?ids=1,2"). */
 export async function kyaraFetch(path: string): Promise<ApiResult> {
   try {
     const r = await pageFetch()(`/api${path}`, { headers: authHeaders() });

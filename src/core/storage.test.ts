@@ -8,7 +8,6 @@ import {
   onStorageChange,
   priceKey,
   readNoTint,
-  readOwned,
   readPrices,
   writeEntries,
   writeNoTint,
@@ -52,23 +51,6 @@ describe("readPrices", () => {
 
   it("accepts an empty list", async () => {
     expect(await readPrices([])).toEqual({ fair: {}, market: {} });
-  });
-});
-
-describe("readOwned", () => {
-  it("null if missing or corrupted", async () => {
-    expect(await readOwned()).toBeNull();
-    await browser.storage.local.set({ owned: "x" });
-    expect(await readOwned()).toBeNull();
-    await browser.storage.local.set({ owned: [1] });
-    expect(await readOwned()).toBeNull();
-  });
-
-  it("returns the cards, including an empty object", async () => {
-    await writeEntries({ owned: { 10: 2 } });
-    expect(await readOwned()).toEqual({ 10: 2 });
-    await writeEntries({ owned: {} });
-    expect(await readOwned()).toEqual({});
   });
 });
 

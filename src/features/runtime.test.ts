@@ -81,8 +81,7 @@ describe("startFeatures", () => {
 
   it("requests missing prices for acceptable offers", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-    renderOffers([{ give: 1, wants: [2] }]);
-    await fakeBrowser.storage.local.set({ owned: { 2: 1 } });
+    renderOffers([{ give: 1, wants: [2], free: [2] }]);
     const fetchMock = mockFetch({ 1: 10, 2: 4 });
     startFeatures(page(), []);
     await settle();
@@ -91,8 +90,7 @@ describe("startFeatures", () => {
 
   it("pricesPending: true during a render whose prices are missing, false once they are stored", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-    renderOffers([{ give: 11, wants: [12] }]);
-    await fakeBrowser.storage.local.set({ owned: { 12: 1 } });
+    renderOffers([{ give: 11, wants: [12], free: [12] }]);
     mockFetch({ 11: 10, 12: 4 });
     const states: boolean[] = [];
     const feature: Feature = {

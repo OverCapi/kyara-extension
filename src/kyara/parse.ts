@@ -1,15 +1,7 @@
 // Reads the kyara.games API's JSON responses. The ONLY place that knows these formats.
 // Used by the background (passive cache) AND by the content script (on-demand requests).
 // No function throws: invalid or unexpected data -> empty result / null.
-import {
-  type FairEntry,
-  fairKey,
-  OWNED_KEY,
-  type OwnedCards,
-  type PriceEntry,
-  priceKey,
-  type StorageEntries,
-} from "../core/storage";
+import { type FairEntry, fairKey, type PriceEntry, priceKey, type StorageEntries } from "../core/storage";
 
 const MAX_DEPTH = 50; // ponytail: guard against absurdly nested JSON; useless for the real API.
 
@@ -53,18 +45,6 @@ export function parseFair(json: unknown, now = Date.now()): StorageEntries {
   return out;
 }
 
-/** Collection `[{ characterId, qty }]` -> owned cards (qty > 0). `null` if it is not a collection. */
-export function parseCollection(json: unknown): OwnedCards | null {
-  if (!Array.isArray(json)) return null;
-  const owned: OwnedCards = {};
-  for (const c of json) {
-    if (isRecord(c) && typeof c.characterId === "number" && typeof c.qty === "number" && c.qty > 0) {
-      owned[c.characterId] = c.qty;
-    }
-  }
-  return owned;
-}
-
 /** Listings of a card: minimum price and number of listings. `null` if the response is unexpected. */
 export function parseMarketMin(json: unknown): { min: number | null; count: number } | null {
   if (!isRecord(json)) return null;
@@ -79,10 +59,6 @@ export function parseResponse(url: string, json: unknown, now = Date.now()): Sto
     path = new URL(url).pathname;
   } catch {
     return {}; // invalid URL: nothing to store
-  }
-  if (path === "/api/me/collection") {
-    const owned = parseCollection(json);
-    return owned ? { [OWNED_KEY]: owned } : {};
   }
   if (path === "/api/fair-play/prices") return parseFair(json, now);
   return parsePrices(json, now);

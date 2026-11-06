@@ -18,11 +18,11 @@ export function gainLabel(want: WantAnalysis | undefined): string {
 export const giveButtons: Feature = {
   name: "give-buttons",
   setup(ctx) {
-    ctx.onOffers(({ offers, store, owned }) => {
+    ctx.onOffers(({ offers, store }) => {
       for (const offer of offers) {
         const buttons = readGiveButtons(offer);
         if (!buttons.length) continue;
-        const { wants } = analyzeOffer(offer, store, owned);
+        const { wants } = analyzeOffer(offer, store);
         const analyses = buttons.map((b) => wants.find((w) => w.card === b.card));
         const rank = rankByGain(analyses.map((w) => w?.ratio ?? null));
         buttons.forEach(({ el }, i) => {

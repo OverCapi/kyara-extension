@@ -17,6 +17,8 @@ export interface Offer {
   li: HTMLElement;
   give: Card | null;
   wants: Card[];
+  /** Wanted cards you can give right now: owned AND not locked (the site shows a "Donner" button only for them). */
+  free: Card[];
 }
 
 /** Card id of a `/wiki/<id>` link, or `null` if the link does not have this format. */
@@ -33,8 +35,10 @@ function toCard(a: Element | null): Card | null {
 /** Reads an offer. Links without a valid id are ignored. */
 export function readOffer(li: HTMLElement): Offer {
   const give = toCard(li.querySelector(`.give ${CARD_SELECTOR}`));
-  const wants = [...li.querySelectorAll(`.want ${CARD_SELECTOR}`)].map(toCard);
-  return { li, give, wants: wants.filter((c): c is Card => c !== null) };
+  const wants = [...li.querySelectorAll(`.want ${CARD_SELECTOR}`)]
+    .map(toCard)
+    .filter((c): c is Card => c !== null);
+  return { li, give, wants, free: readGiveButtons({ li, wants }).map((b) => b.card) };
 }
 
 /** Filter bar of the Trades tab (search + pills), a wrapping flex row. `null` if missing. */
@@ -94,7 +98,7 @@ export interface GiveButton {
  * Other buttons ("Proposer autre chose") are ignored.
  */
 // ponytail: matched by name, since the buttons carry no card id; switch to an id if the site adds one.
-export function readGiveButtons(offer: Offer): GiveButton[] {
+export function readGiveButtons(offer: Pick<Offer, "li" | "wants">): GiveButton[] {
   const named = offer.wants
     .map((card) => ({ card, name: normalize(cardName(card)) }))
     .filter((n) => n.name)

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { browser } from "wxt/browser";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 import type { ResponseFilter } from "../core/firefox";
-import { readOwned, readPrices } from "../core/storage";
+import { readPrices } from "../core/storage";
 import { interceptResponse, startPassiveCache, storeBody, WATCHED_URLS } from "./passive-cache";
 
 beforeEach(() => fakeBrowser.reset());
@@ -33,18 +33,18 @@ describe("storeBody", () => {
   it("invalid JSON or response without prices: nothing, no exception", async () => {
     await expect(storeBody(`${K}/api/market/listings`, "<html>")).resolves.toBeUndefined();
     await expect(storeBody(`${K}/api/market/listings`, "{}")).resolves.toBeUndefined();
-    expect(await readOwned()).toBeNull();
+    expect(await browser.storage.local.get(null)).toEqual({});
   });
 });
 
 describe("interceptResponse", () => {
-  it("copies each chunk as is to the page, then stores the collection", async () => {
+  it("copies each chunk as is to the page, then stores the prices", async () => {
     const filter = fakeFilter();
-    interceptResponse(`${K}/api/me/collection?lean=1`, "7");
-    stream(filter, ['[{"characterId":10,', '"qty":2}]']);
+    interceptResponse(`${K}/api/fair-play/prices?ids=10`, "7");
+    stream(filter, ['{"10":', "12}"]);
     expect(filter.write).toHaveBeenCalledTimes(2);
     expect(filter.close).toHaveBeenCalled();
-    await vi.waitFor(async () => expect(await readOwned()).toEqual({ 10: 2 }));
+    await vi.waitFor(async () => expect((await readPrices([10])).fair[10]?.v).toBe(12));
   });
 
   it("unreadable response: the page still receives everything, nothing is stored", async () => {
@@ -52,17 +52,17 @@ describe("interceptResponse", () => {
     interceptResponse(`${K}/api/market/listings`, "7");
     stream(filter, ["not json"]);
     expect(filter.write).toHaveBeenCalledTimes(1);
-    expect(await readOwned()).toBeNull();
+    expect(await browser.storage.local.get(null)).toEqual({});
   });
 
   it("without the Firefox API: does nothing", () => {
     Reflect.deleteProperty(browser.webRequest, "filterResponseData");
-    expect(() => interceptResponse(`${K}/api/me/collection`, "1")).not.toThrow();
+    expect(() => interceptResponse(`${K}/api/fair-play/prices`, "1")).not.toThrow();
   });
 
   it("filter error: handled without exception", () => {
     const filter = fakeFilter();
-    interceptResponse(`${K}/api/me/collection`, "1");
+    interceptResponse(`${K}/api/fair-play/prices`, "1");
     expect(() => filter.onerror?.()).not.toThrow();
   });
 });
@@ -83,9 +83,9 @@ describe("startPassiveCache", () => {
   it("only intercepts GET", () => {
     const filterFn = fakeFilter();
     const handler = listener().mock.calls[0]?.[0];
-    handler({ method: "POST", url: `${K}/api/me/collection`, requestId: "1" });
+    handler({ method: "POST", url: `${K}/api/fair-play/prices`, requestId: "1" });
     expect(firefoxApi().filterResponseData).not.toHaveBeenCalled();
-    handler({ method: "GET", url: `${K}/api/me/collection`, requestId: "1" });
+    handler({ method: "GET", url: `${K}/api/fair-play/prices`, requestId: "1" });
     expect(firefoxApi().filterResponseData).toHaveBeenCalledWith("1");
     expect(filterFn.ondata).toBeTypeOf("function");
   });
@@ -97,6 +97,6 @@ describe("startPassiveCache", () => {
       }),
     });
     const handler = listener().mock.calls[0]?.[0];
-    expect(handler({ method: "GET", url: `${K}/api/me/collection`, requestId: "1" })).toBeUndefined();
+    expect(handler({ method: "GET", url: `${K}/api/fair-play/prices`, requestId: "1" })).toBeUndefined();
   });
 });

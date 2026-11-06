@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseCollection, parseFair, parseMarketMin, parsePrices, parseResponse } from "./parse";
+import { parseFair, parseMarketMin, parsePrices, parseResponse } from "./parse";
 
 const K = "https://kyara.games";
 const NOW = 1000;
@@ -59,24 +59,6 @@ describe("parseFair", () => {
   });
 });
 
-describe("parseCollection", () => {
-  it("keeps only quantities > 0", () => {
-    expect(
-      parseCollection([
-        { characterId: 10, qty: 2 },
-        { characterId: 11, qty: 0 },
-        { characterId: "12", qty: 1 },
-        null,
-      ]),
-    ).toEqual({ 10: 2 });
-  });
-  it("empty collection = empty object; other shape = null", () => {
-    expect(parseCollection([])).toEqual({});
-    expect(parseCollection({ error: "unauthorized" })).toBeNull();
-    expect(parseCollection(null)).toBeNull();
-  });
-});
-
 describe("parseMarketMin", () => {
   it("reads min price and number of listings", () => {
     expect(parseMarketMin({ items: [{ price: 7 }], total: 3 })).toEqual({ min: 7, count: 3 });
@@ -94,15 +76,12 @@ describe("parseMarketMin", () => {
 describe("parseResponse", () => {
   it("routes to the right format from the URL", () => {
     expect(Object.keys(parseResponse(`${K}/api/fair-play/prices?ids=1,2`, { 1: 12 }, NOW))).toEqual(["f:1"]);
-    expect(parseResponse(`${K}/api/me/collection?lean=1`, [{ characterId: 10, qty: 2 }])).toEqual({
-      owned: { 10: 2 },
-    });
     expect(
       Object.keys(parseResponse(`${K}/api/market/listings?page=1`, { characterId: 1, median7d: 1 }, NOW)),
     ).toEqual(["p:1"]);
   });
   it("API error (logged out): nothing", () => {
-    expect(parseResponse(`${K}/api/me/collection?lean=1`, { error: "unauthorized" })).toEqual({});
+    expect(parseResponse(`${K}/api/fair-play/prices?ids=1`, { error: "unauthorized" })).toEqual({});
   });
   it("invalid URL: nothing", () => {
     expect(parseResponse("not a url", {})).toEqual({});

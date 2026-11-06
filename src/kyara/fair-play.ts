@@ -1,6 +1,6 @@
 // Asks the API for missing fair-play prices, with as few requests as possible:
-//  - only for acceptable offers (you own at least one wanted card),
-//  - only for the offered card + your wanted cards,
+//  - only for acceptable offers (at least one wanted card you can give: owned and not locked),
+//  - only for the offered card + the wanted cards you can give,
 //  - not for offers hidden by a filter that does not depend on prices (rarity),
 //  - offers hidden by the gain filter: only never-priced cards (no hourly refresh of hidden offers),
 //  - in batches of 200 ids (like the site), one request at a time,
@@ -8,7 +8,6 @@
 //  - after a failed response (401, 429, 500…), no request at all for 5 min,
 //  - nothing while the tab is hidden.
 import { createLogger } from "../core/log";
-import type { OwnedCards } from "../core/storage";
 import { isFresh, type PriceStore, writeEntries } from "../core/storage";
 import { kyaraFetch } from "./api";
 import type { Offer } from "./dom";
@@ -34,16 +33,13 @@ function pricingNeed(li: Element): "stale" | "unknown" | "none" {
 /** Ids whose price must be (re)requested, and number of acceptable offers. Pure function. */
 export function findMissing(
   offers: Offer[],
-  owned: OwnedCards | null,
   store: PriceStore,
   tried: Map<number, number>,
   now = Date.now(),
 ): { need: Set<number>; acceptable: number } {
   const need = new Set<number>();
   let acceptable = 0;
-  if (!owned) return { need, acceptable };
-  for (const { li, give, wants } of offers) {
-    const mine = wants.filter((c) => (owned[c.id] ?? 0) > 0);
+  for (const { li, give, free: mine } of offers) {
     const level = pricingNeed(li);
     if (!give || !mine.length || level === "none") continue;
     acceptable++;
@@ -84,11 +80,11 @@ export function createFairPlayRequester(): FairPlayRequester {
   const canRequest = () => Date.now() >= pausedUntil && document.visibilityState === "visible";
 
   return {
-    pending({ offers, owned, store }) {
-      return inflight || (canRequest() && findMissing(offers, owned, store, tried).need.size > 0);
+    pending({ offers, store }) {
+      return inflight || (canRequest() && findMissing(offers, store, tried).need.size > 0);
     },
-    request({ offers, owned, store }, onDone) {
-      const { need, acceptable } = findMissing(offers, owned, store, tried);
+    request({ offers, store }, onDone) {
+      const { need, acceptable } = findMissing(offers, store, tried);
       log.debug(`${offers.length} offers, ${acceptable} acceptable, ${need.size} prices to request`);
       if (!need.size) return;
       if (Date.now() < pausedUntil) return log.debug("request postponed: last response failed");

@@ -58,10 +58,10 @@ describe("trade-badges", () => {
     startFeature(tradeBadges).emit(snap);
     expect(snap.offers[0]?.wants[0]?.el.dataset.kv).toBeUndefined();
   });
-  it("percentage on wanted cards and best owned gain on the arrow", () => {
+  it("percentage on wanted cards and best gain you can give on the arrow", () => {
     const snap = makeSnapshot([{ give: 1, wants: [2, 3] }], {
       fair: { 1: 10, 2: 4, 3: 20 },
-      owned: { 3: 1 },
+      free: [3],
     });
     const { emit } = startFeature(tradeBadges);
     emit(snap);
@@ -69,9 +69,9 @@ describe("trade-badges", () => {
     const arrow = snap.offers[0]?.li.querySelector<HTMLElement>(".arrow");
     expect(w1?.dataset.kvPct).toBe("+150 %");
     expect(w2?.dataset.kvPct).toBe("-50 %");
-    expect(arrow?.dataset.kvMax).toBe("-50 %"); // only card 3 is owned
+    expect(arrow?.dataset.kvMax).toBe("-50 %"); // only card 3 can be given
     expect(arrow?.dataset.kvSign).toBe("-1");
-    emit({ ...snap, owned: {} });
+    emit({ ...snap, offers: snap.offers.map((o) => ({ ...o, free: [] })) });
     expect(arrow?.dataset.kvMax).toBeUndefined();
     expect(arrow?.dataset.kvSign).toBeUndefined();
   });

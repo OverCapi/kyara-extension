@@ -20,7 +20,7 @@ Ce fichier sert de référence pour toute modification du projet. Claude Code le
 L'extension lit les réponses de l'API Kyara avec `webRequest.filterResponseData` (mode `blocking`), et fait ses requêtes avec `content.fetch`. **Ces deux API n'existent que sur Firefox**, en Manifest V2.
 
 - Firefox : `pnpm build`, en MV2. Tout fonctionne.
-- Chrome : `pnpm build:chrome`, en MV3. Le cache passif est coupé (`import.meta.env.FIREFOX` dans `background.ts`), et `pageFetch` retombe sur le `fetch` normal. Les prix viennent seulement des requêtes fair-play et de la collection : plus de `?` que sur Firefox.
+- Chrome : `pnpm build:chrome`, en MV3. Le cache passif est coupé (`import.meta.env.FIREFOX` dans `background.ts`), et `pageFetch` retombe sur le `fetch` normal. Les prix viennent seulement des requêtes fair-play : plus de `?` que sur Firefox.
 - Pour un cache passif sur Chrome : un script injecté dans la page (`world: "MAIN"`) qui intercepte `fetch` et transmet les réponses au content script. WXT gère ce cas, mais c'est un vrai chantier : ne pas le faire sans besoin.
 
 ### Alternatives écartées
@@ -63,13 +63,12 @@ kyara-extension/
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)
     │   ├── api.ts           # Appels à /api avec le jeton et le device id du site
-    │   ├── parse.ts         # Lecture des réponses JSON (prix, fair-play, collection, annonces)
-    │   ├── dom.ts           # Sélecteurs CSS du site et lecture des cartes d'une offre
+    │   ├── parse.ts         # Lecture des réponses JSON (prix, fair-play, annonces)
+    │   ├── dom.ts           # Sélecteurs CSS du site, lecture des cartes d'une offre et des cartes données possibles (boutons « Donner »)
     │   ├── prices.ts        # Valeur d'une carte et analyse de rentabilité d'une offre
-    │   ├── collection.ts    # Cartes possédées (stockage, sinon une requête de rattrapage)
     │   ├── rarity.ts        # Raretés : retrouvées d'après la couleur du box-shadow des cartes
     │   ├── filter-panel/    # Bouton "filtre" + fenêtre à 2 sections (Kyara / extension), catégories
-    │   ├── offers.ts        # Instantané partagé : offres + prix + cartes possédées
+    │   ├── offers.ts        # Instantané partagé : offres + prix
     │   ├── fair-play.ts     # Demande les prix fair-play manquants (lots, TTL, réessais)
     │   └── passive-cache.ts # Lit les réponses de l'API que le site charge déjà (background)
     │
@@ -154,7 +153,7 @@ Aucune autre modification ne doit être nécessaire. Si une feature oblige à mo
 
 - **Jamais de code copié-collé.** Si un bout de code sert deux fois, il devient une fonction dans le bon dossier (`kyara/` ou `core/`).
 - Points de partage déjà en place, à réutiliser plutôt que recréer :
-  - lecture des réponses API (prix, fair-play, collection, annonces) : `kyara/parse.ts`, utilisé par le background et le content script ;
+  - lecture des réponses API (prix, fair-play, annonces) : `kyara/parse.ts`, utilisé par le background et le content script ;
   - surveillance de la page : un seul `MutationObserver`, dans `core/page.ts` ;
   - clés de stockage : `core/storage.ts` uniquement ;
   - calcul de valeur et de gain d'une offre : `kyara/prices.ts`, utilisé par plusieurs features.

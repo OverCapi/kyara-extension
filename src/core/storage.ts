@@ -1,7 +1,6 @@
 // Typed access to browser.storage.local. The ONLY place that knows the storage keys:
 //   "p:<id>"  market medians    (PriceEntry)
 //   "f:<id>"  fair-play price   (FairEntry)
-//   "owned"   owned cards       (OwnedCards)
 //   "noTint"  "profit colors off" preference (boolean)
 //   "minGain" "minimum gain" filter (GainFilter; old format: number of %, > 0 = on)
 //   "rarities" shown rarities (list of strings; empty = all)
@@ -22,17 +21,14 @@ export interface FairEntry {
   v: number;
   t: number;
 }
-/** Owned cards: card id -> quantity (> 0). */
-export type OwnedCards = Record<number, number>;
 /** What parsing produces and storage accepts, already indexed by key. */
-export type StorageEntries = Record<string, PriceEntry | FairEntry | OwnedCards>;
+export type StorageEntries = Record<string, PriceEntry | FairEntry>;
 /** Known prices for a batch of cards, read in a single storage request. */
 export interface PriceStore {
   fair: Record<number, FairEntry | undefined>;
   market: Record<number, PriceEntry | undefined>;
 }
 
-export const OWNED_KEY = "owned";
 const NO_TINT_KEY = "noTint";
 const MIN_GAIN_KEY = "minGain";
 const RARITIES_KEY = "rarities";
@@ -67,12 +63,6 @@ export async function readPrices(ids: number[]): Promise<PriceStore> {
 /** Writes entries already indexed by key (result of parseResponse). */
 export async function writeEntries(entries: StorageEntries): Promise<void> {
   await browser.storage.local.set(entries);
-}
-
-/** Stored owned cards, or `null` if unknown. */
-export async function readOwned(): Promise<OwnedCards | null> {
-  const { [OWNED_KEY]: owned } = await browser.storage.local.get(OWNED_KEY);
-  return isObject(owned) && !Array.isArray(owned) ? (owned as OwnedCards) : null;
 }
 
 /** "Profit colors off" preference. False by default. */

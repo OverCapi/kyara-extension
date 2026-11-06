@@ -18,7 +18,7 @@ export function wantBadge({ value, diff }: WantAnalysis): { text: string; sign: 
   return { text: signed(diff), sign: String(Math.sign(diff)) };
 }
 
-/** Text of the best-gain badge under the arrow. Empty if no owned card has a known gain. */
+/** Text of the best-gain badge under the arrow. Empty if no card you can give has a known gain. */
 export function maxBadge(bestRatio: number | null): string {
   return bestRatio === null ? "" : pctText(bestRatio);
 }
@@ -45,10 +45,10 @@ function setData(el: HTMLElement, key: string, value: string | undefined): void 
 export const tradeBadges: Feature = {
   name: "trade-badges",
   setup(ctx) {
-    ctx.onOffers(({ offers, store, owned }) => {
+    ctx.onOffers(({ offers, store }) => {
       for (const offer of offers) {
         if (!offer.give) continue;
-        const analysis = analyzeOffer(offer, store, owned);
+        const analysis = analyzeOffer(offer, store);
         setBadge(offer.give.el, giveBadge(analysis.give));
         for (const want of analysis.wants) {
           const { text, sign } = wantBadge(want);

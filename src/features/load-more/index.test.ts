@@ -22,9 +22,9 @@ function snap(total: number, hidden: number): OffersSnapshot {
   const offers: Offer[] = Array.from({ length: total }, (_, i) => {
     const li = document.createElement("li");
     if (i < hidden) li.setAttribute("data-kv-hide-gain", "");
-    return { li, give: null, wants: [] };
+    return { li, give: null, wants: [], free: [] };
   });
-  return { offers, store: { fair: {}, market: {} }, owned: null };
+  return { offers, store: { fair: {}, market: {} } };
 }
 const filtering = () => document.documentElement.setAttribute("data-kv-filter-gain", "");
 

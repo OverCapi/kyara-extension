@@ -5,7 +5,7 @@ import { countVisible, isFiltering, isHiddenByFilter } from "./count";
 const offer = (...attrs: string[]): Offer => {
   const li = document.createElement("li");
   for (const a of attrs) li.setAttribute(a, "");
-  return { li, give: null, wants: [] };
+  return { li, give: null, wants: [], free: [] };
 };
 
 describe("isHiddenByFilter / countVisible", () => {
