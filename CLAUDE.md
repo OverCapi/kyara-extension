@@ -135,7 +135,7 @@ export interface Feature {
 }
 ```
 
-`FeatureContext` fournit les services partagés : `onOffers(cb)` (appelé à chaque mise à jour de la page avec offres, prix et cartes possédées), `page` (le contexte WXT : `page.onInvalidated` pour tout nettoyer quand l'extension est rechargée) et `filters` (le panneau de filtres : `filters.addCategory(titre, élément)` range les réglages de la feature dans la section « Filtres de l'extension », sous une catégorie).
+`FeatureContext` fournit les services partagés : `onOffers(cb)` (appelé à chaque mise à jour de la page avec offres et prix), `pricesPending()` (des prix fair-play sont en cours de chargement), `page` (le contexte WXT : `page.onInvalidated` pour tout nettoyer quand l'extension est rechargée) et `filters` (le panneau de filtres : `filters.addCategory(titre, élément)` range les réglages de la feature dans la section « Filtres de l'extension », sous une catégorie).
 
 **Filtres** : une feature qui masque des offres pose son propre attribut (`data-kv-hide-<nom>`) et son propre CSS. Ainsi deux filtres se combinent (une offre est cachée dès qu'un filtre la cache) sans jamais défaire le travail l'un de l'autre.
 
