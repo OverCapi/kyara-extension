@@ -33,5 +33,5 @@
   "rarity.legendary": "Legendary",
   "rarity.mythic": "Mythic",
   "rarity.hint": "Offered card's rarity. No selection = all rarities.",
-  "load.more": "Loading more offers…"
+  "load.loading": "Loading…"
 }
