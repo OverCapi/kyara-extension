@@ -2,8 +2,13 @@
 
 Firefox extension for [kyara.games](https://kyara.games): in the **Marché → Échanges** (Market → Trades) tab, it shows card values and the profitability of each offer, and lets you filter and sort offers.
 
-- Badge on each card: `≈ G◆` on the offered card, `G − W` on the wanted cards.
-- Offer background tinted from blue (gain) to red (loss), based on the best relative gain among your cards. "Profitability on/off" pill at the bottom left.
+![Trades tab with the extension: gain badges, best gain under the arrow, sorted "Donner" buttons](docs/screenshot.webp)
+
+- Badge on each card: `≈ G◆` on the offered card, `G − W` on the wanted cards (plus the gain in % on hover).
+- Under the ⇄ arrow: the best gain in % you can get from the offer.
+- "Donner" (give) buttons: compact, labelled with the gain (`+9◆ +5 %`, green or red) and sorted from most to least profitable.
+- Only cards you can actually give count (owned and not locked: the ones with a "Donner" button).
+- Offer background tinted from blue (gain) to red (loss), based on the best relative gain among those cards. "Profitability on/off" pill at the bottom left.
 - Ring around cards in their rarity's official color.
 - Hovering a card: current minimum price on the market.
 - **Filter panel**: a funnel icon button, right of the search field, opens a popover with two sections.
@@ -12,11 +17,11 @@ Firefox extension for [kyara.games](https://kyara.games): in the **Marché → �
     - **Profitability**: Off / Neutral and up / Positive, plus a minimum gain slider (1 % steps);
     - **Rarity**: one or more rarities of the offered card (none checked = all);
     - **Sort**: offers ranked from most to least profitable.
-- Filtered or sorted offers never show before being processed (no flicker). When a filter leaves fewer than 10 visible offers, "Voir plus d'offres" (load more) is clicked automatically (at most 25 times in a row), and the button shows a loading text meanwhile.
+- Filtered or sorted offers never show before being processed (no flicker). When a filter is on, "Voir plus d'offres" (load more) keeps loading until 10 offers are visible at page load, and 10 new visible offers after each click (at most 25 loads in a row, waiting for prices between loads). The button shows a loading text meanwhile, and "No other offer matches the filters" shows when a load brings nothing.
 - Unknown values show nothing (never a `?`).
 - Texts in French and English, depending on the browser language.
 
-This is not a bot: the extension never acts on your behalf. It reads the responses the site already loads, and only makes a few grouped requests (`/api/fair-play/prices`, max 200 ids) limited to offers you can accept, plus one request per hovered card.
+This is not a bot: the extension never acts on your behalf. It reads the responses the site already loads, and only makes a few grouped requests (`/api/fair-play/prices`, max 200 ids) limited to visible offers you can accept (paused 5 min after a failed response), plus one request per hovered card.
 
 Stack: [WXT](https://wxt.dev) + TypeScript. Project rules: [CLAUDE.md](CLAUDE.md).
 

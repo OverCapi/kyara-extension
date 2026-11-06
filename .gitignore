@@ -6,3 +6,4 @@ coverage
 .DS_Store
 .firefox-profile
 .env
+.vitest
