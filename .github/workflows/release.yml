@@ -47,7 +47,13 @@ jobs:
       - name: Créer la release
         env:
           GH_TOKEN: ${{ github.token }}
+        # updates.json : lu par Firefox via gecko.update_url (wxt.config.ts) pour les mises à jour auto.
         run: |
+          tag="${{ steps.version.outputs.tag }}"
           cp .output/signed/*.xpi firefox.xpi
-          gh release create "${{ steps.version.outputs.tag }}" firefox.xpi \
+          jq -n --arg v "${tag#v}" \
+            --arg link "https://github.com/$GITHUB_REPOSITORY/releases/download/$tag/firefox.xpi" \
+            '{addons: {"kyara-extension@local": {updates: [{version: $v, update_link: $link}]}}}' \
+            > updates.json
+          gh release create "$tag" firefox.xpi updates.json \
             --target "$GITHUB_SHA" --generate-notes
