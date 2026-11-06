@@ -8,6 +8,7 @@
     "build": "wxt build -b firefox --mv2",
     "build:debug": "wxt build -b firefox --mv2 --mode development",
     "zip": "wxt zip -b firefox --mv2",
+    "sign": "pnpm build && web-ext sign --channel=unlisted --source-dir .output/firefox-mv2 --artifacts-dir .output/signed --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET",
     "dev:chrome": "wxt -b chrome",
     "build:chrome": "wxt build -b chrome",
     "test": "vitest run",
@@ -21,6 +22,7 @@
     "happy-dom": "^21.0.4",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0",
+    "web-ext": "^10.8.0",
     "wxt": "^0.21.5"
   }
 }
