@@ -3,7 +3,7 @@
 li[id^="offre-"] :has(> [data-kv-give]) {
   display: flex !important;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch !important; /* same height as "Proposer autre chose" */
   gap: 6px !important;
 }
 /* Other children ("Proposer autre chose", texts) after the give buttons. */
@@ -14,15 +14,12 @@ li[id^="offre-"] [data-kv-give] {
   display: inline-flex !important;
   align-items: center;
   gap: 8px;
-  min-height: 0 !important;
-  height: auto !important;
-  padding: 5px 10px !important;
+  padding-inline: 12px !important;
   border: 1px solid var(--acc, #ff4d2e) !important;
   border-radius: 8px !important;
   background: #24222b !important;
   color: var(--fg, #edeae4) !important;
   font-size: 13px !important;
-  line-height: 1.3 !important;
   white-space: nowrap;
 }
 li[id^="offre-"] [data-kv-give]:hover {

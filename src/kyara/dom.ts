@@ -48,6 +48,11 @@ export function findLoadMore(root: ParentNode = document): HTMLButtonElement | n
   return root.querySelector<HTMLButtonElement>(".board > button.more");
 }
 
+/** Board holding the offer list and the load more button. `null` if missing. */
+export function findOfferBoard(root: ParentNode = document): HTMLElement | null {
+  return root.querySelector<HTMLElement>(".board");
+}
+
 /** Every offer shown in the page. */
 export function readOffers(root: ParentNode = document): Offer[] {
   return [...root.querySelectorAll<HTMLElement>(OFFER_SELECTOR)].map(readOffer);

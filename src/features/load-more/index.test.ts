@@ -95,6 +95,65 @@ describe("load-more", () => {
     expect(clicked).not.toHaveBeenCalled();
   });
 
+  describe("user click: MIN_VISIBLE new visible offers", () => {
+    const board = () => document.querySelector(".board");
+
+    it("keeps loading until MIN_VISIBLE more offers are visible", () => {
+      filtering();
+      const { emit } = startFeature(loadMore);
+      emit(snap(20, 8)); // 12 visible: enough at load
+      expect(clicked).not.toHaveBeenCalled();
+      more?.click(); // user click
+      emit(snap(40, 8 + 15)); // 17 visible: 5 new, not enough
+      expect(clicked).toHaveBeenCalledTimes(2);
+      emit(snap(60, 8 + 15 + 15)); // 22 visible: 10 new
+      expect(clicked).toHaveBeenCalledTimes(2);
+      expect(board()?.hasAttribute("data-kv-empty")).toBe(false);
+    });
+
+    it("nothing new left to load: notice under the list, removed on the next click", () => {
+      filtering();
+      const { emit } = startFeature(loadMore);
+      emit(snap(20, 8));
+      more?.click();
+      more?.remove(); // everything loaded
+      emit(snap(40, 28)); // still 12 visible
+      expect(board()?.getAttribute("data-kv-empty")).toBe("Aucune autre offre ne correspond aux filtres.");
+      board()?.append(more as HTMLButtonElement);
+      more?.click();
+      expect(board()?.hasAttribute("data-kv-empty")).toBe(false);
+    });
+
+    it("cap reached without any visible offer: notice; filter off: notice removed", () => {
+      filtering();
+      const { emit } = startFeature(loadMore);
+      for (let i = 1; i <= MAX_AUTO_LOADS + 1; i++) emit(snap(20 * i, 20 * i));
+      expect(board()?.hasAttribute("data-kv-empty")).toBe(true);
+      document.documentElement.removeAttribute("data-kv-filter-gain");
+      emit(snap(20, 20));
+      expect(board()?.hasAttribute("data-kv-empty")).toBe(false);
+    });
+
+    it("round over with new visible offers: no notice, and notice removed when offers show up", () => {
+      filtering();
+      const { emit } = startFeature(loadMore);
+      more?.remove();
+      emit(snap(20, 20)); // nothing visible, nothing to load
+      expect(board()?.hasAttribute("data-kv-empty")).toBe(true);
+      emit(snap(20, 17)); // filter loosened: 3 visible
+      expect(board()?.hasAttribute("data-kv-empty")).toBe(false);
+    });
+
+    it("notice removed when the extension reloads", () => {
+      filtering();
+      more?.remove();
+      const { emit, page } = startFeature(loadMore);
+      emit(snap(20, 20));
+      page.invalidate();
+      expect(board()?.hasAttribute("data-kv-empty")).toBe(false);
+    });
+  });
+
   describe("loading text on the button", () => {
     const label = () => more?.textContent;
 

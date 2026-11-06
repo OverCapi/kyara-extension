@@ -35,5 +35,6 @@
   "rarity.legendary": "Légendaire",
   "rarity.mythic": "Mythique",
   "rarity.hint": "Rareté de la carte proposée. Aucune sélection = toutes les raretés.",
-  "load.loading": "Chargement…"
+  "load.loading": "Chargement…",
+  "load.none": "Aucune autre offre ne correspond aux filtres."
 }

@@ -4,6 +4,7 @@ import {
   cardId,
   findLoadMore,
   findOfferArrow,
+  findOfferBoard,
   findOfferFilters,
   offerCards,
   offerIds,
@@ -130,5 +131,14 @@ describe("readGiveButtons", () => {
     if (!li) throw new Error("no offer");
     li.querySelector(".want a")?.removeAttribute("title");
     expect(readGiveButtons(readOffer(li))).toEqual([]);
+  });
+});
+
+describe("findOfferBoard", () => {
+  it("finds the board, null if missing", () => {
+    document.body.innerHTML = '<section class="board"></section>';
+    expect(findOfferBoard()?.tagName).toBe("SECTION");
+    document.body.innerHTML = "";
+    expect(findOfferBoard()).toBeNull();
   });
 });
