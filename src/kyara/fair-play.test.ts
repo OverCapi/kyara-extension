@@ -51,6 +51,25 @@ describe("findMissing", () => {
   });
 });
 
+describe("findMissing: filtered offers", () => {
+  it("hidden by a price-independent filter (rarity): nothing requested", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2] }]);
+    li?.setAttribute("data-kv-hide-rarity", "");
+    li?.setAttribute("data-kv-hide-gain", "");
+    const { need, acceptable } = findMissing(readOffers(), { 2: 1 }, emptyStore(), new Map(), NOW);
+    expect(need.size).toBe(0);
+    expect(acceptable).toBe(0);
+  });
+
+  it("hidden by the gain filter: never-priced cards only, stale prices not refreshed", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2] }]);
+    li?.setAttribute("data-kv-hide-gain", "");
+    const stale = NOW - TTL - 1000;
+    const store: PriceStore = { fair: { 1: { v: 1, t: stale } }, market: {} };
+    expect([...findMissing(readOffers(), { 2: 1 }, store, new Map(), NOW).need]).toEqual([2]);
+  });
+});
+
 function snapshot(specs: Parameters<typeof renderOffers>[0], owned: Record<number, number>): OffersSnapshot {
   renderOffers(specs);
   return { offers: readOffers(), store: emptyStore(), owned };
@@ -107,6 +126,32 @@ describe("createFairPlayRequester", () => {
     requester.request(snap, onDone);
     await flush();
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("failed response: remaining batches skipped, no request at all for RETRY", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const ids = Array.from({ length: BATCH + 5 }, (_, i) => i + 1);
+    const fetchMock = mockFetch({}, 429);
+    const onDone = vi.fn();
+    const requester = createFairPlayRequester();
+    requester.request(
+      snapshot(
+        ids.map((id) => ({ give: id, wants: [1000] })),
+        { 1000: 1 },
+      ),
+      onDone,
+    );
+    await vi.waitFor(() => expect(onDone).toHaveBeenCalled());
+    expect(fetchMock).toHaveBeenCalledTimes(1); // second batch not sent
+    document.body.innerHTML = "";
+    const other = snapshot([{ give: 5000, wants: [5001] }], { 5001: 1 });
+    requester.request(other, onDone);
+    await flush();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    vi.setSystemTime(Date.now() + RETRY + 1);
+    requester.request(other, onDone);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    vi.useRealTimers();
   });
 
   it("storage error: caught, onDone called", async () => {
