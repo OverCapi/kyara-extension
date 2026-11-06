@@ -1,20 +1,20 @@
-// « Voir plus d'offres » automatique : quand un filtre est actif et que trop peu d'offres restent visibles,
-// clique le bouton du site (un clic par mise à jour de la page) jusqu'à en avoir assez, ou jusqu'à ce qu'il
-// n'y ait plus rien à charger. Le bouton affiche « Chargement… » pendant chaque chargement (label.ts).
-// À enregistrer APRÈS les features de filtre : il compte ce qu'elles ont masqué.
-// Effet DOM : clics sur le bouton du site + texte du bouton changé le temps du chargement. Aucune requête propre : le site charge.
-// ponytail: minimum et plafond fixes ; les exposer dans le panneau si l'envie vient de les régler.
+// Automatic "Voir plus d'offres" (load more): when a filter is on and too few offers stay visible,
+// clicks the site's button (one click per page update) until there are enough, or until there is
+// nothing left to load. The button shows a loading text during each load (label.ts).
+// Register AFTER the filter features: it counts what they hid.
+// DOM effect: clicks on the site's button + button text changed while loading. No request of its own: the site loads.
+// ponytail: fixed minimum and cap; expose them in the panel if tuning them becomes useful.
 import { findLoadMore } from "../../kyara/dom";
 import type { Feature } from "../types";
 import { countVisible, isFiltering } from "./count";
 import { watchLoadMoreLabel } from "./label";
 
-/** Nombre d'offres visibles à atteindre. */
+/** Number of visible offers to reach. */
 export const MIN_VISIBLE = 10;
-/** Clics automatiques d'affilée au maximum (25 x ~20 offres) : évite de vider l'API si le filtre ne trouve rien. */
+/** Maximum consecutive automatic clicks (25 x ~20 offers): avoids draining the API when the filter finds nothing. */
 export const MAX_AUTO_LOADS = 25;
-/** Le bouton du site reste actif pendant le chargement : on attend ce délai avant de recliquer sans résultat
- * (et avant de remettre son texte d'origine). */
+/** The site's button stays enabled while loading: wait this long before clicking again without a result
+ * (and before restoring its original text). */
 export const LOAD_TIMEOUT = 10_000;
 
 export const loadMore: Feature = {
@@ -23,19 +23,19 @@ export const loadMore: Feature = {
     const arrived = watchLoadMoreLabel(ctx.page, LOAD_TIMEOUT);
     let autoLoads = 0;
     let pending: { total: number; at: number } | null = null;
-    // fin du chargement automatique : rien n'est attendu
+    // end of automatic loading: nothing is awaited
     const stop = () => {
       pending = null;
     };
 
     ctx.onOffers(({ offers }) => {
-      arrived(offers.length); // avant un éventuel nouveau clic, qui remet « Chargement… »
+      arrived(offers.length); // before a possible new click, which sets the loading text again
       if (!isFiltering() || countVisible(offers) >= MIN_VISIBLE) {
         autoLoads = 0;
         return stop();
       }
       const waiting = pending && offers.length === pending.total && Date.now() - pending.at < LOAD_TIMEOUT;
-      if (waiting) return; // chargement en cours
+      if (waiting) return; // loading in progress
       const more = findLoadMore();
       if (!more || autoLoads >= MAX_AUTO_LOADS || document.visibilityState !== "visible") return stop();
       autoLoads++;

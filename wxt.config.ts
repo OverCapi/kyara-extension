@@ -1,20 +1,20 @@
 import { defineConfig } from "wxt";
 import en from "./src/locales/en.json";
 
-// Config WXT : code source dans src/. Nom et description du manifest : src/locales/en.json. Deux cibles :
-//   Firefox (MV2) : complet. MV2 obligatoire, webRequest.filterResponseData (cache passif) n'existe que là.
-//   Chrome (MV3)  : sans cache passif (pas de background), les prix viennent des requêtes fair-play.
+// WXT config: source code in src/. Manifest name and description: src/locales/en.json. Two targets:
+//   Firefox (MV2): full. MV2 required, webRequest.filterResponseData (passive cache) only exists there.
+//   Chrome (MV3) : no passive cache (no background), prices come from the fair-play requests.
 export default defineConfig({
   srcDir: "src",
-  // `pnpm dev` : Firefox s'ouvre sur les Échanges, l'extension se recharge à chaque modification.
-  // Profil gardé dans .firefox-profile/ (non versionné) : la connexion à kyara.games reste d'une fois sur l'autre.
+  // `pnpm dev`: Firefox opens on the Trades tab, the extension reloads on every change.
+  // Profile kept in .firefox-profile/ (not versioned): the kyara.games login persists between runs.
   webExt: {
     firefoxProfile: ".firefox-profile",
     keepProfileChanges: true,
     startUrls: ["https://kyara.games/marche?onglet=offres"],
   },
-  // Extension locale existante : pas encore soumise à addons.mozilla.org, donc exemptée du champ data_collection_permissions.
-  suppressWarnings: { firefoxDataCollection: true },
+  // Sources archive sent to AMO reviewers: never the AMO keys (.env), nor local or generated folders.
+  zip: { excludeSources: [".env", ".env.*", "coverage/**", ".firefox-profile/**", "web-ext-artifacts/**"] },
   manifest: ({ browser }) => ({
     name: en["manifest.name"],
     description: en["manifest.description"],
@@ -23,16 +23,19 @@ export default defineConfig({
         ? ["webRequest", "webRequestBlocking", "storage", "https://kyara.games/*"]
         : ["storage"],
     host_permissions: browser === "firefox" ? undefined : ["https://kyara.games/*"],
-    // update_url : Firefox y vérifie (~toutes les 24 h) s'il existe une version plus récente,
-    // puis installe tout seul le .xpi signé. updates.json est publié par .github/workflows/release.yml.
+    // Listed on addons.mozilla.org: AMO delivers updates, so no update_url (AMO rejects it for listed add-ons).
+    // Keep this id: copies installed from the old GitHub releases share it and update from AMO.
+    // data_collection_permissions: the extension sends nothing anywhere except kyara.games' own API.
     browser_specific_settings:
       browser === "firefox"
         ? {
             gecko: {
               id: "kyara-extension@local",
-              strict_min_version: "115.0",
-              update_url: "https://github.com/OverCapi/kyara-extension/releases/latest/download/updates.json",
+              // 140 = current ESR, first version that knows data_collection_permissions
+              strict_min_version: "140.0",
+              data_collection_permissions: { required: ["none"] },
             },
+            gecko_android: { strict_min_version: "142.0" }, // first Android version that knows it
           }
         : undefined,
   }),

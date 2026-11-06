@@ -17,7 +17,7 @@ beforeEach(() => {
 });
 afterEach(() => document.documentElement.removeAttribute("data-kv-filter-gain"));
 
-/** Instantané de `total` offres dont `hidden` sont cachées par un filtre. */
+/** Snapshot of `total` offers, `hidden` of which are hidden by a filter. */
 function snap(total: number, hidden: number): OffersSnapshot {
   const offers: Offer[] = Array.from({ length: total }, (_, i) => {
     const li = document.createElement("li");
@@ -29,34 +29,34 @@ function snap(total: number, hidden: number): OffersSnapshot {
 const filtering = () => document.documentElement.setAttribute("data-kv-filter-gain", "");
 
 describe("load-more", () => {
-  it("aucun filtre actif : ne clique pas", () => {
+  it("no filter on: does not click", () => {
     startFeature(loadMore).emit(snap(20, 20));
     expect(clicked).not.toHaveBeenCalled();
   });
 
-  it("filtre actif et trop peu d'offres visibles : clique « Voir plus »", () => {
+  it("filter on and too few visible offers: clicks the load more button", () => {
     filtering();
     startFeature(loadMore).emit(snap(20, 20 - (MIN_VISIBLE - 1)));
     expect(clicked).toHaveBeenCalledTimes(1);
   });
 
-  it("assez d'offres visibles : ne clique pas", () => {
+  it("enough visible offers: does not click", () => {
     filtering();
     startFeature(loadMore).emit(snap(20, 20 - MIN_VISIBLE));
     expect(clicked).not.toHaveBeenCalled();
   });
 
-  it("attend la fin du chargement : pas de second clic tant que la liste n'a pas changé", () => {
+  it("waits for loading to end: no second click until the list has changed", () => {
     filtering();
     const { emit } = startFeature(loadMore);
     emit(snap(20, 20));
     emit(snap(20, 20));
     expect(clicked).toHaveBeenCalledTimes(1);
-    emit(snap(40, 40)); // les offres sont arrivées, toujours trop peu visibles
+    emit(snap(40, 40)); // the offers arrived, still too few visible
     expect(clicked).toHaveBeenCalledTimes(2);
   });
 
-  it("chargement qui n'aboutit pas : réessaie après le délai", () => {
+  it("loading that never completes: retries after the timeout", () => {
     filtering();
     const { emit } = startFeature(loadMore);
     emit(snap(20, 20));
@@ -65,63 +65,63 @@ describe("load-more", () => {
     expect(clicked).toHaveBeenCalledTimes(2);
   });
 
-  it("assez d'offres atteintes : remet le compteur à zéro", () => {
+  it("enough offers reached: resets the counter", () => {
     filtering();
     const { emit } = startFeature(loadMore);
     emit(snap(20, 20));
-    emit(snap(40, 0)); // 40 visibles
-    emit(snap(40, 40)); // le filtre change : on peut recharger tout de suite
+    emit(snap(40, 0)); // 40 visible
+    emit(snap(40, 40)); // the filter changes: can load again right away
     expect(clicked).toHaveBeenCalledTimes(2);
   });
 
-  it("plafond de clics automatiques d'affilée", () => {
+  it("cap on consecutive automatic clicks", () => {
     filtering();
     const { emit } = startFeature(loadMore);
     for (let i = 1; i <= MAX_AUTO_LOADS + 5; i++) emit(snap(20 * i, 20 * i));
     expect(clicked).toHaveBeenCalledTimes(MAX_AUTO_LOADS);
   });
 
-  it("plus de bouton (tout est chargé) : ne fait rien", () => {
+  it("no button left (everything loaded): does nothing", () => {
     filtering();
     more?.remove();
     expect(() => startFeature(loadMore).emit(snap(20, 20))).not.toThrow();
     expect(clicked).not.toHaveBeenCalled();
   });
 
-  it("onglet caché : ne clique pas", () => {
+  it("hidden tab: does not click", () => {
     filtering();
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
     startFeature(loadMore).emit(snap(20, 20));
     expect(clicked).not.toHaveBeenCalled();
   });
 
-  describe("texte « Chargement… » du bouton", () => {
+  describe("loading text on the button", () => {
     const label = () => more?.textContent;
 
-    it("clic de l'utilisateur : texte changé, puis remis quand les offres arrivent", () => {
+    it("user click: text changed, then restored when the offers arrive", () => {
       const { emit } = startFeature(loadMore);
       emit(snap(20, 0));
       more?.click();
       expect(label()).toBe("Chargement…");
-      emit(snap(20, 0)); // rendu sans nouvelle offre : toujours en chargement
+      emit(snap(20, 0)); // render without new offers: still loading
       expect(label()).toBe("Chargement…");
       emit(snap(40, 0));
       expect(label()).toBe("Voir plus");
     });
 
-    it("clic automatique de load-more : texte changé, remis puis reposé au clic suivant", () => {
+    it("load-more automatic click: text changed, restored, then set again on the next click", () => {
       filtering();
       const { emit } = startFeature(loadMore);
       emit(snap(20, 20));
       expect(label()).toBe("Chargement…");
-      emit(snap(40, 40)); // offres arrivées, trop peu visibles : nouveau clic
+      emit(snap(40, 40)); // offers arrived, too few visible: new click
       expect(clicked).toHaveBeenCalledTimes(2);
       expect(label()).toBe("Chargement…");
       emit(snap(60, 0));
       expect(label()).toBe("Voir plus");
     });
 
-    it("double clic : le texte d'origine est gardé", () => {
+    it("double click: the original text is kept", () => {
       startFeature(loadMore);
       more?.click();
       more?.click();
@@ -129,7 +129,7 @@ describe("load-more", () => {
       expect(label()).toBe("Voir plus");
     });
 
-    it("remis si le chargement n'aboutit pas dans le délai", () => {
+    it("restored if loading does not complete within the timeout", () => {
       startFeature(loadMore);
       more?.click();
       vi.advanceTimersByTime(LOAD_TIMEOUT - 1);
@@ -138,22 +138,22 @@ describe("load-more", () => {
       expect(label()).toBe("Voir plus");
     });
 
-    it("garde le nœud texte du site (aucun nœud remplacé)", () => {
+    it("keeps the site's text node (no node replaced)", () => {
       const node = more?.firstChild;
       startFeature(loadMore);
       more?.click();
       expect(more?.firstChild).toBe(node);
     });
 
-    it("n'écrase pas un texte réécrit par le site entre-temps", () => {
+    it("does not overwrite a text the site rewrote in the meantime", () => {
       const { emit } = startFeature(loadMore);
       more?.click();
-      if (more?.firstChild) more.firstChild.nodeValue = "Plus rien";
+      if (more?.firstChild) more.firstChild.nodeValue = "Nothing left";
       emit(snap(40, 0));
-      expect(label()).toBe("Plus rien");
+      expect(label()).toBe("Nothing left");
     });
 
-    it("ignore les autres clics et un bouton sans texte", () => {
+    it("ignores other clicks and a button without text", () => {
       startFeature(loadMore);
       document.body.click();
       expect(label()).toBe("Voir plus");
@@ -161,7 +161,7 @@ describe("load-more", () => {
       expect(() => more?.click()).not.toThrow();
     });
 
-    it("texte remis quand l'extension est rechargée, sans minuteur ni écouteur oublié", () => {
+    it("text restored when the extension reloads, with no leftover timer or listener", () => {
       const { page } = startFeature(loadMore);
       more?.click();
       page.invalidate();

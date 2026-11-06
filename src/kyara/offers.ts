@@ -1,6 +1,6 @@
-// Instantané des offres de la page : offres lues + prix connus + cartes possédées.
-// Construit UNE fois par rendu (une seule lecture du stockage), puis donné à toutes les features
-// et au module fair-play.
+// Snapshot of the page's offers: offers read + known prices + owned cards.
+// Built ONCE per render (a single storage read), then given to every feature
+// and to the fair-play module.
 import { type OwnedCards, type PriceStore, readPrices } from "../core/storage";
 import type { CollectionLoader } from "./collection";
 import { type Offer, offerIds, readOffers } from "./dom";
@@ -8,13 +8,13 @@ import { type Offer, offerIds, readOffers } from "./dom";
 export interface OffersSnapshot {
   offers: Offer[];
   store: PriceStore;
-  /** `null` = collection inconnue. */
+  /** `null` = unknown collection. */
   owned: OwnedCards | null;
 }
 
 const EMPTY: OffersSnapshot = { offers: [], store: { fair: {}, market: {} }, owned: null };
 
-/** Lit la page et le stockage. Sans offre affichée : instantané vide (aucun accès au stockage ni au réseau). */
+/** Reads the page and storage. With no offer shown: empty snapshot (no storage or network access). */
 export async function buildSnapshot(collection: CollectionLoader): Promise<OffersSnapshot> {
   const offers = readOffers();
   if (!offers.length) return EMPTY;

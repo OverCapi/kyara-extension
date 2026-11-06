@@ -1,6 +1,6 @@
-/* Panneau de filtres de l'extension, dans la barre de filtres de l'onglet Échanges. */
+/* The extension's filter panel, in the filter bar of the Trades tab. */
 
-/* Le panneau reprend les pastilles du site : les originales sont cachées tant qu'il est là. */
+/* The panel mirrors the site's pills: the originals are hidden while it is there. */
 .filters[data-kv-panel] > .pills {
   display: none !important;
 }
@@ -34,7 +34,7 @@
 .kv-popover {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0; /* le bouton est au bout de la ligne de recherche : la fenêtre s'ouvre vers la gauche */
+  right: 0; /* the button is at the end of the search row: the popover opens to the left */
   z-index: 50;
   display: flex;
   flex-direction: column;
@@ -82,7 +82,7 @@
   gap: 8px;
 }
 
-/* Pastille, au style de celles du site (active = orange). */
+/* Pill, styled like the site's (active = orange). */
 .kv-pill {
   padding: 4px 12px;
   border-radius: 999px;

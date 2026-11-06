@@ -1,12 +1,12 @@
 import { vi } from "vitest";
-// Outils de test partagés.
+// Shared test tools.
 import type { PageContext } from "../core/page";
 import type { Feature } from "../features/types";
 import { readOffers } from "../kyara/dom";
 import type { FilterPanel } from "../kyara/filter-panel";
 import type { OffersSnapshot } from "../kyara/offers";
 
-/** Faux contexte de page : `invalidate()` simule le rechargement de l'extension. */
+/** Fake page context: `invalidate()` simulates reloading the extension. */
 export function fakeCtx(): PageContext & { invalidate(): void } {
   const callbacks: Array<() => void> = [];
   const ctx = {
@@ -22,7 +22,7 @@ export function fakeCtx(): PageContext & { invalidate(): void } {
   return ctx;
 }
 
-/** Remplace `fetch` par un faux qui renvoie `body` en JSON avec ce statut. */
+/** Replaces `fetch` with a fake that returns `body` as JSON with this status. */
 export function mockFetch(body: unknown, status = 200) {
   const fn = vi.fn(async (..._args: unknown[]) => new Response(JSON.stringify(body), { status }));
   vi.stubGlobal("fetch", fn);
@@ -30,14 +30,14 @@ export function mockFetch(body: unknown, status = 200) {
 }
 
 export interface OfferSpec {
-  /** Id de la carte proposée (omis = offre sans carte proposée). */
+  /** Id of the offered card (omitted = offer without an offered card). */
   give?: number;
   wants?: number[];
-  /** `box-shadow` inline de l'image de la carte proposée (couleur de rareté du site). */
+  /** Inline `box-shadow` of the offered card's image (the site's rarity color). */
   shadow?: string;
 }
 
-/** Ajoute à la page des offres avec la même structure que kyara.games. Renvoie les <li>. */
+/** Adds offers to the page with the same structure as kyara.games. Returns the <li> elements. */
 export function renderOffers(specs: OfferSpec[]): HTMLElement[] {
   const card = (id: number, shadow = "") =>
     `<a href="/wiki/${id}" title="Carte ${id}"><img style="box-shadow:${shadow}"></a>`;
@@ -52,7 +52,7 @@ export function renderOffers(specs: OfferSpec[]): HTMLElement[] {
   });
 }
 
-/** Instantané d'offres prêt à l'emploi : rend les offres dans la page et fixe prix fair-play et collection. */
+/** Ready-to-use offers snapshot: renders the offers in the page and sets fair-play prices and collection. */
 export function makeSnapshot(
   specs: OfferSpec[],
   opts: { fair?: Record<number, number>; owned?: Record<number, number> | null } = {},
@@ -64,12 +64,12 @@ export function makeSnapshot(
 
 const startedPages: Array<ReturnType<typeof fakeCtx>> = [];
 
-/** Invalide les contextes de toutes les features démarrées par un test (retire leurs écouteurs). */
+/** Invalidates the contexts of every feature started by a test (removes their listeners). */
 export function stopAllFeatures(): void {
   for (const page of startedPages.splice(0)) page.invalidate();
 }
 
-/** Faux panneau de filtres : range les catégories directement dans la page (les tests les y retrouvent). */
+/** Fake filter panel: puts categories straight into the page (tests find them there). */
 export function fakePanel(): FilterPanel & { categories: Array<{ title: string; el: HTMLElement }> } {
   const categories: Array<{ title: string; el: HTMLElement }> = [];
   return {
@@ -82,7 +82,7 @@ export function fakePanel(): FilterPanel & { categories: Array<{ title: string; 
   };
 }
 
-/** Démarre une feature avec un faux contexte. `emit(snapshot)` simule une mise à jour de la page. */
+/** Starts a feature with a fake context. `emit(snapshot)` simulates a page update. */
 export function startFeature(feature: Feature) {
   const page = fakeCtx();
   startedPages.push(page);

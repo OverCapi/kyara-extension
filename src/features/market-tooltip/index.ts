@@ -1,12 +1,12 @@
-// Box au survol d'une carte d'offre : prix minimum actuel sur le marché.
-// Une requête par carte survolée (après 250 ms sur la carte). La box est un seul élément ajouté à
-// <html>, hors de l'arbre géré par le site. Elle se cache au scroll et quand on quitte la carte.
+// Box shown when hovering an offer's card: current minimum price on the market.
+// One request per hovered card (after 250 ms on the card). The box is a single element appended to
+// <html>, outside the tree managed by the site. It hides on scroll and when leaving the card.
 import { safeAsync } from "../../core/errors";
 import { listen, mountFloating } from "../../core/page";
 import { cardId, OFFER_CARD_SELECTOR } from "../../kyara/dom";
 import type { Feature } from "../types";
 import { createMarketMin } from "./market-min";
-import { showTip, type TipState, tipHtml } from "./view";
+import { showTip, type TipState, tipNodes } from "./view";
 import "./style.css";
 
 export const TIP_DELAY = 250;
@@ -28,7 +28,7 @@ export const marketTooltip: Feature = {
       tip.hidden = true;
     };
     const show = (a: Element, state: TipState) =>
-      showTip(tip, a, tipHtml(a.getAttribute("title") ?? "", state));
+      showTip(tip, a, tipNodes(a.getAttribute("title") ?? "", state));
     const load = safeAsync("market-tooltip:load", async (a: Element) => {
       const id = cardId(a);
       if (id === null) return;

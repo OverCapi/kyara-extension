@@ -1,16 +1,16 @@
-// Puces de rareté du filtre (une par rareté, multi-sélection) et leur petite aide. Aucune logique de
-// filtrage ici (voir index.ts). Chaque puce porte la couleur de sa rareté (variable CSS --kv-rar).
+// Rarity chips of the filter (one per rarity, multi-select) and their short hint. No filtering
+// logic here (see index.ts). Each chip carries its rarity's color (--kv-rar CSS variable).
 import { t } from "../../core/i18n";
 import { makePill } from "../../kyara/filter-panel/pill";
 import { RARITIES, type Rarity, rarityCssColor } from "../../kyara/rarity";
 
 export interface Chips {
   root: HTMLElement;
-  /** Montre ces raretés comme choisies. */
+  /** Shows these rarities as chosen. */
   setSelected(selected: readonly Rarity[]): void;
 }
 
-/** Crée les puces. `onToggle(rareté)` est appelé quand l'utilisateur clique une puce. */
+/** Creates the chips. `onToggle(rarity)` is called when the user clicks a chip. */
 export function createChips(onToggle: (rarity: Rarity) => void): Chips {
   const root = document.createElement("div");
   const row = document.createElement("div");

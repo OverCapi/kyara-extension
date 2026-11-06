@@ -1,8 +1,8 @@
-// Valeur d'une carte et analyse de rentabilité d'une offre. Fonctions pures (aucun DOM, aucun réseau).
+// Card value and offer profitability analysis. Pure functions (no DOM, no network).
 import type { OwnedCards, PriceStore } from "../core/storage";
 import type { Card, Offer } from "./dom";
 
-/** Valeur d'une carte : prix fair-play du site d'abord, sinon médiane marché (7 j, 30 j, dernier prix). */
+/** Value of a card: the site's fair-play price first, otherwise the market median (7 d, 30 d, last price). */
 export function cardValue(store: PriceStore, id: number): number | null {
   const fair = store.fair[id];
   if (fair) return fair.v;
@@ -10,23 +10,23 @@ export function cardValue(store: PriceStore, id: number): number | null {
   return p ? (p.m7 ?? p.m30 ?? p.last ?? null) : null;
 }
 
-/** Une carte demandée : sa valeur et ce que tu gagnes à donner la carte proposée contre elle. */
+/** A wanted card: its value and what you gain by giving the offered card for it. */
 export interface WantAnalysis {
   card: Card;
-  /** Valeur de la carte demandée (W), `null` si inconnue. */
+  /** Value of the wanted card (W), `null` if unknown. */
   value: number | null;
-  /** G - W : positif = tu gagnes. `null` si G ou W est inconnu. */
+  /** G - W: positive = you gain. `null` if G or W is unknown. */
   diff: number | null;
 }
 export interface OfferAnalysis {
-  /** Valeur de la carte proposée (G), `null` si inconnue. */
+  /** Value of the offered card (G), `null` if unknown. */
   give: number | null;
   wants: WantAnalysis[];
-  /** Meilleur gain relatif (G - W) / max(W, 1) parmi les cartes demandées que TU possèdes. `null` si aucune. */
+  /** Best relative gain (G - W) / max(W, 1) among the wanted cards YOU own. `null` if none. */
   bestRatio: number | null;
 }
 
-/** Calcule valeurs, gains et meilleur gain relatif d'une offre. */
+/** Computes the values, gains and best relative gain of an offer. */
 export function analyzeOffer(offer: Offer, store: PriceStore, owned: OwnedCards | null): OfferAnalysis {
   const give = offer.give ? cardValue(store, offer.give.id) : null;
   let bestRatio: number | null = null;

@@ -1,7 +1,7 @@
-// Section "Kyara" du panneau : reflet des pastilles de filtre du site ("Que je n'ai pas", etc.).
-// Le site garde ses vraies pastilles (cachées par le CSS) : un clic sur notre copie clique la vraie,
-// donc rien n'est déplacé dans l'arbre du site. La copie suit l'état (aria-pressed) de l'original.
-// Catégories : "Cartes" pour les pastilles ordinaires, "Mes offres" pour celle qui porte un compteur.
+// "Kyara" section of the panel: mirror of the site's filter pills ("Que je n'ai pas", etc.).
+// The site keeps its real pills (hidden by CSS): a click on our copy clicks the real one,
+// so nothing is moved in the site's tree. The copy follows the original's state (aria-pressed).
+// Categories: "Cards" for regular pills, "My offers" for the one that carries a counter.
 import { safe } from "../../core/errors";
 import { t } from "../../core/i18n";
 import { makePill } from "./pill";
@@ -17,11 +17,11 @@ interface Mirrored {
 const labelOf = (pill: Element) => (pill.textContent ?? "").replace(/\s+/g, " ").trim();
 
 export interface PillMirror {
-  /** Aligne la copie sur les pastilles actuelles de `filters` (reconstruite seulement si elles ont changé). */
+  /** Aligns the copy with the current pills of `filters` (rebuilt only if they changed). */
   sync(filters: HTMLElement): void;
 }
 
-/** Remplit `host` avec les copies des pastilles du site. */
+/** Fills `host` with copies of the site's pills. */
 export function createPillMirror(host: HTMLElement): PillMirror {
   let signature = "";
   let mirrored: Mirrored[] = [];
@@ -37,7 +37,7 @@ export function createPillMirror(host: HTMLElement): PillMirror {
       "click",
       safe("mirror:click", () => {
         source.click();
-        setTimeout(safe("mirror:sync", syncPressed), 0); // le site met son état à jour juste après le clic
+        setTimeout(safe("mirror:sync", syncPressed), 0); // the site updates its state right after the click
       }),
     );
     return { source, copy };
@@ -59,7 +59,7 @@ export function createPillMirror(host: HTMLElement): PillMirror {
     sync(filters) {
       const pills = [...filters.querySelectorAll<HTMLButtonElement>(":scope > .pills > button")];
       const next = pills.map(labelOf).join("|");
-      // les pastilles du site peuvent être recréées (re-rendu) sans changer de texte
+      // the site's pills can be recreated (re-render) without changing text
       if (next !== signature || mirrored.some((m) => !m.source.isConnected)) {
         signature = next;
         rebuild(pills);

@@ -1,16 +1,16 @@
-// Texte « Chargement… » posé sur le bouton « Voir plus d'offres » du site pendant qu'il charge, que
-// le clic vienne de l'utilisateur ou de load-more. On change seulement la valeur du nœud texte existant
-// (aucun nœud ajouté, le site garde la main dessus) et on remet le texte d'origine à l'arrivée des
-// offres, après un délai, ou quand l'extension est rechargée. Texte : locales/*.json.
+// Loading text set on the site's "Voir plus d'offres" (load more) button while it loads, whether
+// the click comes from the user or from load-more. Only the value of the existing text node changes
+// (no node added, the site keeps control of it) and the original text is restored when the offers
+// arrive, after a timeout, or when the extension reloads. Text: locales/*.json.
 import { safe } from "../../core/errors";
 import { t } from "../../core/i18n";
 import { listen, type PageContext } from "../../core/page";
 import { findLoadMore } from "../../kyara/dom";
 
-/** À appeler à chaque rendu avec le nombre d'offres : remet le texte d'origine si ce nombre a changé. */
+/** Call on every render with the number of offers: restores the original text if that number changed. */
 export type OffersArrived = (total: number) => void;
 
-/** Premier nœud texte non vide du bouton : c'est le libellé. */
+/** First non-empty text node of the button: that is the label. */
 function labelNode(button: Element): Text | null {
   const walker = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -19,7 +19,7 @@ function labelNode(button: Element): Text | null {
   return null;
 }
 
-/** Écoute les clics sur « Voir plus d'offres » et y affiche « Chargement… » jusqu'à `arrived()`. */
+/** Listens to clicks on the load more button and shows the loading text on it until `arrived()`. */
 export function watchLoadMoreLabel(page: PageContext, timeout: number): OffersArrived {
   let total = 0;
   let current: { node: Text; original: string; total: number } | null = null;
@@ -27,7 +27,7 @@ export function watchLoadMoreLabel(page: PageContext, timeout: number): OffersAr
 
   const reset = () => {
     clearTimeout(timer);
-    // le site a pu réécrire le texte entre-temps : on ne l'écrase pas
+    // the site may have rewritten the text in the meantime: do not overwrite it
     if (current?.node.nodeValue === t("load.loading")) current.node.nodeValue = current.original;
     current = null;
   };
@@ -44,7 +44,7 @@ export function watchLoadMoreLabel(page: PageContext, timeout: number): OffersAr
       reset();
       current = { node, original, total };
       node.nodeValue = t("load.loading");
-      timer = setTimeout(safe("load-more:label", reset), timeout); // le chargement n'aboutit pas
+      timer = setTimeout(safe("load-more:label", reset), timeout); // loading does not complete
     },
     { capture: true },
   );

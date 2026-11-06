@@ -1,6 +1,6 @@
-// Cache passif (background) : lit les réponses JSON que le site charge déjà, sans requête en plus,
-// et les range dans le stockage via parseResponse. La page reçoit TOUJOURS la réponse intacte,
-// même si l'analyse échoue : une erreur de l'extension ne doit jamais casser le site.
+// Passive cache (background): reads the JSON responses the site already loads, without extra requests,
+// and stores them via parseResponse. The page ALWAYS receives the untouched response,
+// even if parsing fails: an extension error must never break the site.
 import { browser } from "wxt/browser";
 import { safeAsync } from "../core/errors";
 import { filterResponseData } from "../core/firefox";
@@ -10,7 +10,7 @@ import { parseResponse } from "./parse";
 
 const log = createLogger("passive-cache");
 
-/** Adresses d'API surveillées. */
+/** Watched API URLs. */
 export const WATCHED_URLS = [
   "https://kyara.games/api/market/listings*",
   "https://kyara.games/api/market/prices/*",
@@ -19,15 +19,15 @@ export const WATCHED_URLS = [
   "https://kyara.games/api/me/collection*",
 ];
 
-/** Analyse un corps de réponse et stocke ce qu'il contient. Ne lève jamais. */
+/** Parses a response body and stores what it contains. Never throws. */
 export const storeBody = safeAsync("passive-cache:store", async (url: string, text: string) => {
   const found = parseResponse(url, JSON.parse(text));
   if (Object.keys(found).length === 0) return;
-  log.debug(url, "->", Object.keys(found).length, "entrées");
+  log.debug(url, "->", Object.keys(found).length, "entries");
   await writeEntries(found);
 });
 
-/** Branche un filtre sur la réponse : le flux est recopié tel quel vers la page, puis analysé à la fin. */
+/** Plugs a filter on the response: the stream is copied as is to the page, then parsed at the end. */
 export function interceptResponse(url: string, requestId: string): void {
   const filter = filterResponseData(requestId);
   if (!filter) return;
@@ -37,17 +37,17 @@ export function interceptResponse(url: string, requestId: string): void {
     try {
       text += decoder.decode(e.data, { stream: true });
     } finally {
-      filter.write(e.data); // la page reçoit la réponse intacte, quoi qu'il arrive
+      filter.write(e.data); // the page receives the untouched response, whatever happens
     }
   };
   filter.onstop = () => {
     filter.close();
-    void storeBody(url, text + decoder.decode()); // ne rejette jamais (safeAsync)
+    void storeBody(url, text + decoder.decode()); // never rejects (safeAsync)
   };
-  filter.onerror = () => log.error("filtre en erreur", url, filter.error);
+  filter.onerror = () => log.error("filter error", url, filter.error);
 }
 
-/** Démarre l'écoute des requêtes GET vers l'API surveillée. */
+/** Starts listening to GET requests to the watched API. */
 export function startPassiveCache(): void {
   browser.webRequest.onBeforeRequest.addListener(
     (details) => {
@@ -55,12 +55,12 @@ export function startPassiveCache(): void {
       try {
         interceptResponse(details.url, details.requestId);
       } catch (err) {
-        log.error("interception impossible", details.url, err); // la requête continue sans filtre
+        log.error("interception failed", details.url, err); // the request goes on without a filter
       }
       return undefined;
     },
     { urls: WATCHED_URLS },
     ["blocking"],
   );
-  log.debug("chargé");
+  log.debug("loaded");
 }

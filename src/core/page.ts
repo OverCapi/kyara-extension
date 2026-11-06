@@ -1,10 +1,10 @@
-// Surveillance de la page, partagée par tout le code : UN seul MutationObserver (+ stockage +
-// visibilité de l'onglet), avec debounce. Fournit aussi les helpers qui nettoient tout quand
-// l'extension est rechargée (sinon : erreurs "Extension context invalidated").
+// Page watching, shared by all the code: ONE single MutationObserver (+ storage +
+// tab visibility), debounced. Also provides the helpers that clean everything up when
+// the extension reloads (otherwise: "Extension context invalidated" errors).
 import { safe, safeAsync } from "./errors";
 import { onStorageChange } from "./storage";
 
-/** Contexte de la page. Le `ContentScriptContext` de WXT le satisfait. */
+/** Page context. WXT's `ContentScriptContext` satisfies it. */
 export interface PageContext {
   readonly isValid: boolean;
   onInvalidated(cb: () => void): unknown;
@@ -13,13 +13,13 @@ export interface PageContext {
 export const DEBOUNCE_MS = 300;
 
 export interface PageWatcher {
-  /** Ajoute un callback appelé (après debounce) à chaque changement de la page. */
+  /** Adds a callback called (after debounce) on every page change. */
   subscribe(cb: () => Promise<void> | void): void;
-  /** Demande un nouveau passage (debounce inclus). */
+  /** Requests a new run (debounce included). */
   trigger(): void;
 }
 
-/** Ajoute un écouteur DOM retiré automatiquement à l'invalidation du contexte. Erreurs attrapées. */
+/** Adds a DOM listener, removed automatically when the context is invalidated. Errors are caught. */
 export function listen<E extends Event>(
   ctx: PageContext,
   target: EventTarget,
@@ -32,13 +32,13 @@ export function listen<E extends Event>(
   ctx.onInvalidated(() => target.removeEventListener(type, wrapped, options));
 }
 
-/** Ajoute `el` à <html>, hors de l'arbre géré par le site. Retiré à l'invalidation du contexte. */
+/** Appends `el` to <html>, outside the tree managed by the site. Removed when the context is invalidated. */
 export function mountFloating(ctx: PageContext, el: HTMLElement): void {
   document.documentElement.append(el);
   ctx.onInvalidated(() => el.remove());
 }
 
-/** Démarre la surveillance : DOM, stockage et visibilité déclenchent les callbacks, 300 ms après le dernier signal. */
+/** Starts watching: DOM, storage and visibility changes fire the callbacks, 300 ms after the last signal. */
 export function createPageWatcher(ctx: PageContext): PageWatcher {
   const callbacks: Array<() => Promise<void> | void> = [];
   let timer: ReturnType<typeof setTimeout> | undefined;

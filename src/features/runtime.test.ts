@@ -13,7 +13,7 @@ const settle = async () => {
 };
 
 describe("startFeatures", () => {
-  it("donne un instantané à chaque feature après le debounce", async () => {
+  it("gives a snapshot to each feature after the debounce", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     renderOffers([{ give: 1, wants: [2] }]);
     mockFetch({});
@@ -26,7 +26,7 @@ describe("startFeatures", () => {
     expect(seen.mock.calls[0]?.[0].offers).toHaveLength(1);
   });
 
-  it("marque chaque offre comme traitée (data-kv-seen) une fois les features passées", async () => {
+  it("marks each offer as processed (data-kv-seen) once the features have run", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     const [li] = renderOffers([{ give: 1, wants: [2] }]);
     mockFetch({});
@@ -44,7 +44,7 @@ describe("startFeatures", () => {
     expect(li?.hasAttribute("data-kv-seen")).toBe(true);
   });
 
-  it("une feature qui plante (setup ou rendu) n'arrête pas les autres", async () => {
+  it("a crashing feature (setup or render) does not stop the others", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     mockFetch({});
     const ok = vi.fn();
@@ -67,7 +67,7 @@ describe("startFeatures", () => {
     expect(ok).toHaveBeenCalledTimes(1);
   });
 
-  it("demande les prix manquants pour les offres acceptables", async () => {
+  it("requests missing prices for acceptable offers", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     renderOffers([{ give: 1, wants: [2] }]);
     await fakeBrowser.storage.local.set({ owned: { 2: 1 } });

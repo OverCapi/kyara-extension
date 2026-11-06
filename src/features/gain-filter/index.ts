@@ -1,10 +1,10 @@
-// Filtre "gain minimum" : selon le mode choisi (Off / Neutre et + / Positif) et le seuil de la jauge
-// (gauge.ts, dans le panneau de filtres), masque les offres dont le meilleur gain (parmi tes
-// cartes demandées) ne convient pas.
-// Tri : si activé, offres de la plus rentable à la moins rentable.
-// Effet DOM : attribut data-kv-hide-gain sur le <li> (le CSS le cache) et style `order` sur le <li> (tri).
-// Tant que le tri ou le filtre est actif, les offres pas encore traitées sont cachées (pas de clignotement).
-// Le dernier instantané est gardé pour réappliquer le filtre dès que le réglage bouge.
+// "Minimum gain" filter: depending on the chosen mode (Off / Neutral and up / Positive) and the gauge threshold
+// (gauge.ts, in the filter panel), hides the offers whose best gain (among your
+// wanted cards) does not qualify.
+// Sort: when on, offers from most to least profitable.
+// DOM effect: data-kv-hide-gain attribute on the <li> (CSS hides it) and `order` style on the <li> (sort).
+// While sort or filter is on, offers not processed yet are hidden (no flicker).
+// The last snapshot is kept to reapply the filter as soon as the setting changes.
 
 import { t } from "../../core/i18n";
 import type { GainFilter } from "../../core/storage";
@@ -29,22 +29,22 @@ export const gainFilter: Feature = {
       offers.forEach((offer, i) => {
         if (!offer.give) return;
         offer.li.toggleAttribute("data-kv-hide-gain", !passesGainFilter(ratios[i] ?? null, filter));
-        // la liste du site est en flex colonne : `order` réordonne sans déplacer les nœuds de Svelte
+        // the site's list is a flex column: `order` reorders without moving Svelte's nodes
         offer.li.style.order = filter.sort ? String(rank[i]) : "";
       });
     };
     const root = document.documentElement;
-    // Offres arrivées mais pas encore traitées (voir runtime.ts) : cachées par le CSS tant que le tri ou
-    // le filtre est actif, sinon elles s'afficheraient à la mauvaise place / non filtrées, puis sauteraient.
+    // Offers that arrived but are not processed yet (see runtime.ts): hidden by CSS while sort or
+    // filter is on, otherwise they would show in the wrong place / unfiltered, then jump.
     const syncRoot = () => {
       root.toggleAttribute("data-kv-hold-gain", filter.mode !== "off" || filter.sort);
-      root.toggleAttribute("data-kv-filter-gain", filter.mode !== "off"); // lu par load-more
+      root.toggleAttribute("data-kv-filter-gain", filter.mode !== "off"); // read by load-more
     };
     ctx.page.onInvalidated(() => {
       root.removeAttribute("data-kv-hold-gain");
       root.removeAttribute("data-kv-filter-gain");
     });
-    syncRoot(); // réglage par défaut (tri actif) dès le chargement, avant la lecture du stockage
+    syncRoot(); // default setting (sorting on) right at load, before reading storage
     const gauge = createGauge(ctx.page, (next) => {
       filter = next;
       syncRoot();

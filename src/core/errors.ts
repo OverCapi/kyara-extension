@@ -1,11 +1,11 @@
-// Barrières anti-crash : une erreur dans une feature ou un callback est attrapée et loguée (dev),
-// jamais propagée au site ni aux autres features.
-// Toute fonction branchée sur un événement (listener, timer, observer) doit passer par ici.
+// Crash barriers: an error in a feature or a callback is caught and logged (dev),
+// never propagated to the site or to the other features.
+// Every function plugged into an event (listener, timer, observer) must go through here.
 import { createLogger } from "./log";
 
 const log = createLogger("errors");
 
-/** Enveloppe `fn` : l'exception éventuelle est loguée au lieu d'être levée. `label` nomme l'origine. */
+/** Wraps `fn`: any exception is logged instead of thrown. `label` names the origin. */
 export function safe<A extends unknown[]>(label: string, fn: (...args: A) => void): (...args: A) => void {
   return (...args) => {
     try {
@@ -16,7 +16,7 @@ export function safe<A extends unknown[]>(label: string, fn: (...args: A) => voi
   };
 }
 
-/** Comme `safe`, pour une fonction async. La promesse renvoyée ne rejette jamais. */
+/** Like `safe`, for an async function. The returned promise never rejects. */
 export function safeAsync<A extends unknown[]>(
   label: string,
   fn: (...args: A) => Promise<void> | void,

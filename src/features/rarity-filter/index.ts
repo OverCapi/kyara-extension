@@ -1,7 +1,7 @@
-// Filtre de rareté : l'utilisateur choisit une ou plusieurs raretés (commune … mythique) dans le panneau
-// de filtres ; seules les offres dont la carte PROPOSÉE est de cette rareté restent visibles. Aucune
-// rareté choisie = toutes. Le choix est mémorisé (clé rarities) et suivi entre onglets.
-// Effet DOM : attribut data-kv-hide-rarity sur le <li> (le CSS le cache).
+// Rarity filter: the user picks one or more rarities (common … mythic) in the filter
+// panel; only offers whose OFFERED card has that rarity stay visible. No
+// rarity chosen = all. The choice is stored (rarities key) and followed across tabs.
+// DOM effect: data-kv-hide-rarity attribute on the <li> (CSS hides it).
 import { safeAsync } from "../../core/errors";
 import { t } from "../../core/i18n";
 import { onRaritiesChange, readRarities, writeRarities } from "../../core/storage";
@@ -28,7 +28,7 @@ export const rarityFilter: Feature = {
       }
     };
     const root = document.documentElement;
-    // filtre actif : les offres pas encore traitées (voir runtime.ts) restent cachées, sans clignotement
+    // filter on: offers not processed yet (see runtime.ts) stay hidden, no flicker
     const syncRoot = () => root.toggleAttribute("data-kv-filter-rarity", selected.length > 0);
     ctx.page.onInvalidated(() => root.removeAttribute("data-kv-filter-rarity"));
     const apply = (stored: readonly string[]) => {
@@ -40,7 +40,7 @@ export const rarityFilter: Feature = {
     const sync = createStorageSync(writeRarities, apply);
     const chips = createChips((rarity) => {
       const next = selected.includes(rarity) ? selected.filter((r) => r !== rarity) : [...selected, rarity];
-      apply(next); // visuel immédiat, l'écriture suit
+      apply(next); // immediate visual, the write follows
       void sync.save(next);
     });
 

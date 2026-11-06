@@ -1,9 +1,9 @@
-// Panneau de filtres : un petit bouton (icône d'entonnoir) dans la barre de filtres de l'onglet Échanges,
-// qui ouvre une fenêtre à 2 sections : "Filtres Kyara" (reflet des pastilles du site) puis "Filtres de
-// l'extension" (catégories ajoutées par les features via `addCategory`).
-// EXCEPTION à la règle "aucun nœud dans le DOM du site", voulue : le bouton doit être avec les filtres.
-// Il est réinséré à chaque rendu si le site le retire ; les pastilles d'origine sont cachées (attribut
-// data-kv-panel sur la barre) tant que le panneau est là, et tout est retiré quand l'extension est rechargée.
+// Filter panel: a small button (funnel icon) in the filter bar of the Trades tab,
+// that opens a popover with 2 sections: "Kyara filters" (mirror of the site's pills) then "Extension
+// filters" (categories added by the features through `addCategory`).
+// Deliberate EXCEPTION to the "no node in the site's DOM" rule: the button must sit with the filters.
+// It is reinserted on every render if the site removes it; the original pills are hidden (data-kv-panel
+// attribute on the bar) while the panel is there, and everything is removed when the extension reloads.
 import { listen, type PageContext } from "../../core/page";
 import { createPillMirror } from "./mirror";
 import { buildMenu, makeCategory } from "./view";
@@ -12,13 +12,13 @@ import "./style.css";
 const HOST_ATTR = "data-kv-panel";
 
 export interface FilterPanel {
-  /** Place le bouton dans la barre de filtres du site, ou le retire si `filters` est `null`. */
+  /** Places the button in the site's filter bar, or removes it if `filters` is `null`. */
   attach(filters: HTMLElement | null): void;
-  /** Ajoute une catégorie (titre + contenu) à la section de l'extension. Appelé une fois au démarrage. */
+  /** Adds a category (title + content) to the extension section. Called once at startup. */
   addCategory(title: string, el: HTMLElement): void;
 }
 
-/** Crée le panneau (pas encore dans la page : voir `attach`). */
+/** Creates the panel (not in the page yet: see `attach`). */
 export function createFilterPanel(page: PageContext): FilterPanel {
   const menu = buildMenu();
   const mirror = createPillMirror(menu.kyara);
@@ -39,7 +39,7 @@ export function createFilterPanel(page: PageContext): FilterPanel {
   });
   page.onInvalidated(() => {
     menu.root.remove();
-    host?.removeAttribute(HOST_ATTR); // les vraies pastilles du site reviennent
+    host?.removeAttribute(HOST_ATTR); // the site's real pills come back
   });
 
   return {

@@ -1,28 +1,28 @@
 # Kyara Extension
 
-Extension Firefox pour [kyara.games](https://kyara.games) : dans l'onglet **Marché → Échanges**, affiche la valeur des cartes et la rentabilité de chaque offre, et permet de filtrer et trier les offres.
+Firefox extension for [kyara.games](https://kyara.games): in the **Marché → Échanges** (Market → Trades) tab, it shows card values and the profitability of each offer, and lets you filter and sort offers.
 
-- Badge sur chaque carte : `≈ G◆` sur la carte proposée, `G − W` sur les cartes demandées.
-- Fond de l'offre teinté du bleu (gain) au rouge (perte), selon le meilleur gain relatif parmi tes cartes. Pastille « Rentabilité on/off » en bas à gauche.
-- Anneau autour des cartes à la couleur officielle de leur rareté.
-- Survol d'une carte : prix minimum actuel sur le marché.
-- **Panneau de filtres** : un bouton à icône d'entonnoir, à droite de la recherche, ouvre une fenêtre à deux sections.
-  - *Filtres Kyara* : les pastilles du site (Que je n'ai pas, Que je peux accepter…), reprises à l'identique et rangées en catégories.
-  - *Filtres de l'extension* :
-    - **Rentabilité** : Off / Neutre et + / Positif, et un curseur de gain minimum (pas de 1 %) ;
-    - **Rareté** : une ou plusieurs raretés de la carte proposée (aucune cochée = toutes) ;
-    - **Tri** : offres classées de la plus rentable à la moins rentable.
-- Les offres filtrées ou triées n'apparaissent jamais avant d'être traitées (pas de clignotement). Quand un filtre laisse moins de 10 offres visibles, « Voir plus d'offres » est cliqué automatiquement (25 fois au maximum d'affilée), avec une pastille « Chargement… » en bas de page.
-- Les valeurs inconnues n'affichent rien (jamais de `?`).
-- Textes en français et en anglais, selon la langue du navigateur.
+- Badge on each card: `≈ G◆` on the offered card, `G − W` on the wanted cards.
+- Offer background tinted from blue (gain) to red (loss), based on the best relative gain among your cards. "Profitability on/off" pill at the bottom left.
+- Ring around cards in their rarity's official color.
+- Hovering a card: current minimum price on the market.
+- **Filter panel**: a funnel icon button, right of the search field, opens a popover with two sections.
+  - *Kyara filters*: the site's pills (Que je n'ai pas, Que je peux accepter…), mirrored as is and grouped into categories.
+  - *Extension filters*:
+    - **Profitability**: Off / Neutral and up / Positive, plus a minimum gain slider (1 % steps);
+    - **Rarity**: one or more rarities of the offered card (none checked = all);
+    - **Sort**: offers ranked from most to least profitable.
+- Filtered or sorted offers never show before being processed (no flicker). When a filter leaves fewer than 10 visible offers, "Voir plus d'offres" (load more) is clicked automatically (at most 25 times in a row), and the button shows a loading text meanwhile.
+- Unknown values show nothing (never a `?`).
+- Texts in French and English, depending on the browser language.
 
-Ce n'est pas un bot : l'extension n'agit jamais à ta place. Elle lit les réponses que le site charge déjà, et ne fait que quelques requêtes groupées (`/api/fair-play/prices`, max 200 ids) limitées aux offres que tu peux accepter, plus une requête par carte survolée.
+This is not a bot: the extension never acts on your behalf. It reads the responses the site already loads, and only makes a few grouped requests (`/api/fair-play/prices`, max 200 ids) limited to offers you can accept, plus one request per hovered card.
 
-Stack : [WXT](https://wxt.dev) + TypeScript. Règles du projet : [CLAUDE.md](CLAUDE.md).
+Stack: [WXT](https://wxt.dev) + TypeScript. Project rules: [CLAUDE.md](CLAUDE.md).
 
-Les textes affichés sont dans [`src/locales/en.json`](src/locales/en.json) et [`src/locales/fr.json`](src/locales/fr.json) : aucun texte visible n'est écrit dans le code.
+Displayed texts live in [`src/locales/en.json`](src/locales/en.json) and [`src/locales/fr.json`](src/locales/fr.json): no visible text is written in the code.
 
-## Développement
+## Development
 
 ```bash
 pnpm install
@@ -32,29 +32,37 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm dev` ouvre Firefox sur les Échanges avec l'extension, et la recharge à chaque modification. Firefox utilise un profil à part, gardé dans `.firefox-profile/` (non versionné) : connecte-toi à kyara.games une seule fois. Les logs `[kyara-extension:…]` s'affichent dans la console de la page (F12) et dans `about:debugging` → Inspecter pour le script de fond.
+`pnpm dev` opens Firefox on the Trades tab with the extension, and reloads it on every change. Firefox uses a separate profile, kept in `.firefox-profile/` (not versioned): log in to kyara.games only once. `[kyara-extension:…]` logs show in the page console (F12) and in `about:debugging` → Inspect for the background script.
 
-## Installation (build de production)
+## Installation (production build)
 
 ```bash
 pnpm build
 ```
 
-1. Ouvrir `about:debugging#/runtime/this-firefox`.
-2. « Charger un module complémentaire temporaire… » → choisir `.output/firefox-mv2/manifest.json`.
-3. Navigation privée : `about:addons` → Kyara Extension → « Exécuter dans des fenêtres privées » → Autoriser.
+1. Open `about:debugging#/runtime/this-firefox`.
+2. "Load Temporary Add-on…" → pick `.output/firefox-mv2/manifest.json`.
+3. Private browsing: `about:addons` → Kyara Extension → "Run in Private Windows" → Allow.
 
-Le build de production ne contient aucun log.
+The production build contains no logs.
 
-## Chrome (partiel)
+## Release
+
+```bash
+pnpm release
+```
+
+Run from an up-to-date `main`, after bumping `"version"` in `package.json`. The script checks the code, submits the version to addons.mozilla.org with its sources and [`amo-metadata.json`](amo-metadata.json) (AMO keys in `.env`, see [`scripts/release.sh`](scripts/release.sh)), then creates a GitHub release (tag + changelog). Once Mozilla approves the version, it is published on the store and installed copies update themselves.
+
+## Chrome (partial)
 
 ```bash
 pnpm build:chrome
 ```
 
-Build Chrome (Manifest V3) dans `.output/chrome-mv3/`, à charger via `chrome://extensions` → Mode développeur → « Charger l'extension non empaquetée ». Le cache passif des prix n'existe que sur Firefox : sur Chrome, les prix viennent seulement des requêtes fair-play, donc moins de badges. Firefox reste la cible de référence.
+Chrome build (Manifest V3) in `.output/chrome-mv3/`, to load through `chrome://extensions` → Developer mode → "Load unpacked". The passive price cache only exists on Firefox: on Chrome, prices only come from the fair-play requests, so fewer badges. Firefox stays the reference target.
 
-## Tests et vérifications
+## Tests and checks
 
 ```bash
 pnpm test

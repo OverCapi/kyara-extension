@@ -5,18 +5,18 @@ import { setLocale, t, tn } from "./i18n";
 
 const params = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
-describe("catalogues", () => {
-  it("en et fr ont exactement les mêmes clés", () => {
+describe("catalogs", () => {
+  it("en and fr have exactly the same keys", () => {
     expect(Object.keys(fr).sort()).toEqual(Object.keys(en).sort());
   });
-  it("chaque clé a les mêmes {paramètres} dans les deux langues, et aucun texte vide", () => {
+  it("each key has the same {params} in both languages, and no empty text", () => {
     for (const key of Object.keys(en) as Array<keyof typeof en>) {
       expect(params(fr[key]), key).toEqual(params(en[key]));
       expect(en[key].trim(), key).not.toBe("");
       expect(fr[key].trim(), key).not.toBe("");
     }
   });
-  it("chaque pluriel a ses formes _one et _other", () => {
+  it("each plural has its _one and _other forms", () => {
     for (const key of Object.keys(en).filter((k) => k.endsWith("_one"))) {
       expect(en).toHaveProperty(`${key.slice(0, -4)}_other`);
     }
@@ -24,13 +24,13 @@ describe("catalogues", () => {
 });
 
 describe("t", () => {
-  it("renvoie le texte dans la langue choisie", () => {
+  it("returns the text in the chosen language", () => {
     setLocale("fr");
     expect(t("tooltip.unavailable")).toBe("indisponible");
     setLocale("en");
     expect(t("tooltip.unavailable")).toBe("unavailable");
   });
-  it("remplace les paramètres ; un paramètre manquant reste tel quel", () => {
+  it("replaces params; a missing param is left as is", () => {
     setLocale("fr");
     expect(t("gauge.threshold", { pct: 12 })).toBe("Gain min ≥ 12 %");
     expect(t("gauge.threshold")).toBe("Gain min ≥ {pct} %");
@@ -38,7 +38,7 @@ describe("t", () => {
 });
 
 describe("tn", () => {
-  it("choisit singulier ou pluriel", () => {
+  it("picks singular or plural", () => {
     setLocale("fr");
     expect(tn("tooltip.listing", 1)).toBe("1 annonce");
     expect(tn("tooltip.listing", 3)).toBe("3 annonces");
@@ -48,8 +48,8 @@ describe("tn", () => {
   });
 });
 
-describe("langue du navigateur", () => {
-  it("français reconnu, langue inconnue : anglais", async () => {
+describe("browser language", () => {
+  it("French is recognized, unknown language: English", async () => {
     for (const [lang, expected] of [
       ["fr-FR", "indisponible"],
       ["de-DE", "unavailable"],

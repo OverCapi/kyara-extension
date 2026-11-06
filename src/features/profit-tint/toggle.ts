@@ -1,7 +1,7 @@
-// Pastille "Rentabilité on/off" (textes : locales/*.json) : petit bouton fixe en bas à gauche, visible seulement quand la page
-// contient des offres. Ajoutée à <html> (hors de l'arbre du site). Le choix est mémorisé dans le
-// stockage (clé noTint) et suivi en direct, y compris depuis un autre onglet.
-// Effet : classe `kv-no-tint` sur <html> quand les couleurs sont coupées (le CSS retire alors le fond).
+// "Profitability on/off" pill (texts: locales/*.json): small fixed button bottom left, only visible when the page
+// has offers. Appended to <html> (outside the site's tree). The choice is stored
+// (noTint key) and followed live, including from another tab.
+// Effect: `kv-no-tint` class on <html> when colors are off (CSS then removes the background).
 import { safeAsync } from "../../core/errors";
 import { t } from "../../core/i18n";
 import { listen, mountFloating, type PageContext } from "../../core/page";
@@ -11,7 +11,7 @@ export interface Toggle {
   setVisible(visible: boolean): void;
 }
 
-/** Crée la pastille et branche son comportement. */
+/** Creates the pill and wires its behavior. */
 export function createToggle(page: PageContext): Toggle {
   const button = document.createElement("button");
   button.type = "button";

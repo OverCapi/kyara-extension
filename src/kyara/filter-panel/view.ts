@@ -1,5 +1,5 @@
-// DOM du panneau de filtres : bouton (icône d'entonnoir) + fenêtre à 2 sections, rangées en catégories.
-// Aucun écouteur ni logique ici (voir index.ts). Textes : locales/*.json.
+// DOM of the filter panel: button (funnel icon) + popover with 2 sections, split into categories.
+// No listener or logic here (see index.ts). Texts: locales/*.json.
 import { t } from "../../core/i18n";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -25,7 +25,7 @@ function funnelIcon(): SVGElement {
   return svg;
 }
 
-/** Catégorie : un titre et son contenu. */
+/** Category: a title and its content. */
 export function makeCategory(title: string, body: HTMLElement): HTMLElement {
   const category = document.createElement("div");
   category.className = "kv-cat";
@@ -35,7 +35,7 @@ export function makeCategory(title: string, body: HTMLElement): HTMLElement {
   return category;
 }
 
-/** Ligne de pastilles (retour à la ligne automatique). */
+/** Row of pills (wraps automatically). */
 export function pillRow(pills: HTMLElement[]): HTMLElement {
   const row = document.createElement("div");
   row.className = "kv-pills";
@@ -53,7 +53,7 @@ function makeSection(title: string): { root: HTMLElement; body: HTMLElement } {
   return { root, body };
 }
 
-/** Construit le bouton et la fenêtre (cachée). `kyara` et `extension` sont les corps des 2 sections. */
+/** Builds the button and the (hidden) popover. `kyara` and `extension` are the bodies of the 2 sections. */
 export function buildMenu() {
   const root = document.createElement("div");
   root.className = "kv-menu";

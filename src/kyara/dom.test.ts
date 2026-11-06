@@ -3,12 +3,12 @@ import { renderOffers } from "../test/helpers";
 import { cardId, findLoadMore, findOfferFilters, offerCards, offerIds, readOffer, readOffers } from "./dom";
 
 describe("cardId", () => {
-  it("lit le dernier segment de /wiki/<id>", () => {
+  it("reads the last segment of /wiki/<id>", () => {
     const a = document.createElement("a");
     a.setAttribute("href", "/wiki/42");
     expect(cardId(a)).toBe(42);
   });
-  it("null si le lien n'a pas d'id numérique", () => {
+  it("null if the link has no numeric id", () => {
     const a = document.createElement("a");
     a.setAttribute("href", "/wiki/abc");
     expect(cardId(a)).toBeNull();
@@ -17,7 +17,7 @@ describe("cardId", () => {
 });
 
 describe("readOffer / readOffers", () => {
-  it("lit la carte proposée et les cartes demandées", () => {
+  it("reads the offered card and the wanted cards", () => {
     const [li] = renderOffers([{ give: 5, wants: [7, 8] }]);
     const offer = readOffer(li as HTMLElement);
     expect(offer.give?.id).toBe(5);
@@ -25,19 +25,19 @@ describe("readOffer / readOffers", () => {
     expect(offerIds(offer)).toEqual([5, 7, 8]);
     expect(offerCards(offer)).toHaveLength(3);
   });
-  it("offre sans carte proposée", () => {
+  it("offer without an offered card", () => {
     const [li] = renderOffers([{ wants: [7] }]);
     const offer = readOffer(li as HTMLElement);
     expect(offer.give).toBeNull();
     expect(offerIds(offer)).toEqual([7]);
     expect(offerCards(offer)).toHaveLength(1);
   });
-  it("ignore les liens sans id valide", () => {
+  it("ignores links without a valid id", () => {
     const [li] = renderOffers([{ give: 5, wants: [7] }]);
     li?.querySelector(".want")?.insertAdjacentHTML("beforeend", '<a href="/wiki/zzz">?</a>');
     expect(readOffer(li as HTMLElement).wants).toHaveLength(1);
   });
-  it("readOffers renvoie toutes les offres de la page, [] sinon", () => {
+  it("readOffers returns every offer in the page, [] otherwise", () => {
     expect(readOffers()).toEqual([]);
     renderOffers([{ give: 1 }, { give: 2 }]);
     expect(readOffers()).toHaveLength(2);
@@ -45,26 +45,26 @@ describe("readOffer / readOffers", () => {
 });
 
 describe("findOfferFilters", () => {
-  it("trouve la barre qui contient les pastilles, ignore les autres .filters", () => {
+  it("finds the bar that holds the pills, ignores other .filters", () => {
     document.body.innerHTML =
       '<div class="filters"><input></div><div class="filters"><input><div class="pills"></div></div>';
     expect(findOfferFilters()).toBe(document.querySelectorAll(".filters")[1]);
   });
-  it("absente : null", () => {
+  it("missing: null", () => {
     document.body.innerHTML = "";
     expect(findOfferFilters()).toBeNull();
   });
 });
 
 describe("findLoadMore", () => {
-  it("trouve le bouton sous la liste des offres", () => {
+  it("finds the button under the offer list", () => {
     document.body.innerHTML =
       '<section class="board"><ul class="offers"></ul><button class="btn more">Voir plus</button></section>';
     expect(findLoadMore()?.textContent).toBe("Voir plus");
   });
-  it("absent (plus d'offres à charger) : null", () => {
+  it("missing (no more offers to load): null", () => {
     document.body.innerHTML =
-      '<section class="board"><ul class="offers"></ul></section><button class="more">autre</button>';
+      '<section class="board"><ul class="offers"></ul></section><button class="more">other</button>';
     expect(findLoadMore()).toBeNull();
   });
 });

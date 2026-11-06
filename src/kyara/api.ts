@@ -1,6 +1,6 @@
-// Appels à l'API kyara.games depuis le content script, avec les mêmes en-têtes que le site :
-// jeton et device id lus dans le localStorage du site. Le jeton n'est envoyé qu'à /api du même site.
-// `kyaraFetch` ne lève jamais d'exception : tout échec devient `{ ok: false }`.
+// Calls to the kyara.games API from the content script, with the same headers as the site:
+// token and device id read from the site's localStorage. The token is only sent to the same site's /api.
+// `kyaraFetch` never throws: any failure becomes `{ ok: false }`.
 
 import { pageFetch } from "../core/firefox";
 import { createLogger } from "../core/log";
@@ -9,13 +9,13 @@ const log = createLogger("api");
 
 export interface ApiResult {
   ok: boolean;
-  /** Code HTTP, 0 si la requête n'a pas abouti (réseau, JSON illisible). */
+  /** HTTP status, 0 if the request did not complete (network, unreadable JSON). */
   status: number;
-  /** Corps JSON, `null` si échec. */
+  /** JSON body, `null` on failure. */
   data: unknown;
 }
 
-/** En-têtes d'authentification du site. Vides si le localStorage est inaccessible ou sans jeton. */
+/** The site's auth headers. Empty if localStorage is unreachable or has no token. */
 export function authHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
   try {
@@ -24,19 +24,19 @@ export function authHeaders(): Record<string, string> {
     if (token) headers.authorization = `Bearer ${token}`;
     if (device) headers["x-device-id"] = device;
   } catch (err) {
-    log.debug("localStorage inaccessible, requête sans jeton", err);
+    log.debug("localStorage unreachable, request without token", err);
   }
   return headers;
 }
 
-/** GET `/api<path>` (ex. "/me/collection?lean=1"). */
+/** GET `/api<path>` (e.g. "/me/collection?lean=1"). */
 export async function kyaraFetch(path: string): Promise<ApiResult> {
   try {
     const r = await pageFetch()(`/api${path}`, { headers: authHeaders() });
     if (!r.ok) return { ok: false, status: r.status, data: null };
     return { ok: true, status: r.status, data: await r.json() };
   } catch (err) {
-    log.debug(`${path} : échec`, err);
+    log.debug(`${path}: failed`, err);
     return { ok: false, status: 0, data: null };
   }
 }

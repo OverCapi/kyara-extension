@@ -1,12 +1,12 @@
-// Règle du filtre "gain minimum". Fonction pure.
+// Rule of the "minimum gain" filter. Pure function.
 import type { GainFilter } from "../../core/storage";
 
 /**
- * `true` si l'offre doit rester visible. `ratio` = meilleur gain relatif (0.25 = +25 %).
- *   off      : tout reste visible ;
- *   neutral  : gain ≥ 0 et ≥ seuil ;
- *   positive : gain > 0 et ≥ seuil.
- * Gain inconnu (`null`) : masqué dès que le filtre est actif.
+ * `true` if the offer must stay visible. `ratio` = best relative gain (0.25 = +25 %).
+ *   off      : everything stays visible;
+ *   neutral  : gain ≥ 0 and ≥ threshold;
+ *   positive : gain > 0 and ≥ threshold.
+ * Unknown gain (`null`): hidden as soon as the filter is on.
  */
 export function passesGainFilter(
   ratio: number | null,
@@ -15,6 +15,6 @@ export function passesGainFilter(
   if (mode === "off") return true;
   if (ratio === null) return false;
   if (mode === "positive" && ratio <= 0) return false;
-  // comparer en ratio, pas en % : 0.29 * 100 vaut 28.999… et raterait le seuil 29 %
+  // compare as a ratio, not in %: 0.29 * 100 is 28.999… and would miss the 29 % threshold
   return ratio >= pct / 100;
 }

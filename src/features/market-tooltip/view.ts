@@ -1,28 +1,40 @@
-// Affichage de l'infobulle : texte (HTML échappé) et position. Aucune logique réseau.
-import { escapeHtml } from "../../core/html";
+// Tooltip display: content (built as DOM nodes, never innerHTML) and position. No network logic.
 import { t, tn } from "../../core/i18n";
 import type { MarketMin } from "./market-min";
 
-/** État de l'infobulle : chargement, résultat, ou échec. */
+/** Tooltip state: loading, result, or failure. */
 export type TipState = { kind: "loading" } | { kind: "error" } | { kind: "result"; data: MarketMin };
 
-const row = (value: string) => `<span class="kv-row"><span>${t("tooltip.market_min")}</span>${value}</span>`;
+/** Element with a class and children; strings become text nodes, so site text is never parsed as HTML. */
+function el(tag: string, className: string, ...children: Array<Node | string>): HTMLElement {
+  const created = document.createElement(tag);
+  if (className) created.className = className;
+  created.append(...children);
+  return created;
+}
 
-/** HTML de l'infobulle pour une carte. Le nom vient du site : il est échappé. */
-export function tipHtml(name: string, state: TipState): string {
-  const title = `<b>${escapeHtml(name)}</b>`;
-  if (state.kind === "loading") return title + row('<span class="kv-v">…</span>');
-  if (state.kind === "error")
-    return title + row(`<span class="kv-v kv-mut">${t("tooltip.unavailable")}</span>`);
-  const { min, count } = state.data;
-  if (min === null) return title + row(`<span class="kv-v kv-mut">${t("tooltip.no_listing")}</span>`);
-  const sub = `<span class="kv-sub">${tn("tooltip.listing", count)}</span>`;
-  return title + row(`<span class="kv-v">${min}<i>◆</i></span>`) + sub;
+const row = (value: HTMLElement) => el("span", "kv-row", el("span", "", t("tooltip.market_min")), value);
+
+function tipValue(state: TipState): HTMLElement {
+  if (state.kind === "loading") return el("span", "kv-v", "…");
+  if (state.kind === "error") return el("span", "kv-v kv-mut", t("tooltip.unavailable"));
+  const { min } = state.data;
+  if (min === null) return el("span", "kv-v kv-mut", t("tooltip.no_listing"));
+  return el("span", "kv-v", String(min), el("i", "", "◆"));
+}
+
+/** Tooltip content for a card: name, market min row, and the listing count when there are listings. */
+export function tipNodes(name: string, state: TipState): HTMLElement[] {
+  const nodes = [el("b", "", name), row(tipValue(state))];
+  if (state.kind === "result" && state.data.min !== null) {
+    nodes.push(el("span", "kv-sub", tn("tooltip.listing", state.data.count)));
+  }
+  return nodes;
 }
 
 const MARGIN = 8;
 
-/** Position de l'infobulle : au-dessus de la carte (en dessous si pas la place), toujours dans l'écran. */
+/** Tooltip position: above the card (below if there is no room), always on screen. */
 export function tipPosition(
   anchor: { left: number; top: number; bottom: number; width: number },
   size: { width: number; height: number },
@@ -34,9 +46,9 @@ export function tipPosition(
   return { left, top: above >= MARGIN ? above : anchor.bottom + MARGIN };
 }
 
-/** Remplit l'infobulle et la place près de `anchor`. */
-export function showTip(tip: HTMLElement, anchor: Element, html: string): void {
-  tip.innerHTML = html;
+/** Fills the tooltip and places it near `anchor`. */
+export function showTip(tip: HTMLElement, anchor: Element, nodes: Node[]): void {
+  tip.replaceChildren(...nodes);
   tip.hidden = false;
   const pos = tipPosition(
     anchor.getBoundingClientRect(),

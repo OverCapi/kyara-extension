@@ -2,13 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 import { safe, safeAsync } from "./errors";
 
 describe("safe", () => {
-  it("transmet les arguments", () => {
+  it("forwards the arguments", () => {
     const fn = vi.fn();
     safe("t", fn)(1, "a");
     expect(fn).toHaveBeenCalledWith(1, "a");
   });
 
-  it("attrape une exception synchrone", () => {
+  it("catches a synchronous exception", () => {
     expect(() =>
       safe("t", () => {
         throw new Error("x");
@@ -18,7 +18,7 @@ describe("safe", () => {
 });
 
 describe("safeAsync", () => {
-  it("attend la fonction", async () => {
+  it("awaits the function", async () => {
     let done = false;
     await safeAsync("t", async () => {
       await Promise.resolve();
@@ -27,11 +27,11 @@ describe("safeAsync", () => {
     expect(done).toBe(true);
   });
 
-  it("ne rejette jamais (rejet async)", async () => {
+  it("never rejects (async rejection)", async () => {
     await expect(safeAsync("t", () => Promise.reject(new Error("x")))()).resolves.toBeUndefined();
   });
 
-  it("ne rejette jamais (exception synchrone)", async () => {
+  it("never rejects (synchronous exception)", async () => {
     const fn = safeAsync("t", () => {
       throw new Error("x");
     });

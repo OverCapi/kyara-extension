@@ -3,25 +3,25 @@ import { RARITIES } from "../../kyara/rarity";
 import { passesRarity, toRarities } from "./filter";
 
 describe("passesRarity", () => {
-  it("aucune rareté choisie : tout passe, même rareté inconnue", () => {
+  it("no rarity chosen: everything passes, even unknown rarity", () => {
     expect(passesRarity("common", [])).toBe(true);
     expect(passesRarity(null, [])).toBe(true);
   });
-  it("seulement les raretés choisies", () => {
+  it("only the chosen rarities", () => {
     expect(passesRarity("mythic", ["mythic", "legendary"])).toBe(true);
     expect(passesRarity("legendary", ["mythic", "legendary"])).toBe(true);
     expect(passesRarity("rare", ["mythic", "legendary"])).toBe(false);
   });
-  it("rareté inconnue : masquée dès qu'une rareté est choisie", () => {
+  it("unknown rarity: hidden as soon as a rarity is chosen", () => {
     expect(passesRarity(null, ["mythic"])).toBe(false);
   });
 });
 
 describe("toRarities", () => {
-  it("garde les valeurs valides dans l'ordre des raretés, sans doublon", () => {
+  it("keeps valid values in rarity order, without duplicates", () => {
     expect(toRarities(["mythic", "nope", "common", "mythic"], RARITIES)).toEqual(["common", "mythic"]);
   });
-  it("liste vide ou rien de valide : vide", () => {
+  it("empty list or nothing valid: empty", () => {
     expect(toRarities([], RARITIES)).toEqual([]);
     expect(toRarities(["x"], RARITIES)).toEqual([]);
   });

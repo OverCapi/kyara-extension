@@ -1,7 +1,7 @@
-// Anneau autour de chaque carte d'une offre, à la couleur officielle de sa rareté.
-// Le site met déjà cette couleur (--C/--U/--R/--E/--L/--M) dans le box-shadow inline de l'image,
-// mais toujours en vert pour l'anneau extérieur : on reprend la vraie couleur et le CSS dessine l'anneau.
-// Effet DOM : attribut data-kv-rar + variable CSS --kv-rar sur le lien de la carte.
+// Ring around each card of an offer, in its rarity's official color.
+// The site already puts that color (--C/--U/--R/--E/--L/--M) in the image's inline box-shadow,
+// but the outer ring is always green: the real color is reused and CSS draws the ring.
+// DOM effect: data-kv-rar attribute + --kv-rar CSS variable on the card's link.
 import type { Card } from "../../kyara/dom";
 import { offerCards } from "../../kyara/dom";
 import { rarityColor } from "../../kyara/rarity";

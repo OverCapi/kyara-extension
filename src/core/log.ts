@@ -1,15 +1,14 @@
-// Logs de développement. SEUL fichier autorisé à appeler console.*.
-// `import.meta.env.DEV` est remplacé par `false` au build de prod : le corps de ces fonctions
-// est alors vide et disparaît du bundle (aucun log, aucun coût en prod).
-
+// Development logs. The ONLY file allowed to call console.*.
+// `import.meta.env.DEV` is replaced with `false` in the prod build: the body of these functions
+// is then empty and drops out of the bundle (no logs, no cost in prod).
 export interface Logger {
-  /** Suivi normal (requêtes, rendus). Muet en prod. */
+  /** Normal tracing (requests, renders). Silent in prod. */
   debug(...args: unknown[]): void;
-  /** Erreur attrapée ou donnée invalide. Muet en prod. */
+  /** Caught error or invalid data. Silent in prod. */
   error(...args: unknown[]): void;
 }
 
-/** Crée un logger dont chaque ligne est préfixée `[kyara-extension:<module>]`. */
+/** Creates a logger whose lines are prefixed with `[kyara-extension:<module>]`. */
 export function createLogger(module: string): Logger {
   const tag = `[kyara-extension:${module}]`;
   return {

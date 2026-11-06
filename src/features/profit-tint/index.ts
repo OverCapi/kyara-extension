@@ -1,5 +1,5 @@
-// Fond de chaque offre teinté du bleu (gain) au rouge (perte), selon le meilleur gain relatif parmi
-// TES cartes demandées, plus la pastille on/off (toggle.ts). Effet DOM : variable CSS --kv-bg sur le <li>.
+// Each offer's background tinted from blue (gain) to red (loss), from the best relative gain among
+// YOUR wanted cards, plus the on/off pill (toggle.ts). DOM effect: --kv-bg CSS variable on the <li>.
 import { analyzeOffer } from "../../kyara/prices";
 import type { Feature } from "../types";
 import { tintColor } from "./tint";

@@ -5,7 +5,7 @@ import { createMarketMin, TIP_TTL } from "./market-min";
 const listing = { items: [{ price: 7 }], total: 3 };
 
 describe("createMarketMin", () => {
-  it("demande l'annonce la moins chère et renvoie prix et nombre", async () => {
+  it("requests the cheapest listing and returns price and count", async () => {
     const fetchMock = mockFetch(listing);
     expect(await createMarketMin()(5)).toEqual({ min: 7, count: 3 });
     expect(fetchMock.mock.calls[0]?.[0]).toBe(
@@ -13,7 +13,7 @@ describe("createMarketMin", () => {
     );
   });
 
-  it("garde le résultat 2 min, puis redemande", async () => {
+  it("keeps the result 2 min, then requests again", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     const fetchMock = mockFetch(listing);
     const marketMin = createMarketMin();
@@ -26,13 +26,13 @@ describe("createMarketMin", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("échec HTTP ou réponse inattendue : null, non mis en cache", async () => {
+  it("HTTP failure or unexpected response: null, not cached", async () => {
     const fetchMock = mockFetch({}, 500);
     const marketMin = createMarketMin();
     expect(await marketMin(5)).toBeNull();
     expect(await marketMin(5)).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    mockFetch("pas un objet");
+    mockFetch("not an object");
     expect(await marketMin(6)).toBeNull();
   });
 });

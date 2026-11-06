@@ -1,14 +1,14 @@
-/* Offre dont la carte proposée n'a pas une rareté choisie (attribut posé par la feature rarity-filter). */
+/* Offer whose offered card does not have a chosen rarity (attribute set by the rarity-filter feature). */
 li[data-kv-hide-rarity] {
   display: none !important;
 }
 
-/* Offres pas encore filtrées (le runtime pose data-kv-seen quand c'est fait) : cachées, sans clignotement. */
+/* Offers not filtered yet (the runtime sets data-kv-seen once done): hidden, no flicker. */
 html[data-kv-filter-rarity] li[id^="offre-"]:not([data-kv-seen]) {
   display: none !important;
 }
 
-/* Puce de rareté : pastille ronde de la couleur de la rareté devant le nom. */
+/* Rarity chip: round dot in the rarity's color before the name. */
 .kv-chip::before {
   content: "";
   display: inline-block;

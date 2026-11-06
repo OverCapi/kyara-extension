@@ -1,8 +1,8 @@
-// Ordre des offres, de la plus rentable à la moins rentable. Fonction pure.
+// Order of the offers, from most to least profitable. Pure function.
 
 /**
- * Rang de chaque offre (0 = en premier) d'après son meilleur gain relatif. Gain inconnu (`null`) en
- * dernier. À gain égal, l'ordre du site est gardé. `ratios[i]` = gain de l'offre `i` ; renvoie `rank[i]`.
+ * Rank of each offer (0 = first) from its best relative gain. Unknown gain (`null`) comes
+ * last. On equal gain, the site's order is kept. `ratios[i]` = gain of offer `i`; returns `rank[i]`.
  */
 export function rankByGain(ratios: Array<number | null>): number[] {
   const order = ratios
