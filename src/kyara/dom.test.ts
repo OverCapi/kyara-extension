@@ -115,6 +115,16 @@ describe("readGiveButtons", () => {
     );
     expect(readGiveButtons(readOffer(li)).map((b) => b.card.id)).toEqual([2, 3]);
   });
+  it('owned card: the site\'s "(tu l’as)" suffix in the title is ignored', () => {
+    const [li] = renderOffers([{ give: 1, wants: [2], buttons: ["Donner Carte 2 ×1"] }]);
+    if (!li) throw new Error("no offer");
+    const a = li.querySelector(".want a");
+    a?.setAttribute("title", "Carte 2 (tu l’as)");
+    expect(readGiveButtons(readOffer(li)).map((b) => b.card.id)).toEqual([2]);
+    a?.querySelector("img")?.setAttribute("alt", "Carte 2");
+    a?.setAttribute("title", "autre");
+    expect(readGiveButtons(readOffer(li)).map((b) => b.card.id)).toEqual([2]); // alt first
+  });
   it("card without a name: never matched", () => {
     const [li] = renderOffers([{ give: 1, wants: [2], buttons: ["Donner  ×1"] }]);
     if (!li) throw new Error("no offer");

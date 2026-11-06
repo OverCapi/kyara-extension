@@ -72,6 +72,11 @@ export function findOfferArrow(offer: Offer): HTMLElement | null {
 const ACTION_SELECTOR = 'button, [role="button"], a:not([href^="/wiki/"])';
 const normalize = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
 
+/** Name of a card: its image's `alt`, otherwise its `title` without the site's " (tu l'as)" suffix (owned cards). */
+function cardName(card: Card): string {
+  return card.el.querySelector("img")?.alt || card.el.title.replace(/\s*\([^)]*\)\s*$/, "");
+}
+
 /** A "Donner <card>" (give) button and the wanted card it gives. */
 export interface GiveButton {
   el: HTMLElement;
@@ -86,7 +91,7 @@ export interface GiveButton {
 // ponytail: matched by name, since the buttons carry no card id; switch to an id if the site adds one.
 export function readGiveButtons(offer: Offer): GiveButton[] {
   const named = offer.wants
-    .map((card) => ({ card, name: normalize(card.el.title) }))
+    .map((card) => ({ card, name: normalize(cardName(card)) }))
     .filter((n) => n.name)
     .sort((a, b) => b.name.length - a.name.length);
   const buttons: GiveButton[] = [];

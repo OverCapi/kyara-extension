@@ -8,8 +8,8 @@ const HTML =
   '<li class="offer svelte-x" id="offre-abc"><div class="top svelte-x"><div class="give svelte-x">' +
   '<a class="big svelte-x" href="/wiki/1" title="Sumire Akane"><img alt="Sumire Akane"></a></div>' +
   '<div class="arrow svelte-x" aria-hidden="true">⇄</div><div class="want svelte-x"><div class="thumbs svelte-x"><!---->' +
-  '<a class="thumb svelte-x" href="/wiki/2" title="Suzaku"><img alt="Suzaku"></a><!---->' +
-  '<a class="thumb svelte-x" href="/wiki/3" title="Sagittarius"><img alt="Sagittarius"></a></div></div></div> ' +
+  '<a class="thumb svelte-x" href="/wiki/2" title="Suzaku (tu l’as)"><img alt="Suzaku"></a><!---->' +
+  '<a class="thumb svelte-x" href="/wiki/3" title="Sagittarius (tu l’as)"><img alt="Sagittarius"></a></div></div></div> ' +
   '<div class="acts svelte-7j21ia"><!----><button class="btn btn-acc btn-sm" type="button">Donner Suzaku ' +
   '<span class="own mono svelte-7j21ia">×1</span></button><button class="btn btn-acc btn-sm" type="button">' +
   'Donner Sagittarius <span class="own mono svelte-7j21ia">×1</span></button><!----> <!----> ' +
