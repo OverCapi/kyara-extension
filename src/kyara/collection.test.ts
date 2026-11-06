@@ -7,21 +7,21 @@ import { createCollectionLoader } from "./collection";
 beforeEach(() => fakeBrowser.reset());
 
 describe("createCollectionLoader", () => {
-  it("utilise le stockage sans requête quand la collection est connue", async () => {
+  it("uses storage without a request when the collection is known", async () => {
     await writeEntries({ owned: { 1: 2 } });
     const fetchMock = mockFetch([]);
     expect(await createCollectionLoader().load()).toEqual({ 1: 2 });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("rattrape la collection par une requête, et la mémorise", async () => {
+  it("catches up on the collection with a request, and stores it", async () => {
     const fetchMock = mockFetch([{ characterId: 3, qty: 1 }]);
     expect(await createCollectionLoader().load()).toEqual({ 3: 1 });
     expect(fetchMock).toHaveBeenCalledWith("/api/me/collection?lean=1", expect.anything());
     expect(await readOwned()).toEqual({ 3: 1 });
   });
 
-  it("ne redemande jamais deux fois par page, même en cas d'échec", async () => {
+  it("never asks twice per page, even on failure", async () => {
     const fetchMock = mockFetch({ error: "unauthorized" }, 401);
     const loader = createCollectionLoader();
     expect(await loader.load()).toBeNull();
@@ -29,7 +29,7 @@ describe("createCollectionLoader", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("réponse de forme inattendue : null, rien écrit", async () => {
+  it("unexpected response shape: null, nothing written", async () => {
     mockFetch({ nope: true });
     expect(await createCollectionLoader().load()).toBeNull();
     expect(await readOwned()).toBeNull();

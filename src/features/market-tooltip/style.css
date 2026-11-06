@@ -1,4 +1,4 @@
-/* Box au survol : reprend les variables du site (:root de kyara.games). */
+/* Hover box: uses the site's variables (kyara.games :root). */
 .kv-tip {
   position: fixed;
   z-index: 2147483647;

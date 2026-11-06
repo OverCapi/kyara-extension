@@ -1,6 +1,6 @@
-// Lecture des réponses JSON de l'API kyara.games. SEUL endroit qui connaît ces formats.
-// Utilisé par le background (cache passif) ET par le content script (requêtes à la demande).
-// Aucune fonction ne lève d'exception : donnée invalide ou inattendue -> résultat vide / null.
+// Reads the kyara.games API's JSON responses. The ONLY place that knows these formats.
+// Used by the background (passive cache) AND by the content script (on-demand requests).
+// No function throws: invalid or unexpected data -> empty result / null.
 import {
   type FairEntry,
   fairKey,
@@ -11,13 +11,13 @@ import {
   type StorageEntries,
 } from "../core/storage";
 
-const MAX_DEPTH = 50; // ponytail: garde-fou contre un JSON absurdement imbriqué ; inutile pour l'API réelle.
+const MAX_DEPTH = 50; // ponytail: guard against absurdly nested JSON; useless for the real API.
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === "object" && v !== null && !Array.isArray(v);
 const num = (v: unknown): number | null => (typeof v === "number" ? v : null);
 
-/** Un objet `{ characterId, median7d, ... }` -> clé + entrée de stockage, ou `null` si ce n'est pas un prix. */
+/** An object `{ characterId, median7d, ... }` -> key + storage entry, or `null` if it is not a price. */
 function toPriceEntry(obj: Record<string, unknown>, now: number): [string, PriceEntry] | null {
   if (typeof obj.characterId !== "number" || !("median7d" in obj)) return null;
   const entry: PriceEntry = {
@@ -30,7 +30,7 @@ function toPriceEntry(obj: Record<string, unknown>, now: number): [string, Price
   return [priceKey(obj.characterId), entry];
 }
 
-/** Cherche, à n'importe quelle profondeur, les objets `{ characterId, median7d, ... }` (médianes marché). */
+/** Finds, at any depth, the objects `{ characterId, median7d, ... }` (market medians). */
 export function parsePrices(json: unknown, now = Date.now(), depth = 0): StorageEntries {
   const out: StorageEntries = {};
   if (depth > MAX_DEPTH || typeof json !== "object" || json === null) return out;
@@ -40,7 +40,7 @@ export function parsePrices(json: unknown, now = Date.now(), depth = 0): Storage
   return out;
 }
 
-/** Réponse fair-play `{ "<id>": prix }`. Garde les nombres (0 inclus), ignore le reste. */
+/** Fair-play response `{ "<id>": price }`. Keeps numbers (0 included), ignores the rest. */
 export function parseFair(json: unknown, now = Date.now()): StorageEntries {
   const out: StorageEntries = {};
   if (!isRecord(json)) return out;
@@ -53,7 +53,7 @@ export function parseFair(json: unknown, now = Date.now()): StorageEntries {
   return out;
 }
 
-/** Collection `[{ characterId, qty }]` -> cartes possédées (qty > 0). `null` si ce n'est pas une collection. */
+/** Collection `[{ characterId, qty }]` -> owned cards (qty > 0). `null` if it is not a collection. */
 export function parseCollection(json: unknown): OwnedCards | null {
   if (!Array.isArray(json)) return null;
   const owned: OwnedCards = {};
@@ -65,20 +65,20 @@ export function parseCollection(json: unknown): OwnedCards | null {
   return owned;
 }
 
-/** Annonces d'une carte : prix minimum et nombre d'annonces. `null` si la réponse est inattendue. */
+/** Listings of a card: minimum price and number of listings. `null` if the response is unexpected. */
 export function parseMarketMin(json: unknown): { min: number | null; count: number } | null {
   if (!isRecord(json)) return null;
   const first = Array.isArray(json.items) ? json.items[0] : undefined;
   return { min: isRecord(first) ? num(first.price) : null, count: num(json.total) ?? 0 };
 }
 
-/** Choisit le bon format selon l'URL appelée. Renvoie les entrées prêtes à écrire dans le stockage (vide si rien). */
+/** Picks the right format from the called URL. Returns entries ready to write to storage (empty if none). */
 export function parseResponse(url: string, json: unknown, now = Date.now()): StorageEntries {
   let path: string;
   try {
     path = new URL(url).pathname;
   } catch {
-    return {}; // URL invalide : rien à stocker
+    return {}; // invalid URL: nothing to store
   }
   if (path === "/api/me/collection") {
     const owned = parseCollection(json);

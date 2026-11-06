@@ -13,33 +13,33 @@ const NOW = 10_000_000;
 const emptyStore = (): PriceStore => ({ fair: {}, market: {} });
 
 describe("findMissing", () => {
-  it("demande la carte proposée + mes cartes demandées, pas les autres", () => {
+  it("requests the offered card + my wanted cards, not the others", () => {
     renderOffers([{ give: 1, wants: [2, 3] }]);
     const { need, acceptable } = findMissing(readOffers(), { 2: 1 }, emptyStore(), new Map(), NOW);
     expect([...need].sort()).toEqual([1, 2]);
     expect(acceptable).toBe(1);
   });
 
-  it("ignore les offres non acceptables ou sans carte proposée", () => {
+  it("ignores offers that are not acceptable or have no offered card", () => {
     renderOffers([{ give: 1, wants: [3] }, { wants: [2] }]);
     const { need, acceptable } = findMissing(readOffers(), { 2: 1 }, emptyStore(), new Map(), NOW);
     expect(need.size).toBe(0);
     expect(acceptable).toBe(0);
   });
 
-  it("collection inconnue : rien", () => {
+  it("unknown collection: nothing", () => {
     renderOffers([{ give: 1, wants: [2] }]);
     expect(findMissing(readOffers(), null, emptyStore(), new Map(), NOW).need.size).toBe(0);
   });
 
-  it("prix frais : pas redemandé ; prix périmé (TTL) : redemandé", () => {
+  it("fresh price: not requested again; stale price (TTL): requested again", () => {
     renderOffers([{ give: 1, wants: [2] }]);
     const store = (t: number): PriceStore => ({ fair: { 1: { v: 1, t }, 2: { v: 1, t } }, market: {} });
     expect(findMissing(readOffers(), { 2: 1 }, store(NOW - TTL + 1000), new Map(), NOW).need.size).toBe(0);
     expect(findMissing(readOffers(), { 2: 1 }, store(NOW - TTL - 1000), new Map(), NOW).need.size).toBe(2);
   });
 
-  it("id en échec : pas de nouvel essai avant 5 min", () => {
+  it("failed id: no new attempt before 5 min", () => {
     renderOffers([{ give: 1, wants: [2] }]);
     const tried = (ago: number) =>
       new Map([
@@ -58,7 +58,7 @@ function snapshot(specs: Parameters<typeof renderOffers>[0], owned: Record<numbe
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
 describe("createFairPlayRequester", () => {
-  it("fait UNE requête groupée, stocke les prix, puis appelle onDone", async () => {
+  it("makes ONE grouped request, stores the prices, then calls onDone", async () => {
     const fetchMock = mockFetch({ 1: 10, 2: 4 });
     const onDone = vi.fn();
     createFairPlayRequester().request(snapshot([{ give: 1, wants: [2] }], { 2: 1 }), onDone);
@@ -68,7 +68,7 @@ describe("createFairPlayRequester", () => {
     expect((await readPrices([1, 2])).fair[2]?.v).toBe(4);
   });
 
-  it("découpe en lots de 200 ids", async () => {
+  it("splits into batches of 200 ids", async () => {
     const ids = Array.from({ length: BATCH + 5 }, (_, i) => i + 1);
     const specs = ids.map((id) => ({ give: id, wants: [1000] }));
     const fetchMock = mockFetch({});
@@ -78,7 +78,7 @@ describe("createFairPlayRequester", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("une seule requête à la fois", async () => {
+  it("one request at a time", async () => {
     const fetchMock = mockFetch({});
     const requester = createFairPlayRequester();
     const snap = snapshot([{ give: 1, wants: [2] }], { 2: 1 });
@@ -88,7 +88,7 @@ describe("createFairPlayRequester", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("onglet caché : aucune requête", async () => {
+  it("hidden tab: no request", async () => {
     const fetchMock = mockFetch({});
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
     createFairPlayRequester().request(snapshot([{ give: 1, wants: [2] }], { 2: 1 }), vi.fn());
@@ -96,7 +96,7 @@ describe("createFairPlayRequester", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("HTTP 500 : rien écrit, pas de nouvel essai immédiat, onDone appelé", async () => {
+  it("HTTP 500: nothing written, no immediate retry, onDone called", async () => {
     const fetchMock = mockFetch({ error: "x" }, 500);
     const onDone = vi.fn();
     const requester = createFairPlayRequester();
@@ -109,7 +109,7 @@ describe("createFairPlayRequester", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("erreur de stockage : attrapée, onDone appelé", async () => {
+  it("storage error: caught, onDone called", async () => {
     mockFetch({ 1: 10 });
     vi.spyOn(fakeBrowser.storage.local, "set").mockRejectedValue(new Error("context invalidated"));
     const onDone = vi.fn();
@@ -117,7 +117,7 @@ describe("createFairPlayRequester", () => {
     await vi.waitFor(() => expect(onDone).toHaveBeenCalled());
   });
 
-  it("rien à demander : aucune requête", async () => {
+  it("nothing to request: no request", async () => {
     const fetchMock = mockFetch({});
     createFairPlayRequester().request(snapshot([{ give: 1, wants: [2] }], {}), vi.fn());
     await flush();

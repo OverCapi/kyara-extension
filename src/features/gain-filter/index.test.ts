@@ -16,8 +16,8 @@ const pressed = () => document.querySelector('.kv-mode:not(.kv-sort)[aria-presse
 const hidden = (snap: ReturnType<typeof makeSnapshot>) =>
   snap.offers.map((o) => o.li.hasAttribute("data-kv-hide-gain"));
 
-// offre 1 : +100 % (10 contre 5, possédée) ; offre 2 : +20 % (6 contre 5) ; offre 3 : gain inconnu ;
-// offre 4 : neutre (5 contre 5) ; offre 5 : -20 % (4 contre 5)
+// offer 1: +100 % (10 for 5, owned); offer 2: +20 % (6 for 5); offer 3: unknown gain;
+// offer 4: neutral (5 for 5); offer 5: -20 % (4 for 5)
 const specs = [
   { give: 1, wants: [2] },
   { give: 3, wants: [2] },
@@ -29,19 +29,19 @@ const opts = { fair: { 1: 10, 2: 5, 3: 6, 4: 5, 5: 4 }, owned: { 2: 1 } };
 
 async function setSlider(value: string) {
   const el = input();
-  if (!el) throw new Error("jauge absente");
+  if (!el) throw new Error("gauge missing");
   el.value = value;
   el.dispatchEvent(new Event("input"));
 }
 
 function clickMode(label: string) {
   const el = modeButton(label);
-  if (!el) throw new Error(`mode ${label} absent`);
+  if (!el) throw new Error(`mode ${label} missing`);
   el.click();
 }
 
 describe("gain-filter", () => {
-  it("Off par défaut : rien n'est masqué, curseur grisé", async () => {
+  it("Off by default: nothing hidden, slider greyed out", async () => {
     const snap = makeSnapshot(specs, opts);
     startFeature(gainFilter).emit(snap);
     await vi.waitFor(() => expect(pressed()).toBe("Off"));
@@ -50,7 +50,7 @@ describe("gain-filter", () => {
     expect(hidden(snap)).toEqual([false, false, false, false, false]);
   });
 
-  it("Neutre et + : neutres et rentables ; Positif : rentables seulement ; mémorisé", async () => {
+  it("Neutral and up: neutral and profitable; Positive: profitable only; stored", async () => {
     const snap = makeSnapshot(specs, opts);
     startFeature(gainFilter).emit(snap);
     await vi.waitFor(() => expect(pressed()).toBe("Off"));
@@ -67,7 +67,7 @@ describe("gain-filter", () => {
     expect(hidden(snap)).toEqual([false, false, false, false, false]);
   });
 
-  it("le curseur filtre au pas de 1 % et mémorise", async () => {
+  it("the slider filters in 1 % steps and stores", async () => {
     await writeGainFilter({ mode: "neutral", pct: 0, sort: true });
     const snap = makeSnapshot(specs, opts);
     startFeature(gainFilter).emit(snap);
@@ -82,7 +82,7 @@ describe("gain-filter", () => {
     );
   });
 
-  it("un changement venu d'un autre onglet est suivi", async () => {
+  it("a change from another tab is followed", async () => {
     const snap = makeSnapshot(specs, opts);
     startFeature(gainFilter).emit(snap);
     await writeGainFilter({ mode: "positive", pct: 90, sort: true });
@@ -91,7 +91,7 @@ describe("gain-filter", () => {
     expect(pressed()).toBe("Positif");
   });
 
-  it("anciens formats repris ; hors échelle : borné", async () => {
+  it("old formats are read; out of range: clamped", async () => {
     await browser.storage.local.set({ minGain: 500 });
     startFeature(gainFilter).emit(makeSnapshot(specs, opts));
     await vi.waitFor(() => expect(input()?.value).toBe("100"));
@@ -101,22 +101,22 @@ describe("gain-filter", () => {
     expect(input()?.value).toBe("30");
   });
 
-  it("valeur corrompue : Off", async () => {
-    await browser.storage.local.set({ minGain: { mode: "tout", pct: -3 } });
+  it("corrupted value: Off", async () => {
+    await browser.storage.local.set({ minGain: { mode: "all", pct: -3 } });
     startFeature(gainFilter).emit(makeSnapshot(specs, opts));
     await vi.waitFor(() => expect(pressed()).toBe("Off"));
     expect(input()?.value).toBe("0");
   });
 
-  it("tri : meilleure offre en premier via `order`, gain inconnu en dernier", async () => {
+  it("sort: best offer first through `order`, unknown gain last", async () => {
     const snap = makeSnapshot(specs, opts);
     startFeature(gainFilter).emit(snap);
     await vi.waitFor(() => expect(pressed()).toBe("Off"));
-    // gains : +100 %, +20 %, inconnu, 0 %, -20 %
+    // gains: +100 %, +20 %, unknown, 0 %, -20 %
     expect(snap.offers.map((o) => o.li.style.order)).toEqual(["0", "1", "4", "2", "3"]);
   });
 
-  it("pastille de tri : coupe le tri (order retiré) et mémorise ; les nœuds ne bougent pas", async () => {
+  it("sort pill: turns sorting off (order removed) and stores; nodes do not move", async () => {
     const snap = makeSnapshot(specs, opts);
     startFeature(gainFilter).emit(snap);
     await vi.waitFor(() => expect(sortButton()?.getAttribute("aria-pressed")).toBe("true"));
@@ -130,26 +130,26 @@ describe("gain-filter", () => {
     expect(snap.offers[0]?.li.style.order).toBe("0");
   });
 
-  it("ancien format sans tri : tri actif", async () => {
+  it("old format without sort: sorting on", async () => {
     await browser.storage.local.set({ minGain: { mode: "off", pct: 0 } });
     startFeature(gainFilter).emit(makeSnapshot(specs, opts));
     await vi.waitFor(() => expect(sortButton()?.getAttribute("aria-pressed")).toBe("true"));
   });
 
-  it("offre sans carte proposée : ignorée", () => {
+  it("offer without an offered card: ignored", () => {
     const snap = makeSnapshot([{ wants: [2] }]);
     startFeature(gainFilter).emit(snap);
     expect(hidden(snap)).toEqual([false]);
   });
 
-  it("range ses réglages dans 2 catégories du panneau : Rentabilité et Tri", () => {
+  it("puts its settings in 2 panel categories: Profitability and Sort", () => {
     const { filters } = startFeature(gainFilter);
     expect(filters.categories.map((c) => c.title)).toEqual(["Rentabilité", "Tri"]);
     expect(filters.categories[0]?.el.querySelector('input[type="range"]')).not.toBeNull();
     expect(filters.categories[1]?.el.querySelector(".kv-sort")).not.toBeNull();
   });
 
-  it("échec d'écriture : attrapé", async () => {
+  it("write failure: caught", async () => {
     startFeature(gainFilter).emit(makeSnapshot([{ give: 1 }]));
     vi.spyOn(fakeBrowser.storage.local, "set").mockRejectedValue(new Error("invalidated"));
     clickMode("Positif");
@@ -157,18 +157,18 @@ describe("gain-filter", () => {
     expect(pressed()).toBe("Positif");
   });
 
-  it("offres pas encore traitées retenues (hold) tant que tri ou filtre est actif ; filtre signalé à load-more", async () => {
+  it("offers not processed yet are held while sort or filter is on; filter reported to load-more", async () => {
     const root = document.documentElement;
     const { page } = startFeature(gainFilter);
-    expect(root.hasAttribute("data-kv-hold-gain")).toBe(true); // tri actif par défaut, avant même le stockage
+    expect(root.hasAttribute("data-kv-hold-gain")).toBe(true); // sorting on by default, even before storage
     expect(root.hasAttribute("data-kv-filter-gain")).toBe(false);
     await vi.waitFor(() => expect(pressed()).toBe("Off"));
     clickMode("Positif");
     expect(root.hasAttribute("data-kv-filter-gain")).toBe(true);
-    sortButton()?.click(); // tri coupé, filtre toujours actif
+    sortButton()?.click(); // sorting off, filter still on
     expect(root.hasAttribute("data-kv-hold-gain")).toBe(true);
     clickMode("Off");
-    expect(root.hasAttribute("data-kv-hold-gain")).toBe(false); // ni tri ni filtre : rien à retenir
+    expect(root.hasAttribute("data-kv-hold-gain")).toBe(false); // neither sort nor filter: nothing to hold
     expect(root.hasAttribute("data-kv-filter-gain")).toBe(false);
     clickMode("Neutre et +");
     page.invalidate();

@@ -22,22 +22,22 @@ const offer = (give: number | null, wants: number[]): Offer => ({
 });
 
 describe("cardValue", () => {
-  it("fair-play d'abord (0 inclus)", () => {
+  it("fair-play first (0 included)", () => {
     expect(cardValue(store({ 1: 0 }, { 1: price(9) }), 1)).toBe(0);
   });
-  it("sinon médiane 7 j, puis 30 j, puis dernier prix", () => {
+  it("otherwise 7-day median, then 30-day, then last price", () => {
     expect(cardValue(store({}, { 1: price(9, 8, 7) }), 1)).toBe(9);
     expect(cardValue(store({}, { 1: price(null, 8, 7) }), 1)).toBe(8);
     expect(cardValue(store({}, { 1: price(null, null, 7) }), 1)).toBe(7);
   });
-  it("null si inconnue", () => {
+  it("null if unknown", () => {
     expect(cardValue(store({}), 1)).toBeNull();
     expect(cardValue(store({}, { 1: price(null) }), 1)).toBeNull();
   });
 });
 
 describe("analyzeOffer", () => {
-  it("calcule G, W et G - W", () => {
+  it("computes G, W and G - W", () => {
     const a = analyzeOffer(offer(1, [2, 3]), store({ 1: 10, 2: 4, 3: 12 }), null);
     expect(a.give).toBe(10);
     expect(a.wants.map((w) => [w.value, w.diff])).toEqual([
@@ -45,7 +45,7 @@ describe("analyzeOffer", () => {
       [12, -2],
     ]);
   });
-  it("diff null si G ou W inconnu", () => {
+  it("diff null if G or W is unknown", () => {
     expect(analyzeOffer(offer(1, [2]), store({ 2: 4 }), null).wants[0]).toMatchObject({
       value: 4,
       diff: null,
@@ -55,15 +55,15 @@ describe("analyzeOffer", () => {
       diff: null,
     });
   });
-  it("offre sans carte proposée", () => {
+  it("offer without an offered card", () => {
     expect(analyzeOffer(offer(null, [2]), store({ 2: 4 }), null).give).toBeNull();
   });
-  it("meilleur ratio : seulement les cartes que je possède, W borné à 1", () => {
+  it("best ratio: only cards I own, W floored at 1", () => {
     const s = store({ 1: 10, 2: 5, 3: 0 });
     expect(analyzeOffer(offer(1, [2, 3]), s, { 2: 1 }).bestRatio).toBe(1); // (10-5)/5
     expect(analyzeOffer(offer(1, [2, 3]), s, { 2: 1, 3: 1 }).bestRatio).toBe(10); // (10-0)/max(0,1)
   });
-  it("ratio négatif conservé, null sans carte possédée ou collection inconnue", () => {
+  it("negative ratio kept, null without an owned card or with an unknown collection", () => {
     const s = store({ 1: 5, 2: 10 });
     expect(analyzeOffer(offer(1, [2]), s, { 2: 1 }).bestRatio).toBe(-0.5);
     expect(analyzeOffer(offer(1, [2]), s, {}).bestRatio).toBeNull();

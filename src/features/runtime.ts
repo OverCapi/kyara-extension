@@ -1,7 +1,7 @@
-// Chef d'orchestre du content script : à chaque changement de la page (debounce 300 ms), construit
-// l'instantané des offres UNE fois, place le panneau de filtres, le donne à chaque feature, puis demande
-// les prix manquants.
-// Chaque feature est isolée par safe() : si l'une plante, les autres continuent.
+// Content script conductor: on every page change (300 ms debounce), builds
+// the offers snapshot ONCE, places the filter panel, gives the snapshot to every feature, then requests
+// the missing prices.
+// Each feature is isolated by safe(): if one crashes, the others go on.
 import { safe } from "../core/errors";
 import { createLogger } from "../core/log";
 import { createPageWatcher, type PageContext } from "../core/page";
@@ -14,10 +14,10 @@ import type { Feature, FeatureContext } from "./types";
 
 const log = createLogger("runtime");
 
-/** Posé sur chaque offre une fois traitée par les features. Les filtres cachent (CSS) les offres sans cet attribut. */
+/** Set on each offer once the features have processed it. Filters hide (CSS) offers without this attribute. */
 export const SEEN_ATTR = "data-kv-seen";
 
-/** Démarre toutes les features sur la page courante. */
+/** Starts every feature on the current page. */
 export function startFeatures(page: PageContext, features: Feature[]): void {
   const watcher = createPageWatcher(page);
   const listeners: Array<(snapshot: OffersSnapshot) => void> = [];
@@ -38,10 +38,10 @@ export function startFeatures(page: PageContext, features: Feature[]): void {
     const snapshot = await buildSnapshot(collection);
     safe("runtime:panel", filters.attach)(findOfferFilters());
     for (const listener of listeners) listener(snapshot);
-    // filtres et tri ont fini : les offres peuvent s'afficher (voir data-kv-hold-* / data-kv-filter-*)
+    // filters and sorting are done: the offers can show (see data-kv-hold-* / data-kv-filter-*)
     for (const { li } of snapshot.offers) li.setAttribute(SEEN_ATTR, "");
     fairPlay.request(snapshot, watcher.trigger);
   });
   watcher.trigger();
-  log.debug("chargé sur", location.href);
+  log.debug("loaded on", location.href);
 }

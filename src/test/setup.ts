@@ -1,12 +1,12 @@
-// Réglages communs à tous les tests (voir vitest.config.ts) :
-//  - logs de dev coupés (les tests restent silencieux) ;
-//  - un test échoue si le code émet console.error ou console.warn (règle "zéro erreur / zéro warning").
+// Settings shared by every test (see vitest.config.ts):
+//  - dev logs off (tests stay silent);
+//  - a test fails if the code emits console.error or console.warn ("zero error / zero warning" rule).
 import { afterEach, beforeEach, expect, vi } from "vitest";
 import { setLocale } from "../core/i18n";
 import { stopAllFeatures } from "./helpers";
 
 beforeEach(() => {
-  setLocale("fr"); // les tests vérifient les textes français
+  setLocale("fr"); // tests check the French texts
   vi.stubEnv("DEV", false);
   vi.spyOn(console, "error").mockImplementation(() => {});
   vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -21,10 +21,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
   document.body.replaceChildren();
-  // éléments flottants ajoutés à <html> par les features (pastille, infobulle)
+  // floating elements appended to <html> by the features (pill, tooltip)
   for (const el of document.documentElement.querySelectorAll(":scope > :not(head):not(body)")) el.remove();
   document.documentElement.classList.remove("kv-no-tint");
   for (const name of document.documentElement.getAttributeNames()) {
-    if (name.startsWith("data-kv-")) document.documentElement.removeAttribute(name); // réglages posés par les features
+    if (name.startsWith("data-kv-")) document.documentElement.removeAttribute(name); // settings set by the features
   }
 });

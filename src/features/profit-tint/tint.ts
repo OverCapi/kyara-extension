@@ -1,10 +1,10 @@
-// Couleur de fond d'une offre selon son gain relatif. Fonction pure.
+// Background color of an offer from its relative gain. Pure function.
 
 /**
- * Gain relatif -> couleur CSS : +100 % ou plus = bleu clair plein, 0 = neutre, -100 % = rouge plein.
- * `null` (gain inconnu) = transparent.
+ * Relative gain -> CSS color: +100 % or more = full light blue, 0 = neutral, -100 % = full red.
+ * `null` (unknown gain) = transparent.
  */
-// ponytail: seuil fixe à ±100 %, à exposer en option si l'échelle ne convient pas.
+// ponytail: fixed ±100 % threshold, expose as an option if the scale does not fit.
 export function tintColor(ratio: number | null): string {
   if (ratio === null) return "transparent";
   const t = Math.max(-1, Math.min(1, ratio));

@@ -1,25 +1,25 @@
-// Badge de valeur sur chaque carte d'une offre (onglet Échanges).
-//   carte proposée   : "≈ G◆"  (rien si la valeur est inconnue)
-//   cartes demandées : "G - W" signé, ce que tu gagnes si tu donnes G pour recevoir W
-//                      (ou "W◆" si seul G est inconnu, rien si W est inconnu)
-// Aucun nœud ajouté dans le DOM du site : seulement data-kv / data-kv-sign, affichés par le CSS.
+// Value badge on each card of an offer (Trades tab).
+//   offered card : "≈ G◆"  (nothing if the value is unknown)
+//   wanted cards : signed "G - W", what you gain by giving G to receive W
+//                  (or "W◆" if only G is unknown, nothing if W is unknown)
+// No node added to the site's DOM: only data-kv / data-kv-sign, displayed by CSS.
 import { t } from "../../core/i18n";
 import { analyzeOffer, type WantAnalysis } from "../../kyara/prices";
 import type { Feature } from "../types";
 import "./style.css";
 
-/** Texte du badge de la carte proposée. Vide si la valeur est inconnue (pas de badge). */
+/** Badge text of the offered card. Empty if the value is unknown (no badge). */
 export function giveBadge(give: number | null): string {
   return give === null ? "" : t("badge.give", { value: give });
 }
 
-/** Texte et signe ("1", "-1" ou "0") du badge d'une carte demandée. Texte vide = pas de badge. */
+/** Text and sign ("1", "-1" or "0") of a wanted card's badge. Empty text = no badge. */
 export function wantBadge({ value, diff }: WantAnalysis): { text: string; sign: string } {
   if (diff === null) return { text: value === null ? "" : t("badge.value", { value }), sign: "0" };
   return { text: (diff > 0 ? "+" : "") + diff, sign: String(Math.sign(diff)) };
 }
 
-/** Pose le badge, ou le retire si `text` est vide (valeur inconnue : on n'affiche rien). */
+/** Sets the badge, or removes it if `text` is empty (unknown value: show nothing). */
 function setBadge(el: HTMLElement, text: string, sign?: string): void {
   if (!text) {
     delete el.dataset.kv;

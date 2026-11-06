@@ -1,19 +1,19 @@
 import { defineConfig } from "wxt";
 import en from "./src/locales/en.json";
 
-// Config WXT : code source dans src/. Nom et description du manifest : src/locales/en.json. Deux cibles :
-//   Firefox (MV2) : complet. MV2 obligatoire, webRequest.filterResponseData (cache passif) n'existe que là.
-//   Chrome (MV3)  : sans cache passif (pas de background), les prix viennent des requêtes fair-play.
+// WXT config: source code in src/. Manifest name and description: src/locales/en.json. Two targets:
+//   Firefox (MV2): full. MV2 required, webRequest.filterResponseData (passive cache) only exists there.
+//   Chrome (MV3) : no passive cache (no background), prices come from the fair-play requests.
 export default defineConfig({
   srcDir: "src",
-  // `pnpm dev` : Firefox s'ouvre sur les Échanges, l'extension se recharge à chaque modification.
-  // Profil gardé dans .firefox-profile/ (non versionné) : la connexion à kyara.games reste d'une fois sur l'autre.
+  // `pnpm dev`: Firefox opens on the Trades tab, the extension reloads on every change.
+  // Profile kept in .firefox-profile/ (not versioned): the kyara.games login persists between runs.
   webExt: {
     firefoxProfile: ".firefox-profile",
     keepProfileChanges: true,
     startUrls: ["https://kyara.games/marche?onglet=offres"],
   },
-  // Extension locale existante : pas encore soumise à addons.mozilla.org, donc exemptée du champ data_collection_permissions.
+  // Existing local extension: not submitted to addons.mozilla.org yet, so exempt from the data_collection_permissions field.
   suppressWarnings: { firefoxDataCollection: true },
   manifest: ({ browser }) => ({
     name: en["manifest.name"],
@@ -23,8 +23,8 @@ export default defineConfig({
         ? ["webRequest", "webRequestBlocking", "storage", "https://kyara.games/*"]
         : ["storage"],
     host_permissions: browser === "firefox" ? undefined : ["https://kyara.games/*"],
-    // update_url : Firefox y vérifie (~toutes les 24 h) s'il existe une version plus récente,
-    // puis installe tout seul le .xpi signé. updates.json est publié par .github/workflows/release.yml.
+    // update_url: Firefox checks there (~every 24 h) for a newer version,
+    // then installs the signed .xpi by itself. updates.json is published by scripts/release.sh.
     browser_specific_settings:
       browser === "firefox"
         ? {

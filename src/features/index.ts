@@ -1,4 +1,4 @@
-// Liste des features actives. Pour ajouter une feature : créer son dossier, puis l'ajouter ici.
+// List of active features. To add a feature: create its folder, then add it here.
 import { gainFilter } from "./gain-filter";
 import { loadMore } from "./load-more";
 import { marketTooltip } from "./market-tooltip";
@@ -8,7 +8,7 @@ import { rarityRing } from "./rarity-ring";
 import { tradeBadges } from "./trade-badges";
 import type { Feature } from "./types";
 
-// loadMore après les filtres : il compte les offres qu'ils ont masquées.
+// loadMore after the filters: it counts the offers they hid.
 export const features: Feature[] = [
   rarityRing,
   tradeBadges,

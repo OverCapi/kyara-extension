@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import { features } from "./index";
 
 describe("features", () => {
-  it("noms uniques et non vides", () => {
+  it("unique, non-empty names", () => {
     const names = features.map((f) => f.name);
     expect(names.every(Boolean)).toBe(true);
     expect(new Set(names).size).toBe(names.length);
   });
-  it("contient toutes les features", () => {
+  it("contains every feature", () => {
     expect(features.map((f) => f.name).sort()).toEqual([
       "gain-filter",
       "load-more",

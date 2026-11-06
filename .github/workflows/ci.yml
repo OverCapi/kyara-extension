@@ -1,4 +1,4 @@
-# Lint, types, tests et build à chaque push sur dev et à chaque PR vers dev ou main.
+# Lint, types, tests and build on every push to dev and every PR to dev or main.
 name: CI
 
 on:

@@ -18,26 +18,26 @@ describe("parsePrices", () => {
     ],
   };
 
-  it("trouve les médianes à n'importe quelle profondeur", () => {
+  it("finds the medians at any depth", () => {
     const out = parsePrices(listing, NOW);
     expect(Object.keys(out).sort()).toEqual(["p:1", "p:2"]);
     expect(out["p:1"]).toEqual({ m7: 18, m30: 19, s7: 400, last: 15, t: NOW });
     expect(out["p:2"]).toMatchObject({ m7: null, m30: 7 });
   });
 
-  it("met null sur les champs absents ou invalides", () => {
+  it("sets null on missing or invalid fields", () => {
     const out = parsePrices({ characterId: 3, median7d: "x" }, NOW);
     expect(out["p:3"]).toEqual({ m7: null, m30: null, s7: null, last: null, t: NOW });
   });
 
-  it("ignore ce qui n'est pas un prix", () => {
+  it("ignores what is not a price", () => {
     expect(parsePrices(null)).toEqual({});
-    expect(parsePrices("texte")).toEqual({});
+    expect(parsePrices("text")).toEqual({});
     expect(parsePrices({ characterId: "1", median7d: 1 })).toEqual({});
     expect(parsePrices({ characterId: 1 })).toEqual({});
   });
 
-  it("s'arrête sur un JSON trop imbriqué", () => {
+  it("stops on overly nested JSON", () => {
     let deep: unknown = { characterId: 9, median7d: 1 };
     for (let i = 0; i < 100; i++) deep = { child: deep };
     expect(parsePrices(deep)).toEqual({});
@@ -45,13 +45,13 @@ describe("parsePrices", () => {
 });
 
 describe("parseFair", () => {
-  it("garde les nombres (0 inclus), ignore le reste", () => {
+  it("keeps numbers (0 included), ignores the rest", () => {
     const out = parseFair({ 1: 12, 2: 0, 3: null, 4: "5" }, NOW);
     expect(Object.keys(out).sort()).toEqual(["f:1", "f:2"]);
     expect(out["f:1"]).toEqual({ v: 12, t: NOW });
   });
 
-  it("ignore les ids non numériques et les formes inattendues", () => {
+  it("ignores non-numeric ids and unexpected shapes", () => {
     expect(parseFair({ abc: 1 })).toEqual({});
     expect(parseFair([1, 2])).toEqual({});
     expect(parseFair(null)).toEqual({});
@@ -60,7 +60,7 @@ describe("parseFair", () => {
 });
 
 describe("parseCollection", () => {
-  it("garde seulement les quantités > 0", () => {
+  it("keeps only quantities > 0", () => {
     expect(
       parseCollection([
         { characterId: 10, qty: 2 },
@@ -70,7 +70,7 @@ describe("parseCollection", () => {
       ]),
     ).toEqual({ 10: 2 });
   });
-  it("collection vide = objet vide ; autre forme = null", () => {
+  it("empty collection = empty object; other shape = null", () => {
     expect(parseCollection([])).toEqual({});
     expect(parseCollection({ error: "unauthorized" })).toBeNull();
     expect(parseCollection(null)).toBeNull();
@@ -78,21 +78,21 @@ describe("parseCollection", () => {
 });
 
 describe("parseMarketMin", () => {
-  it("lit prix min et nombre d'annonces", () => {
+  it("reads min price and number of listings", () => {
     expect(parseMarketMin({ items: [{ price: 7 }], total: 3 })).toEqual({ min: 7, count: 3 });
   });
-  it("aucune annonce", () => {
+  it("no listings", () => {
     expect(parseMarketMin({ items: [], total: 0 })).toEqual({ min: null, count: 0 });
     expect(parseMarketMin({})).toEqual({ min: null, count: 0 });
   });
-  it("forme inattendue : null", () => {
+  it("unexpected shape: null", () => {
     expect(parseMarketMin(null)).toBeNull();
     expect(parseMarketMin([1])).toBeNull();
   });
 });
 
 describe("parseResponse", () => {
-  it("route vers le bon format selon l'URL", () => {
+  it("routes to the right format from the URL", () => {
     expect(Object.keys(parseResponse(`${K}/api/fair-play/prices?ids=1,2`, { 1: 12 }, NOW))).toEqual(["f:1"]);
     expect(parseResponse(`${K}/api/me/collection?lean=1`, [{ characterId: 10, qty: 2 }])).toEqual({
       owned: { 10: 2 },
@@ -101,10 +101,10 @@ describe("parseResponse", () => {
       Object.keys(parseResponse(`${K}/api/market/listings?page=1`, { characterId: 1, median7d: 1 }, NOW)),
     ).toEqual(["p:1"]);
   });
-  it("erreur d'API (non connecté) : rien", () => {
+  it("API error (logged out): nothing", () => {
     expect(parseResponse(`${K}/api/me/collection?lean=1`, { error: "unauthorized" })).toEqual({});
   });
-  it("URL invalide : rien", () => {
-    expect(parseResponse("pas une url", {})).toEqual({});
+  it("invalid URL: nothing", () => {
+    expect(parseResponse("not a url", {})).toEqual({});
   });
 });

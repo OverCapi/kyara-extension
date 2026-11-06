@@ -12,7 +12,7 @@ beforeEach(() => {
 const settle = () => vi.advanceTimersByTimeAsync(DEBOUNCE_MS + 10);
 
 describe("createPageWatcher", () => {
-  it("déclenche après un changement du DOM (avec debounce)", async () => {
+  it("fires after a DOM change (debounced)", async () => {
     const cb = vi.fn();
     const watcher = createPageWatcher(fakeCtx());
     watcher.subscribe(cb);
@@ -22,7 +22,7 @@ describe("createPageWatcher", () => {
     expect(cb).toHaveBeenCalledTimes(1);
   });
 
-  it("déclenche sur changement de stockage et de visibilité", async () => {
+  it("fires on storage and visibility changes", async () => {
     const cb = vi.fn();
     createPageWatcher(fakeCtx()).subscribe(cb);
     await browser.storage.local.set({ a: 1 });
@@ -32,7 +32,7 @@ describe("createPageWatcher", () => {
     expect(cb).toHaveBeenCalledTimes(2);
   });
 
-  it("trigger() relance manuellement", async () => {
+  it("trigger() reruns manually", async () => {
     const cb = vi.fn();
     const watcher = createPageWatcher(fakeCtx());
     watcher.subscribe(cb);
@@ -41,7 +41,7 @@ describe("createPageWatcher", () => {
     expect(cb).toHaveBeenCalledTimes(1);
   });
 
-  it("un callback qui plante n'empêche pas les suivants", async () => {
+  it("a crashing callback does not block the next ones", async () => {
     const next = vi.fn();
     const watcher = createPageWatcher(fakeCtx());
     watcher.subscribe(() => Promise.reject(new Error("x")));
@@ -51,7 +51,7 @@ describe("createPageWatcher", () => {
     expect(next).toHaveBeenCalledTimes(1);
   });
 
-  it("s'arrête quand le contexte est invalidé", async () => {
+  it("stops when the context is invalidated", async () => {
     const cb = vi.fn();
     const ctx = fakeCtx();
     const watcher = createPageWatcher(ctx);
@@ -66,7 +66,7 @@ describe("createPageWatcher", () => {
 });
 
 describe("listen", () => {
-  it("appelle le handler puis se retire à l'invalidation", () => {
+  it("calls the handler, then removes itself on invalidation", () => {
     const ctx = fakeCtx();
     const handler = vi.fn();
     listen(ctx, document, "ping", handler);
@@ -76,7 +76,7 @@ describe("listen", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
-  it("attrape les erreurs du handler", () => {
+  it("catches handler errors", () => {
     listen(fakeCtx(), document, "ping", () => {
       throw new Error("x");
     });
@@ -85,7 +85,7 @@ describe("listen", () => {
 });
 
 describe("mountFloating", () => {
-  it("ajoute à <html> puis retire à l'invalidation", () => {
+  it("appends to <html>, then removes on invalidation", () => {
     const ctx = fakeCtx();
     const el = document.createElement("div");
     mountFloating(ctx, el);

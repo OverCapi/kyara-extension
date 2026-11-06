@@ -13,12 +13,12 @@ function setup() {
 }
 
 describe("market-tooltip", () => {
-  it("cachée au départ", () => {
+  it("hidden at first", () => {
     setup();
     expect(tip()?.hidden).toBe(true);
   });
 
-  it("après le délai : nom, puis prix minimum", async () => {
+  it("after the delay: name, then minimum price", async () => {
     const fetchMock = mockFetch({ items: [{ price: 7 }], total: 2 });
     const { card } = setup();
     hover(card);
@@ -28,14 +28,14 @@ describe("market-tooltip", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("échec réseau : 'indisponible'", async () => {
+  it("network failure: 'unavailable'", async () => {
     mockFetch({}, 500);
     const { card } = setup();
     hover(card);
     await vi.waitFor(() => expect(tip()?.innerHTML).toContain("indisponible"), { timeout: 2000 });
   });
 
-  it("quitter la carte avant le délai : aucune requête", async () => {
+  it("leaving the card before the delay: no request", async () => {
     const fetchMock = mockFetch({ items: [], total: 0 });
     const { card } = setup();
     hover(card);
@@ -45,7 +45,7 @@ describe("market-tooltip", () => {
     expect(tip()?.hidden).toBe(true);
   });
 
-  it("se cache au scroll", async () => {
+  it("hides on scroll", async () => {
     mockFetch({ items: [{ price: 1 }], total: 1 });
     const { card } = setup();
     hover(card);
@@ -54,7 +54,7 @@ describe("market-tooltip", () => {
     expect(tip()?.hidden).toBe(true);
   });
 
-  it("ignore un lien sans id valide", async () => {
+  it("ignores a link without a valid id", async () => {
     const fetchMock = mockFetch({});
     const { card } = setup();
     card.setAttribute("href", "/wiki/abc");
@@ -63,7 +63,7 @@ describe("market-tooltip", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("retirée quand l'extension est rechargée", () => {
+  it("removed when the extension reloads", () => {
     const { feature } = setup();
     feature.page.invalidate();
     expect(tip()).toBeNull();

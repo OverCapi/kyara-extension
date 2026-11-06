@@ -1,9 +1,9 @@
-// Demande à l'API les prix fair-play manquants, avec le minimum de requêtes :
-//  - seulement pour les offres acceptables (tu possèdes au moins une carte demandée),
-//  - seulement pour la carte proposée + tes cartes demandées,
-//  - par lots de 200 ids (comme le site), une requête à la fois,
-//  - prix redemandé après 1 h, id en échec réessayé après 5 min,
-//  - rien si l'onglet est caché.
+// Asks the API for missing fair-play prices, with as few requests as possible:
+//  - only for acceptable offers (you own at least one wanted card),
+//  - only for the offered card + your wanted cards,
+//  - in batches of 200 ids (like the site), one request at a time,
+//  - price requested again after 1 h, failed id retried after 5 min,
+//  - nothing while the tab is hidden.
 import { createLogger } from "../core/log";
 import type { OwnedCards } from "../core/storage";
 import { isFresh, type PriceStore, writeEntries } from "../core/storage";
@@ -14,11 +14,11 @@ import { parseFair } from "./parse";
 
 const log = createLogger("fair-play");
 
-export const TTL = 60 * 60 * 1000; // prix redemandé après 1 h
-export const RETRY = 5 * 60 * 1000; // id en échec : pas de nouvel essai avant 5 min
+export const TTL = 60 * 60 * 1000; // price requested again after 1 h
+export const RETRY = 5 * 60 * 1000; // failed id: no new attempt before 5 min
 export const BATCH = 200;
 
-/** Ids dont le prix est à (re)demander, et nombre d'offres acceptables. Fonction pure. */
+/** Ids whose price must be (re)requested, and number of acceptable offers. Pure function. */
 export function findMissing(
   offers: Offer[],
   owned: OwnedCards | null,
@@ -42,12 +42,12 @@ export function findMissing(
 }
 
 export interface FairPlayRequester {
-  /** Lance si besoin les requêtes pour cet instantané. `onDone` est appelé quand elles sont finies. */
+  /** Starts the requests for this snapshot if needed. `onDone` is called when they are finished. */
   request(snapshot: OffersSnapshot, onDone: () => void): void;
 }
 
 export function createFairPlayRequester(): FairPlayRequester {
-  const tried = new Map<number, number>(); // id -> date du dernier essai
+  const tried = new Map<number, number>(); // id -> time of the last attempt
   let inflight = false;
 
   async function fetchAll(ids: number[]): Promise<void> {
@@ -55,7 +55,7 @@ export function createFairPlayRequester(): FairPlayRequester {
       const chunk = ids.slice(i, i + BATCH);
       for (const id of chunk) tried.set(id, Date.now());
       const res = await kyaraFetch(`/fair-play/prices?ids=${chunk.join(",")}`);
-      log.debug(`fair-play : ${chunk.length} ids -> HTTP ${res.status}`);
+      log.debug(`fair-play: ${chunk.length} ids -> HTTP ${res.status}`);
       if (res.ok) await writeEntries(parseFair(res.data));
     }
   }
@@ -63,16 +63,16 @@ export function createFairPlayRequester(): FairPlayRequester {
   return {
     request({ offers, owned, store }, onDone) {
       const { need, acceptable } = findMissing(offers, owned, store, tried);
-      log.debug(`${offers.length} offres, ${acceptable} acceptables, ${need.size} prix à demander`);
+      log.debug(`${offers.length} offers, ${acceptable} acceptable, ${need.size} prices to request`);
       if (!need.size) return;
-      if (inflight) return log.debug("requête reportée : une requête est en cours"); // relancé à la fin
-      if (document.visibilityState !== "visible") return log.debug("requête reportée : onglet caché");
+      if (inflight) return log.debug("request postponed: a request is in flight"); // rerun when it ends
+      if (document.visibilityState !== "visible") return log.debug("request postponed: tab hidden");
       inflight = true;
       fetchAll([...need])
-        .catch((err) => log.error("fair-play : erreur", err))
+        .catch((err) => log.error("fair-play: error", err))
         .finally(() => {
           inflight = false;
-          onDone(); // la liste a pu changer pendant la requête (ex. filtre "Que je peux accepter")
+          onDone(); // the list may have changed during the request (e.g. the site's "Que je peux accepter" filter)
         });
     },
   };

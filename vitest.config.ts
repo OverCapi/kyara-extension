@@ -1,8 +1,8 @@
 import { defineConfig } from "vitest/config";
 import { WxtVitest } from "wxt/testing/vitest-plugin";
 
-// Tests : API browser simulée en mémoire (fakeBrowser), DOM simulé par happy-dom.
-// Seuils de couverture : voir CLAUDE.md §7.
+// Tests: browser API simulated in memory (fakeBrowser), DOM simulated by happy-dom.
+// Coverage thresholds: see CLAUDE.md §7.
 export default defineConfig({
   plugins: [WxtVitest()],
   test: {

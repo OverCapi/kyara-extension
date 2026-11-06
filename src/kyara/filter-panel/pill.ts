@@ -1,7 +1,7 @@
-// Pastille cliquable au style des pastilles du site : `aria-pressed="true"` = active.
-// Utilisée par le panneau de filtres et par les features qui y rangent leurs réglages.
+// Clickable pill styled like the site's pills: `aria-pressed="true"` = active.
+// Used by the filter panel and by the features that put their settings in it.
 
-/** Crée une pastille (bouton) avec ce texte. Aucun écouteur : à l'appelant d'en brancher. */
+/** Creates a pill (button) with this text. No listener: up to the caller to add one. */
 export function makePill(text: string): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";

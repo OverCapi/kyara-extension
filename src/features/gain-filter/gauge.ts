@@ -1,7 +1,7 @@
-// Réglages du filtre "gain minimum" et du tri, rangés dans le panneau de filtres (2 catégories) :
-//   Rentabilité : 3 pastilles de mode (Off / Neutre et + / Positif) + curseur de seuil au pas de 1 % ;
-//   Tri         : pastille "Trier par rentabilité".
-// Le réglage est mémorisé dans le stockage (clé minGain) et suivi en direct, autres onglets compris.
+// Settings of the "minimum gain" filter and of sorting, placed in the filter panel (2 categories):
+//   Profitability: 3 mode pills (Off / Neutral and up / Positive) + threshold slider in 1 % steps;
+//   Sort         : "Sort by profitability" pill.
+// The setting is stored (minGain key) and followed live, other tabs included.
 import { safeAsync } from "../../core/errors";
 import { type MessageKey, t } from "../../core/i18n";
 import { listen, type PageContext } from "../../core/page";
@@ -26,13 +26,13 @@ const MODE_LABELS: Record<GainMode, MessageKey> = {
 };
 
 export interface Gauge {
-  /** Contenu de la catégorie "Rentabilité" : modes + curseur. */
+  /** Content of the "Profitability" category: modes + slider. */
   profit: HTMLElement;
-  /** Contenu de la catégorie "Tri". */
+  /** Content of the "Sort" category. */
   sort: HTMLElement;
 }
 
-/** Construit les éléments (aucun écouteur). */
+/** Builds the elements (no listener). */
 function buildGauge() {
   const modes = GAIN_MODES.map((mode) => {
     const button = makePill(t(MODE_LABELS[mode]));
@@ -58,7 +58,7 @@ function buildGauge() {
   return { profit, sort: pillRow([sortButton]), sortButton, modes, text, range };
 }
 
-/** Crée les réglages. `onChange(filtre)` est appelé à chaque changement (saisi ici ou venu d'un autre onglet). */
+/** Creates the settings. `onChange(filter)` is called on every change (made here or from another tab). */
 export function createGauge(page: PageContext, onChange: (filter: GainFilter) => void): Gauge {
   const { profit, sort, sortButton, modes, text, range } = buildGauge();
 
@@ -77,7 +77,7 @@ export function createGauge(page: PageContext, onChange: (filter: GainFilter) =>
   const sync = createStorageSync(writeGainFilter, apply);
   const update = (patch: Partial<GainFilter>) => {
     const value = { ...state, pct: Number(range.value), ...patch };
-    apply(value); // visuel immédiat, l'écriture suit
+    apply(value); // immediate visual, the write follows
     void sync.save(value);
   };
   listen(page, range, "input", () => update({}));

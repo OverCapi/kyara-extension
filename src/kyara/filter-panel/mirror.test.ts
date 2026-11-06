@@ -24,28 +24,28 @@ const labels = (host: HTMLElement) => [...host.querySelectorAll(".kv-pill")].map
 const copies = (host: HTMLElement) => [...host.querySelectorAll<HTMLButtonElement>(".kv-pill")];
 
 describe("createPillMirror", () => {
-  it("2 catégories : Cartes (pastilles ordinaires) et Mes offres (celle qui a un compteur)", () => {
+  it("2 categories: Cards (regular pills) and My offers (the one with a counter)", () => {
     const { filters, host, mirror } = setup();
     mirror.sync(filters);
     expect(titles(host)).toEqual(["Cartes", "Mes offres"]);
     expect(labels(host)).toEqual(["Que je n’ai pas", "Que je cherche", "Mes offres 0"]);
   });
-  it("catégorie vide : pas de titre", () => {
+  it("empty category: no title", () => {
     const { filters, host, mirror } = setup('<button type="button">Que je cherche</button>');
     mirror.sync(filters);
     expect(titles(host)).toEqual(["Cartes"]);
   });
-  it("aucune pastille : rien", () => {
+  it("no pill: nothing", () => {
     const { filters, host, mirror } = setup("");
     mirror.sync(filters);
     expect(host.children).toHaveLength(0);
   });
-  it("la copie reprend l'état de l'original", () => {
+  it("the copy takes the original's state", () => {
     const { filters, host, mirror } = setup();
     mirror.sync(filters);
     expect(copies(host).map((b) => b.getAttribute("aria-pressed"))).toEqual(["false", "true", "false"]);
   });
-  it("un clic sur la copie clique l'original, puis la copie suit son nouvel état", async () => {
+  it("a click on the copy clicks the original, then the copy follows its new state", async () => {
     const { filters, host, mirror } = setup();
     const source = filters.querySelector<HTMLButtonElement>(".pills > button");
     source?.addEventListener("click", () => source.setAttribute("aria-pressed", "true"));
@@ -53,7 +53,7 @@ describe("createPillMirror", () => {
     copies(host)[0]?.click();
     await vi.waitFor(() => expect(copies(host)[0]?.getAttribute("aria-pressed")).toBe("true"));
   });
-  it("mêmes pastilles : la copie n'est pas reconstruite, mais son état est mis à jour", () => {
+  it("same pills: the copy is not rebuilt, but its state is updated", () => {
     const { filters, host, mirror } = setup();
     mirror.sync(filters);
     const before = copies(host);
@@ -62,7 +62,7 @@ describe("createPillMirror", () => {
     expect(copies(host)[0]).toBe(before[0]);
     expect(before[0]?.getAttribute("aria-pressed")).toBe("true");
   });
-  it("texte changé (ex. compteur) : reconstruite", () => {
+  it("changed text (e.g. counter): rebuilt", () => {
     const { filters, host, mirror } = setup();
     mirror.sync(filters);
     const counter = filters.querySelector(".n");
@@ -70,7 +70,7 @@ describe("createPillMirror", () => {
     mirror.sync(filters);
     expect(labels(host)).toContain("Mes offres 3");
   });
-  it("pastilles recréées par le site avec le même texte : reconstruite, le clic vise les nouvelles", () => {
+  it("pills recreated by the site with the same text: rebuilt, the click targets the new ones", () => {
     const { filters, host, mirror } = setup();
     mirror.sync(filters);
     const pills = filters.querySelector(".pills");

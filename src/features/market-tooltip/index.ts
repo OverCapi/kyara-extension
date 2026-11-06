@@ -1,6 +1,6 @@
-// Box au survol d'une carte d'offre : prix minimum actuel sur le marché.
-// Une requête par carte survolée (après 250 ms sur la carte). La box est un seul élément ajouté à
-// <html>, hors de l'arbre géré par le site. Elle se cache au scroll et quand on quitte la carte.
+// Box shown when hovering an offer's card: current minimum price on the market.
+// One request per hovered card (after 250 ms on the card). The box is a single element appended to
+// <html>, outside the tree managed by the site. It hides on scroll and when leaving the card.
 import { safeAsync } from "../../core/errors";
 import { listen, mountFloating } from "../../core/page";
 import { cardId, OFFER_CARD_SELECTOR } from "../../kyara/dom";

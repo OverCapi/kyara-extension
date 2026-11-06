@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# Release Firefox en local (`pnpm release`) : vérifie, fait signer le .xpi par Mozilla (AMO, unlisted),
-# puis crée la release GitHub v<version> avec firefox.xpi (lien du README) et updates.json
-# (lu par Firefox via gecko.update_url pour les mises à jour auto).
-# À lancer depuis main, à jour avec origin/main, avec une "version" de package.json jamais publiée.
-# Clés AMO : variables AMO_JWT_ISSUER / AMO_JWT_SECRET, ou fichier .env (non versionné).
+# Local Firefox release (`pnpm release`): checks, gets the .xpi signed by Mozilla (AMO, unlisted),
+# then creates the GitHub release v<version> with firefox.xpi (README link) and updates.json
+# (read by Firefox through gecko.update_url for automatic updates).
+# Run from main, up to date with origin/main, with a package.json "version" never published before.
+# AMO keys: AMO_JWT_ISSUER / AMO_JWT_SECRET variables, or a .env file (not versioned).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 [ -f .env ] && set -a && source .env && set +a
-: "${AMO_JWT_ISSUER:?manquant (export ou .env)}"
-: "${AMO_JWT_SECRET:?manquant (export ou .env)}"
+: "${AMO_JWT_ISSUER:?missing (export or .env)}"
+: "${AMO_JWT_SECRET:?missing (export or .env)}"
 
 fail() { echo "✗ $1" >&2; exit 1; }
 
-[ "$(git branch --show-current)" = main ] || fail "Passe sur main avant de publier."
-[ -z "$(git status --porcelain)" ] || fail "Des modifications ne sont pas commitées."
+[ "$(git branch --show-current)" = main ] || fail "Switch to main before publishing."
+[ -z "$(git status --porcelain)" ] || fail "There are uncommitted changes."
 git fetch -q origin main
-[ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || fail "main n'est pas à jour avec origin/main (pull ou push)."
+[ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || fail "main is not in sync with origin/main (pull or push)."
 
 version="$(node -p 'require("./package.json").version')"
 tag="v$version"
-# AMO refuse de signer deux fois la même version.
-gh release view "$tag" >/dev/null 2>&1 && fail "La release $tag existe déjà : augmente \"version\" dans package.json."
+# AMO refuses to sign the same version twice.
+gh release view "$tag" >/dev/null 2>&1 && fail "Release $tag already exists: bump \"version\" in package.json."
 
 pnpm check
 pnpm test
@@ -40,4 +40,4 @@ VERSION="$version" LINK="https://github.com/$repo/releases/download/$tag/firefox
 
 gh release create "$tag" .output/release/firefox.xpi .output/release/updates.json \
   --target main --generate-notes
-echo "✓ Release $tag publiée."
+echo "✓ Release $tag published."

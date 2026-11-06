@@ -1,4 +1,4 @@
-// Point d'entrée du content script (pages kyara.games) : démarre les features. Aucune logique ici.
+// Content script entry point (kyara.games pages): starts the features. No logic here.
 import { features } from "../features";
 import { startFeatures } from "../features/runtime";
 

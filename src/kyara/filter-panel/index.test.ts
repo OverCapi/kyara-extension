@@ -18,12 +18,12 @@ const menu = () => document.querySelector<HTMLElement>(".kv-menu");
 const button = () => document.querySelector<HTMLButtonElement>(".kv-menu-btn");
 const popover = () => document.querySelector<HTMLElement>(".kv-popover");
 
-describe("createFilterPanel : placement", () => {
-  it("rien dans la page avant attach", () => {
+describe("createFilterPanel: placement", () => {
+  it("nothing in the page before attach", () => {
     createFilterPanel(fakeCtx());
     expect(menu()).toBeNull();
   });
-  it("attach : bouton dans la barre, pastilles d'origine cachées par l'attribut, une seule fois", () => {
+  it("attach: button in the bar, original pills hidden by the attribute, only once", () => {
     const panel = createFilterPanel(fakeCtx());
     const filters = bar();
     panel.attach(filters);
@@ -32,7 +32,7 @@ describe("createFilterPanel : placement", () => {
     expect(document.querySelectorAll(".kv-menu")).toHaveLength(1);
     expect(filters.hasAttribute("data-kv-panel")).toBe(true);
   });
-  it("attach(null) retire le bouton ; une nouvelle barre le récupère", () => {
+  it("attach(null) removes the button; a new bar gets it back", () => {
     const panel = createFilterPanel(fakeCtx());
     panel.attach(bar());
     panel.attach(null);
@@ -41,7 +41,7 @@ describe("createFilterPanel : placement", () => {
     panel.attach(fresh);
     expect(fresh.lastElementChild).toBe(menu());
   });
-  it("rechargement de l'extension : bouton retiré et pastilles du site rendues", () => {
+  it("extension reload: button removed and the site's pills restored", () => {
     const page = fakeCtx();
     const panel = createFilterPanel(page);
     const filters = bar();
@@ -50,27 +50,27 @@ describe("createFilterPanel : placement", () => {
     expect(menu()).toBeNull();
     expect(filters.hasAttribute("data-kv-panel")).toBe(false);
   });
-  it("rechargement avant tout attach : sans erreur", () => {
+  it("reload before any attach: no error", () => {
     const page = fakeCtx();
     createFilterPanel(page);
     expect(() => page.invalidate()).not.toThrow();
   });
 });
 
-describe("createFilterPanel : fenêtre", () => {
+describe("createFilterPanel: popover", () => {
   const open = () => {
     const panel = createFilterPanel(fakeCtx());
     panel.attach(bar());
     return panel;
   };
-  it("bouton à icône d'entonnoir, titré, fenêtre fermée au départ", () => {
+  it("funnel icon button, with a title, popover closed at first", () => {
     open();
     expect(button()?.querySelector("svg path")).not.toBeNull();
     expect(button()?.title).toBe("Filtres");
     expect(popover()?.hidden).toBe(true);
     expect(button()?.getAttribute("aria-expanded")).toBe("false");
   });
-  it("un clic ouvre, un autre ferme", () => {
+  it("one click opens, another closes", () => {
     open();
     button()?.click();
     expect(popover()?.hidden).toBe(false);
@@ -78,7 +78,7 @@ describe("createFilterPanel : fenêtre", () => {
     button()?.click();
     expect(popover()?.hidden).toBe(true);
   });
-  it("un clic dehors ferme, un clic dedans non", () => {
+  it("a click outside closes, a click inside does not", () => {
     open();
     button()?.click();
     popover()?.click();
@@ -86,7 +86,7 @@ describe("createFilterPanel : fenêtre", () => {
     document.body.click();
     expect(popover()?.hidden).toBe(true);
   });
-  it("Échap ferme, une autre touche non", () => {
+  it("Escape closes, another key does not", () => {
     open();
     button()?.click();
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }));
@@ -94,26 +94,26 @@ describe("createFilterPanel : fenêtre", () => {
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     expect(popover()?.hidden).toBe(true);
   });
-  it("2 sections dans l'ordre : Kyara puis extension", () => {
+  it("2 sections in order: Kyara then extension", () => {
     open();
     const titles = [...document.querySelectorAll(".kv-section > h3")].map((h) => h.textContent);
     expect(titles).toEqual(["Filtres Kyara", "Filtres de l'extension"]);
   });
-  it("addCategory range la catégorie (titre + contenu) dans la section de l'extension", () => {
+  it("addCategory puts the category (title + content) in the extension section", () => {
     const panel = open();
     const content = document.createElement("p");
-    content.textContent = "réglage";
-    panel.addCategory("Rareté", content);
+    content.textContent = "setting";
+    panel.addCategory("Rarity", content);
     const sections = document.querySelectorAll(".kv-section");
     const cat = sections[1]?.querySelector(".kv-cat");
-    expect(cat?.querySelector("h4")?.textContent).toBe("Rareté");
+    expect(cat?.querySelector("h4")?.textContent).toBe("Rarity");
     expect(cat?.contains(content)).toBe(true);
-    expect(sections[0]?.querySelector(".kv-cat")).not.toBeNull(); // la pastille du site est reflétée ici
+    expect(sections[0]?.querySelector(".kv-cat")).not.toBeNull(); // the site's pill is mirrored here
   });
-  it("catégorie ajoutée avant attach : conservée quand le panneau est placé", () => {
+  it("category added before attach: kept when the panel is placed", () => {
     const panel = createFilterPanel(fakeCtx());
-    panel.addCategory("Tri", document.createElement("div"));
+    panel.addCategory("Sort", document.createElement("div"));
     panel.attach(bar());
-    expect(document.querySelectorAll(".kv-section")[1]?.querySelector("h4")?.textContent).toBe("Tri");
+    expect(document.querySelectorAll(".kv-section")[1]?.querySelector("h4")?.textContent).toBe("Sort");
   });
 });

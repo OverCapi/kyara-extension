@@ -1,8 +1,8 @@
-// Échappement HTML : à appliquer à tout texte venant du site avant de l'insérer via innerHTML.
+// HTML escaping: apply to any text coming from the site before inserting it through innerHTML.
 
 const ENTITIES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
 
-/** Remplace & < > " par leurs entités HTML. */
+/** Replaces & < > " with their HTML entities. */
 export function escapeHtml(s: string): string {
   return s.replace(/[&<>"]/g, (c) => ENTITIES[c] ?? c);
 }

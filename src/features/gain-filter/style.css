@@ -1,14 +1,14 @@
-/* Offre sous le gain minimum (attribut posé par la feature gain-filter). */
+/* Offer below the minimum gain (attribute set by the gain-filter feature). */
 li[data-kv-hide-gain] {
   display: none !important;
 }
 
-/* Offres pas encore triées / filtrées (le runtime pose data-kv-seen quand c'est fait) : cachées, sans clignotement. */
+/* Offers not sorted / filtered yet (the runtime sets data-kv-seen once done): hidden, no flicker. */
 html[data-kv-hold-gain] li[id^="offre-"]:not([data-kv-seen]) {
   display: none !important;
 }
 
-/* Curseur de seuil, sous les pastilles de mode. */
+/* Threshold slider, under the mode pills. */
 .kv-level {
   display: flex;
   align-items: center;
@@ -47,7 +47,7 @@ html[data-kv-hold-gain] li[id^="offre-"]:not([data-kv-seen]) {
   border-radius: 50%;
   background: var(--fg, #edeae4);
 }
-/* Filtre sur Off : curseur grisé (sa valeur reste mémorisée). */
+/* Filter on Off: slider greyed out (its value stays stored). */
 .kv-level input[type="range"]:disabled {
   opacity: 0.4;
   cursor: default;

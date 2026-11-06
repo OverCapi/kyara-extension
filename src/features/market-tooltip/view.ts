@@ -1,14 +1,14 @@
-// Affichage de l'infobulle : texte (HTML échappé) et position. Aucune logique réseau.
+// Tooltip display: text (escaped HTML) and position. No network logic.
 import { escapeHtml } from "../../core/html";
 import { t, tn } from "../../core/i18n";
 import type { MarketMin } from "./market-min";
 
-/** État de l'infobulle : chargement, résultat, ou échec. */
+/** Tooltip state: loading, result, or failure. */
 export type TipState = { kind: "loading" } | { kind: "error" } | { kind: "result"; data: MarketMin };
 
 const row = (value: string) => `<span class="kv-row"><span>${t("tooltip.market_min")}</span>${value}</span>`;
 
-/** HTML de l'infobulle pour une carte. Le nom vient du site : il est échappé. */
+/** Tooltip HTML for a card. The name comes from the site: it is escaped. */
 export function tipHtml(name: string, state: TipState): string {
   const title = `<b>${escapeHtml(name)}</b>`;
   if (state.kind === "loading") return title + row('<span class="kv-v">…</span>');
@@ -22,7 +22,7 @@ export function tipHtml(name: string, state: TipState): string {
 
 const MARGIN = 8;
 
-/** Position de l'infobulle : au-dessus de la carte (en dessous si pas la place), toujours dans l'écran. */
+/** Tooltip position: above the card (below if there is no room), always on screen. */
 export function tipPosition(
   anchor: { left: number; top: number; bottom: number; width: number },
   size: { width: number; height: number },
@@ -34,7 +34,7 @@ export function tipPosition(
   return { left, top: above >= MARGIN ? above : anchor.bottom + MARGIN };
 }
 
-/** Remplit l'infobulle et la place près de `anchor`. */
+/** Fills the tooltip and places it near `anchor`. */
 export function showTip(tip: HTMLElement, anchor: Element, html: string): void {
   tip.innerHTML = html;
   tip.hidden = false;

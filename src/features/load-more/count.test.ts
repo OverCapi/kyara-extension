@@ -9,12 +9,12 @@ const offer = (...attrs: string[]): Offer => {
 };
 
 describe("isHiddenByFilter / countVisible", () => {
-  it("une offre est cachée dès qu'un attribut data-kv-hide-* est posé", () => {
+  it("an offer is hidden as soon as a data-kv-hide-* attribute is set", () => {
     expect(isHiddenByFilter(offer("data-kv-hide-gain").li)).toBe(true);
     expect(isHiddenByFilter(offer("data-kv-hide-rarity").li)).toBe(true);
     expect(isHiddenByFilter(offer("data-kv-seen", "id").li)).toBe(false);
   });
-  it("compte les offres non cachées", () => {
+  it("counts the offers that are not hidden", () => {
     expect(countVisible([])).toBe(0);
     expect(
       countVisible([offer(), offer("data-kv-hide-gain"), offer("data-kv-hide-rarity", "data-kv-hide-gain")]),
@@ -23,11 +23,11 @@ describe("isHiddenByFilter / countVisible", () => {
 });
 
 describe("isFiltering", () => {
-  it("vrai si un attribut data-kv-filter-* est posé", () => {
+  it("true if a data-kv-filter-* attribute is set", () => {
     const root = document.createElement("html");
     expect(isFiltering(root)).toBe(false);
     root.setAttribute("data-kv-hold-gain", "");
-    expect(isFiltering(root)).toBe(false); // tri seul : pas un filtre
+    expect(isFiltering(root)).toBe(false); // sorting alone: not a filter
     root.setAttribute("data-kv-filter-rarity", "");
     expect(isFiltering(root)).toBe(true);
   });

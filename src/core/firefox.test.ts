@@ -3,11 +3,11 @@ import { browser } from "wxt/browser";
 import { filterResponseData, pageFetch } from "./firefox";
 
 describe("filterResponseData", () => {
-  it("renvoie null si l'API Firefox est absente", () => {
+  it("returns null when the Firefox API is missing", () => {
     expect(filterResponseData("1")).toBeNull();
   });
 
-  it("renvoie le filtre de l'API quand elle existe", () => {
+  it("returns the API's filter when it exists", () => {
     const filter = { write: vi.fn() };
     const api = vi.fn(() => filter);
     Object.assign(browser.webRequest, { filterResponseData: api });
@@ -18,14 +18,14 @@ describe("filterResponseData", () => {
 });
 
 describe("pageFetch", () => {
-  it("utilise fetch hors Firefox", async () => {
+  it("uses fetch outside Firefox", async () => {
     const fn = vi.fn(async () => new Response("{}"));
     vi.stubGlobal("fetch", fn);
     await pageFetch()("/x");
     expect(fn).toHaveBeenCalledWith("/x");
   });
 
-  it("préfère content.fetch quand il existe", async () => {
+  it("prefers content.fetch when it exists", async () => {
     const contentFetch = vi.fn(async () => new Response("{}"));
     vi.stubGlobal("content", { fetch: contentFetch });
     await pageFetch()("/x");

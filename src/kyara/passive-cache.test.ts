@@ -26,11 +26,11 @@ function stream(filter: ResponseFilter, chunks: string[]) {
 }
 
 describe("storeBody", () => {
-  it("stocke les prix trouvés", async () => {
+  it("stores the prices found", async () => {
     await storeBody(`${K}/api/fair-play/prices?ids=1`, '{"1": 12}');
     expect((await readPrices([1])).fair[1]?.v).toBe(12);
   });
-  it("JSON invalide ou réponse sans prix : rien, sans exception", async () => {
+  it("invalid JSON or response without prices: nothing, no exception", async () => {
     await expect(storeBody(`${K}/api/market/listings`, "<html>")).resolves.toBeUndefined();
     await expect(storeBody(`${K}/api/market/listings`, "{}")).resolves.toBeUndefined();
     expect(await readOwned()).toBeNull();
@@ -38,7 +38,7 @@ describe("storeBody", () => {
 });
 
 describe("interceptResponse", () => {
-  it("recopie chaque morceau tel quel vers la page, puis stocke la collection", async () => {
+  it("copies each chunk as is to the page, then stores the collection", async () => {
     const filter = fakeFilter();
     interceptResponse(`${K}/api/me/collection?lean=1`, "7");
     stream(filter, ['[{"characterId":10,', '"qty":2}]']);
@@ -47,20 +47,20 @@ describe("interceptResponse", () => {
     await vi.waitFor(async () => expect(await readOwned()).toEqual({ 10: 2 }));
   });
 
-  it("réponse illisible : la page reçoit quand même tout, rien n'est stocké", async () => {
+  it("unreadable response: the page still receives everything, nothing is stored", async () => {
     const filter = fakeFilter();
     interceptResponse(`${K}/api/market/listings`, "7");
-    stream(filter, ["pas du json"]);
+    stream(filter, ["not json"]);
     expect(filter.write).toHaveBeenCalledTimes(1);
     expect(await readOwned()).toBeNull();
   });
 
-  it("sans API Firefox : ne fait rien", () => {
+  it("without the Firefox API: does nothing", () => {
     Reflect.deleteProperty(browser.webRequest, "filterResponseData");
     expect(() => interceptResponse(`${K}/api/me/collection`, "1")).not.toThrow();
   });
 
-  it("filtre en erreur : géré sans exception", () => {
+  it("filter error: handled without exception", () => {
     const filter = fakeFilter();
     interceptResponse(`${K}/api/me/collection`, "1");
     expect(() => filter.onerror?.()).not.toThrow();
@@ -75,12 +75,12 @@ describe("startPassiveCache", () => {
     return addListener;
   }
 
-  it("écoute les URLs surveillées en mode bloquant", () => {
+  it("listens to the watched URLs in blocking mode", () => {
     const add = listener();
     expect(add).toHaveBeenCalledWith(expect.any(Function), { urls: WATCHED_URLS }, ["blocking"]);
   });
 
-  it("n'intercepte que les GET", () => {
+  it("only intercepts GET", () => {
     const filterFn = fakeFilter();
     const handler = listener().mock.calls[0]?.[0];
     handler({ method: "POST", url: `${K}/api/me/collection`, requestId: "1" });
@@ -90,7 +90,7 @@ describe("startPassiveCache", () => {
     expect(filterFn.ondata).toBeTypeOf("function");
   });
 
-  it("si l'interception plante, la requête continue", () => {
+  it("if interception crashes, the request goes on", () => {
     Object.assign(browser.webRequest, {
       filterResponseData: vi.fn(() => {
         throw new Error("denied");
