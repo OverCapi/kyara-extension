@@ -58,7 +58,7 @@ kyara-extension/
     │   ├── rarity-ring/     # Anneau couleur de rareté
     │   ├── gain-filter/     # Filtre "Gain min" (Off / Neutre et + / Positif + curseur) et tri par rentabilité
     │   ├── rarity-filter/   # Filtre par rareté de la carte proposée (puces multi-sélection)
-    │   ├── load-more/       # Clique « Voir plus d'offres » tant qu'un filtre laisse trop peu d'offres visibles, avec un indicateur de chargement
+    │   ├── load-more/       # Clique « Voir plus d'offres » tant qu'un filtre laisse trop peu d'offres visibles, le bouton affichant « Chargement… » pendant le chargement
     │   └── market-tooltip/  # Infobulle "Min marché" au survol
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)

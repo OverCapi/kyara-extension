@@ -18,15 +18,22 @@ export default defineConfig({
   manifest: ({ browser }) => ({
     name: en["manifest.name"],
     description: en["manifest.description"],
-    version: "0.1.0",
     permissions:
       browser === "firefox"
         ? ["webRequest", "webRequestBlocking", "storage", "https://kyara.games/*"]
         : ["storage"],
     host_permissions: browser === "firefox" ? undefined : ["https://kyara.games/*"],
+    // update_url : Firefox y vérifie (~toutes les 24 h) s'il existe une version plus récente,
+    // puis installe tout seul le .xpi signé. updates.json est publié par .github/workflows/release.yml.
     browser_specific_settings:
       browser === "firefox"
-        ? { gecko: { id: "kyara-extension@local", strict_min_version: "115.0" } }
+        ? {
+            gecko: {
+              id: "kyara-extension@local",
+              strict_min_version: "115.0",
+              update_url: "https://github.com/OverCapi/kyara-extension/releases/latest/download/updates.json",
+            },
+          }
         : undefined,
   }),
 });

@@ -95,65 +95,80 @@ describe("load-more", () => {
     expect(clicked).not.toHaveBeenCalled();
   });
 
-  describe("indicateur de chargement", () => {
-    const loading = () => document.querySelector<HTMLElement>(".kv-loading");
+  describe("texte « Chargement… » du bouton", () => {
+    const label = () => more?.textContent;
 
-    it("caché au départ, avec son texte ; affiché dès qu'un chargement est lancé", () => {
-      filtering();
+    it("clic de l'utilisateur : texte changé, puis remis quand les offres arrivent", () => {
       const { emit } = startFeature(loadMore);
-      expect(loading()?.hidden).toBe(true);
-      expect(loading()?.textContent).toBe("Chargement d'autres offres…");
-      expect(loading()?.getAttribute("role")).toBe("status");
-      emit(snap(20, 20));
-      expect(loading()?.hidden).toBe(false);
+      emit(snap(20, 0));
+      more?.click();
+      expect(label()).toBe("Chargement…");
+      emit(snap(20, 0)); // rendu sans nouvelle offre : toujours en chargement
+      expect(label()).toBe("Chargement…");
+      emit(snap(40, 0));
+      expect(label()).toBe("Voir plus");
     });
 
-    it("reste affiché entre deux chargements, disparaît quand il y a assez d'offres", () => {
+    it("clic automatique de load-more : texte changé, remis puis reposé au clic suivant", () => {
       filtering();
       const { emit } = startFeature(loadMore);
       emit(snap(20, 20));
-      emit(snap(20, 20)); // toujours en attente
-      expect(loading()?.hidden).toBe(false);
-      emit(snap(40, 40)); // nouvelles offres, toujours trop peu : nouveau chargement
-      expect(loading()?.hidden).toBe(false);
+      expect(label()).toBe("Chargement…");
+      emit(snap(40, 40)); // offres arrivées, trop peu visibles : nouveau clic
+      expect(clicked).toHaveBeenCalledTimes(2);
+      expect(label()).toBe("Chargement…");
       emit(snap(60, 0));
-      expect(loading()?.hidden).toBe(true);
+      expect(label()).toBe("Voir plus");
     });
 
-    it("disparaît si le filtre est coupé", () => {
-      filtering();
-      const { emit } = startFeature(loadMore);
-      emit(snap(20, 20));
-      document.documentElement.removeAttribute("data-kv-filter-gain");
-      emit(snap(20, 20));
-      expect(loading()?.hidden).toBe(true);
+    it("double clic : le texte d'origine est gardé", () => {
+      startFeature(loadMore);
+      more?.click();
+      more?.click();
+      vi.advanceTimersByTime(LOAD_TIMEOUT);
+      expect(label()).toBe("Voir plus");
     });
 
-    it("disparaît quand il n'y a plus rien à charger", () => {
-      filtering();
-      const { emit } = startFeature(loadMore);
-      emit(snap(20, 20));
-      more?.remove();
-      emit(snap(40, 40));
-      expect(loading()?.hidden).toBe(true);
-    });
-
-    it("disparaît si le chargement n'aboutit pas dans le délai (aucune mise à jour de la page)", () => {
-      filtering();
-      startFeature(loadMore).emit(snap(20, 20));
+    it("remis si le chargement n'aboutit pas dans le délai", () => {
+      startFeature(loadMore);
+      more?.click();
       vi.advanceTimersByTime(LOAD_TIMEOUT - 1);
-      expect(loading()?.hidden).toBe(false);
+      expect(label()).toBe("Chargement…");
       vi.advanceTimersByTime(1);
-      expect(loading()?.hidden).toBe(true);
+      expect(label()).toBe("Voir plus");
     });
 
-    it("retiré quand l'extension est rechargée, sans minuteur oublié", () => {
-      filtering();
-      const { emit, page } = startFeature(loadMore);
-      emit(snap(20, 20));
+    it("garde le nœud texte du site (aucun nœud remplacé)", () => {
+      const node = more?.firstChild;
+      startFeature(loadMore);
+      more?.click();
+      expect(more?.firstChild).toBe(node);
+    });
+
+    it("n'écrase pas un texte réécrit par le site entre-temps", () => {
+      const { emit } = startFeature(loadMore);
+      more?.click();
+      if (more?.firstChild) more.firstChild.nodeValue = "Plus rien";
+      emit(snap(40, 0));
+      expect(label()).toBe("Plus rien");
+    });
+
+    it("ignore les autres clics et un bouton sans texte", () => {
+      startFeature(loadMore);
+      document.body.click();
+      expect(label()).toBe("Voir plus");
+      more?.replaceChildren(document.createElement("span"));
+      expect(() => more?.click()).not.toThrow();
+    });
+
+    it("texte remis quand l'extension est rechargée, sans minuteur ni écouteur oublié", () => {
+      const { page } = startFeature(loadMore);
+      more?.click();
       page.invalidate();
-      expect(loading()).toBeNull();
+      expect(label()).toBe("Voir plus");
       expect(vi.getTimerCount()).toBe(0);
+      more?.click();
+      expect(label()).toBe("Voir plus");
     });
   });
 });
