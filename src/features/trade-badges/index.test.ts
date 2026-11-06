@@ -16,7 +16,7 @@ describe("badges", () => {
     expect(want(5, 0)).toEqual({ text: "0", sign: "0" });
   });
   it("best gain under the arrow", () => {
-    expect(maxBadge(0.4)).toBe("max +40 %");
+    expect(maxBadge(0.4)).toBe("+40 %");
     expect(maxBadge(null)).toBe("");
   });
   it("wanted card: value alone or unknown", () => {
@@ -69,7 +69,7 @@ describe("trade-badges", () => {
     const arrow = snap.offers[0]?.li.querySelector<HTMLElement>(".arrow");
     expect(w1?.dataset.kvPct).toBe("+150 %");
     expect(w2?.dataset.kvPct).toBe("-50 %");
-    expect(arrow?.dataset.kvMax).toBe("max -50 %"); // only card 3 is owned
+    expect(arrow?.dataset.kvMax).toBe("-50 %"); // only card 3 is owned
     expect(arrow?.dataset.kvSign).toBe("-1");
     emit({ ...snap, owned: {} });
     expect(arrow?.dataset.kvMax).toBeUndefined();

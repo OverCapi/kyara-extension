@@ -106,6 +106,15 @@ describe("readGiveButtons", () => {
     if (!li) throw new Error("no offer");
     expect(readGiveButtons(readOffer(li)).map((b) => b.card.id)).toEqual([22]);
   });
+  it("any clickable element, case and spaces ignored; card and profile links ignored", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2, 3] }]);
+    if (!li) throw new Error("no offer");
+    li.insertAdjacentHTML(
+      "beforeend",
+      '<div class="x"><a href="/echange">DONNER  carte 2</a><span role="button">Donner Carte 3</span></div>',
+    );
+    expect(readGiveButtons(readOffer(li)).map((b) => b.card.id)).toEqual([2, 3]);
+  });
   it("card without a name: never matched", () => {
     const [li] = renderOffers([{ give: 1, wants: [2], buttons: ["Donner  ×1"] }]);
     if (!li) throw new Error("no offer");

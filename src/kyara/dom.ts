@@ -68,9 +68,13 @@ export function findOfferArrow(offer: Offer): HTMLElement | null {
   return offer.li.querySelector<HTMLElement>(".arrow");
 }
 
+/** Clickable elements of an offer that can be a give button (card links excluded: they have no text). */
+const ACTION_SELECTOR = 'button, [role="button"], a:not([href^="/wiki/"])';
+const normalize = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
+
 /** A "Donner <card>" (give) button and the wanted card it gives. */
 export interface GiveButton {
-  el: HTMLButtonElement;
+  el: HTMLElement;
   card: Card;
 }
 
@@ -82,12 +86,13 @@ export interface GiveButton {
 // ponytail: matched by name, since the buttons carry no card id; switch to an id if the site adds one.
 export function readGiveButtons(offer: Offer): GiveButton[] {
   const named = offer.wants
-    .map((card) => ({ card, name: card.el.title.trim() }))
+    .map((card) => ({ card, name: normalize(card.el.title) }))
     .filter((n) => n.name)
     .sort((a, b) => b.name.length - a.name.length);
   const buttons: GiveButton[] = [];
-  for (const el of offer.li.querySelectorAll<HTMLButtonElement>(".acts button")) {
-    const hit = named.find((n) => (el.textContent ?? "").includes(n.name));
+  for (const el of offer.li.querySelectorAll<HTMLElement>(ACTION_SELECTOR)) {
+    const text = normalize(el.textContent ?? "");
+    const hit = named.find((n) => text.includes(n.name));
     if (hit) buttons.push({ el, card: hit.card });
   }
   return buttons;

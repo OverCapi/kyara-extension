@@ -1,5 +1,5 @@
 // Badges on the cards of each offer: value of the offered card ("≈ 12◆"), gain per wanted card ("+6",
-// its percentage on hover), and the best percentage you can get under the ⇄ arrow ("max +40 %").
+// its percentage on hover), and the best percentage you can get under the ⇄ arrow ("+40 %").
 // DOM effect: data-kv* attributes only (the CSS draws the badges).
 import { t } from "../../core/i18n";
 import { findOfferArrow } from "../../kyara/dom";
@@ -20,7 +20,7 @@ export function wantBadge({ value, diff }: WantAnalysis): { text: string; sign: 
 
 /** Text of the best-gain badge under the arrow. Empty if no owned card has a known gain. */
 export function maxBadge(bestRatio: number | null): string {
-  return bestRatio === null ? "" : t("badge.max", { pct: pctText(bestRatio) });
+  return bestRatio === null ? "" : pctText(bestRatio);
 }
 
 const sign = (ratio: number | null) => (ratio === null ? undefined : String(Math.sign(ratio)));
