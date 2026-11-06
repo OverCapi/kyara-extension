@@ -39,7 +39,7 @@ export function readOffer(li: HTMLElement): Offer {
 
 /** Filter bar of the Trades tab (search + pills), a wrapping flex row. `null` if missing. */
 export function findOfferFilters(root: ParentNode = document): HTMLElement | null {
-  // no :has(): Firefox 115 (minimum version) does not support it
+  // parent of .pills rather than :has(), which keeps the selector cheap on every render
   return root.querySelector(".filters > .pills")?.parentElement ?? null;
 }
 

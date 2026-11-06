@@ -6,7 +6,7 @@ import { listen, mountFloating } from "../../core/page";
 import { cardId, OFFER_CARD_SELECTOR } from "../../kyara/dom";
 import type { Feature } from "../types";
 import { createMarketMin } from "./market-min";
-import { showTip, type TipState, tipHtml } from "./view";
+import { showTip, type TipState, tipNodes } from "./view";
 import "./style.css";
 
 export const TIP_DELAY = 250;
@@ -28,7 +28,7 @@ export const marketTooltip: Feature = {
       tip.hidden = true;
     };
     const show = (a: Element, state: TipState) =>
-      showTip(tip, a, tipHtml(a.getAttribute("title") ?? "", state));
+      showTip(tip, a, tipNodes(a.getAttribute("title") ?? "", state));
     const load = safeAsync("market-tooltip:load", async (a: Element) => {
       const id = cardId(a);
       if (id === null) return;

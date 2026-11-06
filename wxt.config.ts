@@ -13,8 +13,8 @@ export default defineConfig({
     keepProfileChanges: true,
     startUrls: ["https://kyara.games/marche?onglet=offres"],
   },
-  // Existing local extension: not submitted to addons.mozilla.org yet, so exempt from the data_collection_permissions field.
-  suppressWarnings: { firefoxDataCollection: true },
+  // Sources archive sent to AMO reviewers: never the AMO keys (.env), nor local or generated folders.
+  zip: { excludeSources: [".env", ".env.*", "coverage/**", ".firefox-profile/**", "web-ext-artifacts/**"] },
   manifest: ({ browser }) => ({
     name: en["manifest.name"],
     description: en["manifest.description"],
@@ -23,16 +23,19 @@ export default defineConfig({
         ? ["webRequest", "webRequestBlocking", "storage", "https://kyara.games/*"]
         : ["storage"],
     host_permissions: browser === "firefox" ? undefined : ["https://kyara.games/*"],
-    // update_url: Firefox checks there (~every 24 h) for a newer version,
-    // then installs the signed .xpi by itself. updates.json is published by scripts/release.sh.
+    // Listed on addons.mozilla.org: AMO delivers updates, so no update_url (AMO rejects it for listed add-ons).
+    // Keep this id: copies installed from the old GitHub releases share it and update from AMO.
+    // data_collection_permissions: the extension sends nothing anywhere except kyara.games' own API.
     browser_specific_settings:
       browser === "firefox"
         ? {
             gecko: {
               id: "kyara-extension@local",
-              strict_min_version: "115.0",
-              update_url: "https://github.com/OverCapi/kyara-extension/releases/latest/download/updates.json",
+              // 140 = current ESR, first version that knows data_collection_permissions
+              strict_min_version: "140.0",
+              data_collection_permissions: { required: ["none"] },
             },
+            gecko_android: { strict_min_version: "142.0" }, // first Android version that knows it
           }
         : undefined,
   }),

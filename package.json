@@ -9,7 +9,7 @@
     "build": "wxt build -b firefox --mv2",
     "build:debug": "wxt build -b firefox --mv2 --mode development",
     "zip": "wxt zip -b firefox --mv2",
-    "sign": "pnpm build && web-ext sign --channel=unlisted --source-dir .output/firefox-mv2 --artifacts-dir .output/signed --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET",
+    "sign": "rm -rf .output/*.zip && pnpm zip && web-ext sign --channel=listed --source-dir .output/firefox-mv2 --upload-source-code .output/kyara-extension-$npm_package_version-sources.zip --amo-metadata amo-metadata.json --artifacts-dir .output/signed --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET",
     "release": "scripts/release.sh",
     "dev:chrome": "wxt -b chrome",
     "build:chrome": "wxt build -b chrome",

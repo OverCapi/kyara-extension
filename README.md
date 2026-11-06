@@ -52,7 +52,7 @@ The production build contains no logs.
 pnpm release
 ```
 
-Run from an up-to-date `main`, after bumping `"version"` in `package.json`. The script checks the code, gets the extension signed by Mozilla (AMO keys in `.env`, see [`scripts/release.sh`](scripts/release.sh)), then publishes a GitHub release with `firefox.xpi` and `updates.json`. Installed copies update themselves through `updates.json`.
+Run from an up-to-date `main`, after bumping `"version"` in `package.json`. The script checks the code, submits the version to addons.mozilla.org with its sources and [`amo-metadata.json`](amo-metadata.json) (AMO keys in `.env`, see [`scripts/release.sh`](scripts/release.sh)), then creates a GitHub release (tag + changelog). Once Mozilla approves the version, it is published on the store and installed copies update themselves.
 
 ## Chrome (partial)
 

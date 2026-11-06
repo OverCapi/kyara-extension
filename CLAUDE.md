@@ -80,7 +80,6 @@ kyara-extension/
     │   ├── storage.ts       # Accès typé à browser.storage (clés, types, TTL)
     │   ├── storage-sync.ts  # Écriture d'un réglage + tri des échos de storage.onChanged (curseur, puces)
     │   ├── page.ts          # UN MutationObserver partagé + debounce, éléments flottants ajoutés à <html>
-    │   ├── html.ts          # Échappement HTML
     │   ├── errors.ts        # safe() / safeAsync() : barrière anti-crash
     │   ├── firefox.ts       # API propres à Firefox (filterResponseData, content.fetch)
     │   └── log.ts           # Logs de dev préfixés [kyara-extension:<module>], supprimés du build de prod
@@ -204,6 +203,7 @@ Objectif : **zéro crash, zéro erreur, zéro warning** dans la console de la pa
 
 - **Jamais de `catch {}` vide.** Au minimum un log de dev qui explique pourquoi l'erreur est ignorée.
 - **Jamais de `throw` qui sort d'une feature.** Les erreurs sont converties en valeur (`null`, résultat vide) à la frontière du module.
+- **Jamais de `innerHTML`** (ni `outerHTML`, `insertAdjacentHTML`) dans le code de l'extension : le linter d'addons.mozilla.org le signale. On construit les nœuds (`createElement`, `append`, `textContent`). Les tests peuvent l'utiliser pour monter un faux DOM.
 - Les données externes (API, DOM, stockage) sont typées `unknown` puis validées avant usage. Pas de `as MonType` sur une donnée non vérifiée.
 - **Pas de warning non plus** : pas de `console.warn` en prod, pas de permission inutile dans le manifest, pas de CSS invalide, pas d'API dépréciée. `pnpm check` et `pnpm build` doivent sortir sans aucun avertissement.
 
@@ -285,7 +285,9 @@ pnpm build      # Build de production dans .output/, sans logs
 pnpm build:debug # Build non minifié avec logs, dans .output/firefox-mv2-dev/
 pnpm build:chrome # Build Chrome MV3 (sans cache passif), dans .output/chrome-mv3/
 pnpm dev:chrome   # Lance Chrome avec l'extension, rechargement auto
-pnpm zip        # Archive prête pour addons.mozilla.org
+pnpm zip        # Archives extension + sources (sans .env ni coverage) pour addons.mozilla.org
+pnpm sign       # Soumet la version à addons.mozilla.org (listée, avec sources et amo-metadata.json)
+pnpm release    # Depuis main : vérifs, `pnpm sign`, puis release GitHub (tag + changelog)
 pnpm test       # Tests Vitest
 pnpm test:coverage  # Tests + rapport de couverture (échoue sous les seuils)
 pnpm check      # Biome (lint + format) + vérification TypeScript

@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { tipHtml, tipPosition } from "./view";
+import { type TipState, tipNodes, tipPosition } from "./view";
 
-describe("tipHtml", () => {
+const tipHtml = (name: string, state: TipState) => {
+  const box = document.createElement("div");
+  box.append(...tipNodes(name, state));
+  return box.innerHTML;
+};
+
+describe("tipNodes", () => {
   it("loading", () => {
     expect(tipHtml("Saber", { kind: "loading" })).toContain("…");
   });
@@ -18,7 +24,7 @@ describe("tipHtml", () => {
     expect(one).toContain("1 annonce<");
     expect(many).toContain("3 annonces<");
   });
-  it("escapes the name coming from the site", () => {
+  it("keeps the name coming from the site as text, never as HTML", () => {
     const html = tipHtml('<img src=x onerror="a">', { kind: "loading" });
     expect(html).not.toContain("<img");
     expect(html).toContain("&lt;img");

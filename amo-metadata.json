@@ -1,0 +1,13 @@
+{
+  "categories": ["games-entertainment"],
+  "summary": {
+    "en-US": "Shows card values and trade profitability on kyara.games, with filters and sorting for trade offers.",
+    "fr": "Affiche la valeur des cartes et la rentabilité des échanges sur kyara.games, avec filtres et tri des offres."
+  },
+  "homepage": { "en-US": "https://github.com/OverCapi/kyara-extension" },
+  "support_url": { "en-US": "https://github.com/OverCapi/kyara-extension/issues" },
+  "version": {
+    "license": "all-rights-reserved",
+    "approval_notes": "Build: Node 24 + pnpm 12. Run `pnpm install --frozen-lockfile` then `pnpm build`; the output is .output/firefox-mv2/. Sources are attached. The extension only runs on kyara.games. webRequestBlocking + filterResponseData read the JSON responses the site already loads (prices, collection) and always pass them through untouched; nothing is sent anywhere except kyara.games' own API, with the user's existing session token."
+  }
+}
