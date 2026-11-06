@@ -18,7 +18,6 @@ export default defineConfig({
   manifest: ({ browser }) => ({
     name: en["manifest.name"],
     description: en["manifest.description"],
-    version: "0.1.0",
     permissions:
       browser === "firefox"
         ? ["webRequest", "webRequestBlocking", "storage", "https://kyara.games/*"]

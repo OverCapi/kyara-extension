@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "packageManager": "pnpm@12.9.1",
   "scripts": {
     "dev": "mkdir -p .firefox-profile && wxt -b firefox --mv2",
     "build": "wxt build -b firefox --mv2",
