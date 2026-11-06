@@ -1,4 +1,6 @@
-// Card value and offer profitability analysis. Pure functions (no DOM, no network).
+// Card values and trade profitability, shared by the badge, tint, filter and give-button features.
+// Pure functions: no DOM change, no request.
+import { t } from "../core/i18n";
 import type { OwnedCards, PriceStore } from "../core/storage";
 import type { Card, Offer } from "./dom";
 
@@ -17,12 +19,14 @@ export interface WantAnalysis {
   value: number | null;
   /** G - W: positive = you gain. `null` if G or W is unknown. */
   diff: number | null;
+  /** Relative gain (G - W) / max(W, 1). `null` if G or W is unknown. */
+  ratio: number | null;
 }
 export interface OfferAnalysis {
   /** Value of the offered card (G), `null` if unknown. */
   give: number | null;
   wants: WantAnalysis[];
-  /** Best relative gain (G - W) / max(W, 1) among the wanted cards YOU own. `null` if none. */
+  /** Best relative gain among the wanted cards YOU own. `null` if none. */
   bestRatio: number | null;
 }
 
@@ -33,10 +37,21 @@ export function analyzeOffer(offer: Offer, store: PriceStore, owned: OwnedCards 
   const wants = offer.wants.map((card): WantAnalysis => {
     const value = cardValue(store, card.id);
     const diff = give === null || value === null ? null : give - value;
-    if (diff !== null && value !== null && (owned?.[card.id] ?? 0) > 0) {
-      bestRatio = Math.max(bestRatio ?? Number.NEGATIVE_INFINITY, diff / Math.max(value, 1));
+    const ratio = diff === null || value === null ? null : diff / Math.max(value, 1);
+    if (ratio !== null && (owned?.[card.id] ?? 0) > 0) {
+      bestRatio = Math.max(bestRatio ?? Number.NEGATIVE_INFINITY, ratio);
     }
-    return { card, value, diff };
+    return { card, value, diff, ratio };
   });
   return { give, wants, bestRatio };
+}
+
+/** Number with its sign: "+6", "-2", "0". */
+export function signed(n: number): string {
+  return (n > 0 ? "+" : "") + n;
+}
+
+/** Relative gain as a rounded, signed percentage ("+40 %"). */
+export function pctText(ratio: number): string {
+  return t("badge.pct", { pct: signed(Math.round(ratio * 100)) });
 }

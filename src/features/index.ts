@@ -1,5 +1,6 @@
 // List of active features. To add a feature: create its folder, then add it here.
 import { gainFilter } from "./gain-filter";
+import { giveButtons } from "./give-buttons";
 import { loadMore } from "./load-more";
 import { marketTooltip } from "./market-tooltip";
 import { profitTint } from "./profit-tint";
@@ -12,6 +13,7 @@ import type { Feature } from "./types";
 export const features: Feature[] = [
   rarityRing,
   tradeBadges,
+  giveButtons,
   profitTint,
   gainFilter,
   rarityFilter,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { rankByGain } from "./sort";
+import { rankByGain } from "./rank";
 
 describe("rankByGain", () => {
   it("empty list", () => {

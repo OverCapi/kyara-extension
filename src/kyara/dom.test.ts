@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { renderOffers } from "../test/helpers";
-import { cardId, findLoadMore, findOfferFilters, offerCards, offerIds, readOffer, readOffers } from "./dom";
+import {
+  cardId,
+  findLoadMore,
+  findOfferArrow,
+  findOfferFilters,
+  offerCards,
+  offerIds,
+  readGiveButtons,
+  readOffer,
+  readOffers,
+} from "./dom";
 
 describe("cardId", () => {
   it("reads the last segment of /wiki/<id>", () => {
@@ -66,5 +76,40 @@ describe("findLoadMore", () => {
     document.body.innerHTML =
       '<section class="board"><ul class="offers"></ul></section><button class="more">other</button>';
     expect(findLoadMore()).toBeNull();
+  });
+});
+
+describe("findOfferArrow", () => {
+  it("finds the arrow, null if missing", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2] }]);
+    if (!li) throw new Error("no offer");
+    expect(findOfferArrow(readOffer(li))?.textContent).toBe("⇄");
+    li.querySelector(".arrow")?.remove();
+    expect(findOfferArrow(readOffer(li))).toBeNull();
+  });
+});
+
+describe("readGiveButtons", () => {
+  it("matches each give button to its wanted card by name, ignores other buttons", () => {
+    const [li] = renderOffers([
+      { give: 1, wants: [2, 3], buttons: ["Donner Carte 3 ×1", "Donner Carte 2 ×1", "Proposer autre chose"] },
+    ]);
+    if (!li) throw new Error("no offer");
+    const buttons = readGiveButtons(readOffer(li));
+    expect(buttons.map((b) => [b.el.textContent, b.card.id])).toEqual([
+      ["Donner Carte 3 ×1", 3],
+      ["Donner Carte 2 ×1", 2],
+    ]);
+  });
+  it("longest name wins when a name contains another", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2, 22], buttons: ["Donner Carte 22 ×1"] }]);
+    if (!li) throw new Error("no offer");
+    expect(readGiveButtons(readOffer(li)).map((b) => b.card.id)).toEqual([22]);
+  });
+  it("card without a name: never matched", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2], buttons: ["Donner  ×1"] }]);
+    if (!li) throw new Error("no offer");
+    li.querySelector(".want a")?.removeAttribute("title");
+    expect(readGiveButtons(readOffer(li))).toEqual([]);
   });
 });

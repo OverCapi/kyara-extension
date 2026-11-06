@@ -10,6 +10,7 @@ describe("features", () => {
   it("contains every feature", () => {
     expect(features.map((f) => f.name).sort()).toEqual([
       "gain-filter",
+      "give-buttons",
       "load-more",
       "market-tooltip",
       "profit-tint",

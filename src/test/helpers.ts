@@ -35,6 +35,8 @@ export interface OfferSpec {
   wants?: number[];
   /** Inline `box-shadow` of the offered card's image (the site's rarity color). */
   shadow?: string;
+  /** Texts of the buttons under the offer (e.g. "Donner Carte 2 ×1", "Proposer autre chose"). */
+  buttons?: string[];
 }
 
 /** Adds offers to the page with the same structure as kyara.games. Returns the <li> elements. */
@@ -46,7 +48,8 @@ export function renderOffers(specs: OfferSpec[]): HTMLElement[] {
     li.id = `offre-${i + 1}`;
     li.innerHTML =
       `<div class="thumbs"><div class="give">${s.give ? card(s.give, s.shadow) : ""}</div>` +
-      `<div class="want">${(s.wants ?? []).map((id) => card(id)).join("")}</div></div>`;
+      `<div class="arrow">⇄</div><div class="want">${(s.wants ?? []).map((id) => card(id)).join("")}</div></div>` +
+      `<div class="acts">${(s.buttons ?? []).map((b) => `<button>${b}</button>`).join("")}</div>`;
     document.body.append(li);
     return li;
   });

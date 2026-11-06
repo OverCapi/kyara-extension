@@ -78,13 +78,21 @@ describe("createFilterPanel: popover", () => {
     button()?.click();
     expect(popover()?.hidden).toBe(true);
   });
-  it("a click outside closes, a click inside does not", () => {
+  const press = (el: Element | null | undefined) =>
+    el?.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+  it("a press outside closes, a press inside does not", () => {
     open();
     button()?.click();
-    popover()?.click();
+    press(popover());
     expect(popover()?.hidden).toBe(false);
-    document.body.click();
+    press(document.body);
     expect(popover()?.hidden).toBe(true);
+  });
+  it("a click by script outside (load-more, mirrored pill) does not close", () => {
+    open();
+    button()?.click();
+    document.body.click();
+    expect(popover()?.hidden).toBe(false);
   });
   it("Escape closes, another key does not", () => {
     open();

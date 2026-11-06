@@ -62,3 +62,33 @@ export function offerIds(offer: Offer): number[] {
 export function offerCards(offer: Offer): Card[] {
   return offer.give ? [offer.give, ...offer.wants] : offer.wants;
 }
+
+/** Arrow (⇄) between the offered and the wanted cards. `null` if missing. */
+export function findOfferArrow(offer: Offer): HTMLElement | null {
+  return offer.li.querySelector<HTMLElement>(".arrow");
+}
+
+/** A "Donner <card>" (give) button and the wanted card it gives. */
+export interface GiveButton {
+  el: HTMLButtonElement;
+  card: Card;
+}
+
+/**
+ * "Donner <card>" buttons of an offer (only shown for cards you own), each matched to its wanted card by
+ * the card name (`title` of the card link). Longest name first, so "Saki Aoi" wins over "Saki".
+ * Other buttons ("Proposer autre chose") are ignored.
+ */
+// ponytail: matched by name, since the buttons carry no card id; switch to an id if the site adds one.
+export function readGiveButtons(offer: Offer): GiveButton[] {
+  const named = offer.wants
+    .map((card) => ({ card, name: card.el.title.trim() }))
+    .filter((n) => n.name)
+    .sort((a, b) => b.name.length - a.name.length);
+  const buttons: GiveButton[] = [];
+  for (const el of offer.li.querySelectorAll<HTMLButtonElement>(".acts button")) {
+    const hit = named.find((n) => (el.textContent ?? "").includes(n.name));
+    if (hit) buttons.push({ el, card: hit.card });
+  }
+  return buttons;
+}

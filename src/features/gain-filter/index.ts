@@ -7,13 +7,13 @@
 // The last snapshot is kept to reapply the filter as soon as the setting changes.
 
 import { t } from "../../core/i18n";
+import { rankByGain } from "../../core/rank";
 import type { GainFilter } from "../../core/storage";
 import type { OffersSnapshot } from "../../kyara/offers";
 import { analyzeOffer } from "../../kyara/prices";
 import type { Feature } from "../types";
 import { passesGainFilter } from "./filter";
 import { createGauge } from "./gauge";
-import { rankByGain } from "./sort";
 import "./style.css";
 
 export const gainFilter: Feature = {

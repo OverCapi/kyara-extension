@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { PriceStore } from "../core/storage";
 import type { Card, Offer } from "./dom";
-import { analyzeOffer, cardValue } from "./prices";
+import { analyzeOffer, cardValue, pctText, signed } from "./prices";
 
 const price = (m7: number | null, m30: number | null = null, last: number | null = null) => ({
   m7,
@@ -40,15 +40,16 @@ describe("analyzeOffer", () => {
   it("computes G, W and G - W", () => {
     const a = analyzeOffer(offer(1, [2, 3]), store({ 1: 10, 2: 4, 3: 12 }), null);
     expect(a.give).toBe(10);
-    expect(a.wants.map((w) => [w.value, w.diff])).toEqual([
-      [4, 6],
-      [12, -2],
+    expect(a.wants.map((w) => [w.value, w.diff, w.ratio])).toEqual([
+      [4, 6, 1.5],
+      [12, -2, -2 / 12],
     ]);
   });
   it("diff null if G or W is unknown", () => {
     expect(analyzeOffer(offer(1, [2]), store({ 2: 4 }), null).wants[0]).toMatchObject({
       value: 4,
       diff: null,
+      ratio: null,
     });
     expect(analyzeOffer(offer(1, [2]), store({ 1: 4 }), null).wants[0]).toMatchObject({
       value: null,
@@ -68,5 +69,16 @@ describe("analyzeOffer", () => {
     expect(analyzeOffer(offer(1, [2]), s, { 2: 1 }).bestRatio).toBe(-0.5);
     expect(analyzeOffer(offer(1, [2]), s, {}).bestRatio).toBeNull();
     expect(analyzeOffer(offer(1, [2]), s, null).bestRatio).toBeNull();
+  });
+});
+
+describe("signed / pctText", () => {
+  it("adds the + sign to positive numbers only", () => {
+    expect([signed(6), signed(-2), signed(0)]).toEqual(["+6", "-2", "0"]);
+  });
+  it("rounded signed percentage", () => {
+    expect(pctText(0.404)).toBe("+40 %");
+    expect(pctText(-0.5)).toBe("-50 %");
+    expect(pctText(0)).toBe("0 %");
   });
 });

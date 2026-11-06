@@ -1,4 +1,4 @@
-// Order of the offers, from most to least profitable. Pure function.
+// Rank of items from a gain, most profitable first. Pure function, used to sort offers and give buttons.
 
 /**
  * Rank of each offer (0 = first) from its best relative gain. Unknown gain (`null`) comes

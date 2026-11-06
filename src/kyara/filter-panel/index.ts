@@ -31,7 +31,9 @@ export function createFilterPanel(page: PageContext): FilterPanel {
     menu.button.setAttribute("aria-expanded", String(open));
   };
   listen(page, menu.button, "click", () => setOpen(!isOpen));
-  listen(page, document, "click", (e) => {
+  // pointerdown, not click: the site's buttons clicked by script (load-more, mirrored pills) fire a
+  // click but no pointerdown, and must not close the panel while the user is setting it.
+  listen(page, document, "pointerdown", (e) => {
     if (!(e.target instanceof Node) || !menu.root.contains(e.target)) setOpen(false);
   });
   listen<KeyboardEvent>(page, document, "keydown", (e) => {

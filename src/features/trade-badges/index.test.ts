@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { makeSnapshot, startFeature } from "../../test/helpers";
-import { giveBadge, tradeBadges, wantBadge } from "./index";
+import { giveBadge, maxBadge, tradeBadges, wantBadge } from "./index";
 
-const want = (value: number | null, diff: number | null) => wantBadge({ card: {} as never, value, diff });
+const want = (value: number | null, diff: number | null) =>
+  wantBadge({ card: {} as never, value, diff, ratio: null });
 
 describe("badges", () => {
   it("offered card", () => {
@@ -13,6 +14,10 @@ describe("badges", () => {
     expect(want(4, 6)).toEqual({ text: "+6", sign: "1" });
     expect(want(12, -2)).toEqual({ text: "-2", sign: "-1" });
     expect(want(5, 0)).toEqual({ text: "0", sign: "0" });
+  });
+  it("best gain under the arrow", () => {
+    expect(maxBadge(0.4)).toBe("max +40 %");
+    expect(maxBadge(null)).toBe("");
   });
   it("wanted card: value alone or unknown", () => {
     expect(want(4, null)).toEqual({ text: "4◆", sign: "0" });
@@ -52,5 +57,28 @@ describe("trade-badges", () => {
     const snap = makeSnapshot([{ wants: [2] }]);
     startFeature(tradeBadges).emit(snap);
     expect(snap.offers[0]?.wants[0]?.el.dataset.kv).toBeUndefined();
+  });
+  it("percentage on wanted cards and best owned gain on the arrow", () => {
+    const snap = makeSnapshot([{ give: 1, wants: [2, 3] }], {
+      fair: { 1: 10, 2: 4, 3: 20 },
+      owned: { 3: 1 },
+    });
+    const { emit } = startFeature(tradeBadges);
+    emit(snap);
+    const [w1, w2] = snap.offers[0]?.wants.map((c) => c.el) ?? [];
+    const arrow = snap.offers[0]?.li.querySelector<HTMLElement>(".arrow");
+    expect(w1?.dataset.kvPct).toBe("+150 %");
+    expect(w2?.dataset.kvPct).toBe("-50 %");
+    expect(arrow?.dataset.kvMax).toBe("max -50 %"); // only card 3 is owned
+    expect(arrow?.dataset.kvSign).toBe("-1");
+    emit({ ...snap, owned: {} });
+    expect(arrow?.dataset.kvMax).toBeUndefined();
+    expect(arrow?.dataset.kvSign).toBeUndefined();
+  });
+  it("offer without an arrow: badges still set", () => {
+    const snap = makeSnapshot([{ give: 1, wants: [2] }], { fair: { 1: 10, 2: 4 } });
+    snap.offers[0]?.li.querySelector(".arrow")?.remove();
+    startFeature(tradeBadges).emit(snap);
+    expect(snap.offers[0]?.wants[0]?.el.dataset.kv).toBe("+6");
   });
 });
