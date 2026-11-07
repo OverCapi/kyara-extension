@@ -1,0 +1,30 @@
+/* Discreet "loading prices" spinner, bottom-right; never captures the mouse. */
+.kv-pending {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483646;
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 2px solid var(--fg2, #b7b2bd);
+  border-top-color: transparent;
+  border-radius: 50%;
+  opacity: 0.5;
+  pointer-events: none;
+  animation: kv-pending-spin 0.9s linear infinite;
+}
+.kv-pending[hidden] {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kv-pending {
+    animation: none;
+    border-top-color: var(--fg2, #b7b2bd);
+  }
+}
+@keyframes kv-pending-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

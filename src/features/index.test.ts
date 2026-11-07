@@ -13,6 +13,7 @@ describe("features", () => {
       "give-buttons",
       "load-more",
       "market-tooltip",
+      "prices-pending",
       "profit-tint",
       "rarity-filter",
       "rarity-ring",
