@@ -62,6 +62,14 @@ describe("profit-tint: pill", () => {
     expect(document.documentElement.classList.contains("kv-no-tint")).toBe(false);
   });
 
+  it("P key toggles and stores", async () => {
+    startFeature(profitTint);
+    await vi.waitFor(() => expect(button()?.textContent).toBe("Rentabilité on"));
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "p" }));
+    await vi.waitFor(() => expect(button()?.textContent).toBe("Rentabilité off"));
+    expect(await readNoTint()).toBe(true);
+  });
+
   it("write failure on click: caught", async () => {
     startFeature(profitTint);
     vi.spyOn(fakeBrowser.storage.local, "set").mockRejectedValue(new Error("invalidated"));

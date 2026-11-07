@@ -32,6 +32,19 @@ export function listen<E extends Event>(
   ctx.onInvalidated(() => target.removeEventListener(type, wrapped, options));
 }
 
+/**
+ * Runs `cb` when `key` is pressed (case-insensitive) with no Ctrl/Meta/Alt, outside text fields.
+ * Removed automatically when the context is invalidated. Errors are caught.
+ */
+export function onShortcut(ctx: PageContext, key: string, cb: () => void): void {
+  listen<KeyboardEvent>(ctx, document, "keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.key.toLowerCase() !== key) return;
+    const el = e.target instanceof HTMLElement ? e.target : null;
+    if (el?.closest("input, textarea, select, [contenteditable]:not([contenteditable=false])")) return;
+    cb();
+  });
+}
+
 /** Appends `el` to <html>, outside the tree managed by the site. Removed when the context is invalidated. */
 export function mountFloating(ctx: PageContext, el: HTMLElement): void {
   document.documentElement.append(el);

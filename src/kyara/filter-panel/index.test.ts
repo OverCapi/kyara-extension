@@ -102,6 +102,13 @@ describe("createFilterPanel: popover", () => {
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     expect(popover()?.hidden).toBe(true);
   });
+  it("F key opens and closes the panel", () => {
+    open();
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "f" }));
+    expect(popover()?.hidden).toBe(false);
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "F" }));
+    expect(popover()?.hidden).toBe(true);
+  });
   it("2 sections in order: Kyara then extension", () => {
     open();
     const titles = [...document.querySelectorAll(".kv-section > h3")].map((h) => h.textContent);

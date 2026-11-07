@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { browser } from "wxt/browser";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 import { fakeCtx } from "../test/helpers";
-import { createPageWatcher, DEBOUNCE_MS, listen, mountFloating } from "./page";
+import { createPageWatcher, DEBOUNCE_MS, listen, mountFloating, onShortcut } from "./page";
 
 beforeEach(() => {
   fakeBrowser.reset();
@@ -81,6 +81,46 @@ describe("listen", () => {
       throw new Error("x");
     });
     expect(() => document.dispatchEvent(new Event("ping"))).not.toThrow();
+  });
+});
+
+describe("onShortcut", () => {
+  const press = (init: KeyboardEventInit, target: EventTarget = document) =>
+    target.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, ...init }));
+  it("fires for the key, any case", () => {
+    const cb = vi.fn();
+    onShortcut(fakeCtx(), "f", cb);
+    press({ key: "f" });
+    press({ key: "F" });
+    press({ key: "g" });
+    expect(cb).toHaveBeenCalledTimes(2);
+  });
+  it("ignored with Ctrl, Meta or Alt", () => {
+    const cb = vi.fn();
+    onShortcut(fakeCtx(), "f", cb);
+    press({ key: "f", ctrlKey: true });
+    press({ key: "f", metaKey: true });
+    press({ key: "f", altKey: true });
+    expect(cb).not.toHaveBeenCalled();
+  });
+  it("ignored in input, textarea, select and contenteditable", () => {
+    const cb = vi.fn();
+    onShortcut(fakeCtx(), "f", cb);
+    for (const tag of ["input", "textarea", "select", "div"]) {
+      const el = document.createElement(tag);
+      if (tag === "div") el.setAttribute("contenteditable", "true");
+      document.body.append(el);
+      press({ key: "f" }, el);
+    }
+    expect(cb).not.toHaveBeenCalled();
+  });
+  it("removed after invalidation", () => {
+    const cb = vi.fn();
+    const ctx = fakeCtx();
+    onShortcut(ctx, "f", cb);
+    ctx.invalidate();
+    press({ key: "f" });
+    expect(cb).not.toHaveBeenCalled();
   });
 });
 

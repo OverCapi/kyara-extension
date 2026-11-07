@@ -4,7 +4,7 @@
 // Deliberate EXCEPTION to the "no node in the site's DOM" rule: the button must sit with the filters.
 // It is reinserted on every render if the site removes it; the original pills are hidden (data-kv-panel
 // attribute on the bar) while the panel is there, and everything is removed when the extension reloads.
-import { listen, type PageContext } from "../../core/page";
+import { listen, onShortcut, type PageContext } from "../../core/page";
 import { createPillMirror } from "./mirror";
 import { buildMenu, makeCategory } from "./view";
 import "./style.css";
@@ -39,6 +39,7 @@ export function createFilterPanel(page: PageContext): FilterPanel {
   listen<KeyboardEvent>(page, document, "keydown", (e) => {
     if (e.key === "Escape") setOpen(false);
   });
+  onShortcut(page, "f", () => setOpen(!isOpen));
   page.onInvalidated(() => {
     menu.root.remove();
     host?.removeAttribute(HOST_ATTR); // the site's real pills come back

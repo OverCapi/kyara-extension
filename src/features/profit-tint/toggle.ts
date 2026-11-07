@@ -4,7 +4,7 @@
 // Effect: `kv-no-tint` class on <html> when colors are off (CSS then removes the background).
 import { safeAsync } from "../../core/errors";
 import { t } from "../../core/i18n";
-import { listen, mountFloating, type PageContext } from "../../core/page";
+import { listen, mountFloating, onShortcut, type PageContext } from "../../core/page";
 import { onNoTintChange, readNoTint, writeNoTint } from "../../core/storage";
 
 export interface Toggle {
@@ -29,6 +29,7 @@ export function createToggle(page: PageContext): Toggle {
     writeNoTint(!document.documentElement.classList.contains("kv-no-tint")),
   );
   listen(page, button, "click", () => void flip());
+  onShortcut(page, "p", () => void flip());
   page.onInvalidated(onNoTintChange(apply));
   void safeAsync("toggle:init", async () => apply(await readNoTint()))();
 
