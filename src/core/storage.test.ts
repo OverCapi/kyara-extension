@@ -2,15 +2,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { browser } from "wxt/browser";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 import {
+  DEFAULT_TINT_FULL,
   fairKey,
   isFresh,
   onNoTintChange,
   onStorageChange,
+  onTintFullChange,
   priceKey,
   readNoTint,
   readPrices,
+  readTintFull,
   writeEntries,
   writeNoTint,
+  writeTintFull,
 } from "./storage";
 
 beforeEach(() => fakeBrowser.reset());
@@ -83,5 +87,30 @@ describe("listeners", () => {
     await writeNoTint(false);
     expect(cb).toHaveBeenLastCalledWith(false);
     stop();
+  });
+});
+
+describe("tint scale", () => {
+  it("default 100, stored value read back", async () => {
+    expect(await readTintFull()).toBe(DEFAULT_TINT_FULL);
+    await writeTintFull(40);
+    expect(await readTintFull()).toBe(40);
+  });
+  it("corrupted or non-positive value: default", async () => {
+    for (const bad of ["x", 0, -5, Number.NaN, null]) {
+      await browser.storage.local.set({ tintFull: bad });
+      expect(await readTintFull()).toBe(DEFAULT_TINT_FULL);
+    }
+  });
+  it("onTintFullChange follows its key only, then stops", async () => {
+    const cb = vi.fn();
+    const stop = onTintFullChange(cb);
+    await browser.storage.local.set({ other: 1 });
+    expect(cb).not.toHaveBeenCalled();
+    await writeTintFull(25);
+    expect(cb).toHaveBeenLastCalledWith(25);
+    stop();
+    await writeTintFull(30);
+    expect(cb).toHaveBeenCalledTimes(1);
   });
 });

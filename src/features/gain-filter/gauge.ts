@@ -15,6 +15,7 @@ import {
 } from "../../core/storage";
 import { createStorageSync } from "../../core/storage-sync";
 import { makePill } from "../../kyara/filter-panel/pill";
+import { createSlider } from "../../kyara/filter-panel/slider";
 import { pillRow } from "../../kyara/filter-panel/view";
 
 export const MAX_GAIN = 100;
@@ -39,28 +40,19 @@ function buildGauge() {
     button.classList.add("kv-mode");
     return { mode, button };
   });
-  const text = document.createElement("span");
-  const range = document.createElement("input");
-  range.type = "range";
-  range.min = "0";
-  range.max = String(MAX_GAIN);
-  range.step = "1";
-  range.setAttribute("aria-label", t("gauge.slider_label"));
-  const level = document.createElement("div");
-  level.className = "kv-level";
-  level.append(text, range);
+  const slider = createSlider({ ariaLabel: t("gauge.slider_label"), min: 0, max: MAX_GAIN, step: 1 });
   const profit = document.createElement("div");
   profit.className = "kv-gauge";
   profit.title = t("gauge.title");
-  profit.append(pillRow(modes.map((m) => m.button)), level);
+  profit.append(pillRow(modes.map((m) => m.button)), slider.root);
   const sortButton = makePill(t("gauge.sort"));
   sortButton.classList.add("kv-sort");
-  return { profit, sort: pillRow([sortButton]), sortButton, modes, text, range };
+  return { profit, sort: pillRow([sortButton]), sortButton, modes, slider };
 }
 
 /** Creates the settings. `onChange(filter)` is called on every change (made here or from another tab). */
 export function createGauge(page: PageContext, onChange: (filter: GainFilter) => void): Gauge {
-  const { profit, sort, sortButton, modes, text, range } = buildGauge();
+  const { profit, sort, sortButton, modes, slider } = buildGauge();
 
   let state: GainFilter = { mode: "off", pct: 0, sort: true };
   const apply = (value: GainFilter) => {
@@ -68,19 +60,17 @@ export function createGauge(page: PageContext, onChange: (filter: GainFilter) =>
     state = { ...value, pct };
     for (const m of modes) m.button.setAttribute("aria-pressed", String(m.mode === state.mode));
     sortButton.setAttribute("aria-pressed", String(state.sort));
-    range.value = String(pct);
-    range.disabled = state.mode === "off";
-    profit.style.setProperty("--kv-fill", `${(pct / MAX_GAIN) * 100}%`);
-    text.textContent = t("gauge.threshold", { pct });
+    slider.range.disabled = state.mode === "off";
+    slider.show(pct, t("gauge.threshold", { pct }));
     onChange(state);
   };
   const sync = createStorageSync(writeGainFilter, apply);
   const update = (patch: Partial<GainFilter>) => {
-    const value = { ...state, pct: Number(range.value), ...patch };
+    const value = { ...state, pct: Number(slider.range.value), ...patch };
     apply(value); // immediate visual, the write follows
     void sync.save(value);
   };
-  listen(page, range, "input", () => update({}));
+  listen(page, slider.range, "input", () => update({}));
   listen(page, sortButton, "click", () => update({ sort: !state.sort }));
   for (const m of modes) listen(page, m.button, "click", () => update({ mode: m.mode }));
   page.onInvalidated(onGainFilterChange(sync.onStored));

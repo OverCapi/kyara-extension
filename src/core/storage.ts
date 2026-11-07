@@ -3,6 +3,7 @@
 //   "f:<id>"  fair-play price   (FairEntry)
 //   "noTint"  "profit colors off" preference (boolean)
 //   "minGain" "minimum gain" filter (GainFilter; old format: number of %, > 0 = on)
+//   "tintFull" gain (%) at which the offer tint is at full intensity (number)
 //   "rarities" shown rarities (list of strings; empty = all)
 //   "wanted"  wanted cards list (WantedCards)
 // These keys are the same as in the old version: the already filled cache stays valid.
@@ -33,6 +34,7 @@ export interface PriceStore {
 const NO_TINT_KEY = "noTint";
 const MIN_GAIN_KEY = "minGain";
 const RARITIES_KEY = "rarities";
+const TINT_FULL_KEY = "tintFull";
 const WANTED_KEY = "wanted";
 export const priceKey = (id: number): string => `p:${id}`;
 export const fairKey = (id: number): string => `f:${id}`;
@@ -73,9 +75,8 @@ export async function readNoTint(): Promise<boolean> {
   return v === true;
 }
 
-export async function writeNoTint(value: boolean): Promise<void> {
-  await browser.storage.local.set({ [NO_TINT_KEY]: value });
-}
+export const writeNoTint = (value: boolean): Promise<void> =>
+  browser.storage.local.set({ [NO_TINT_KEY]: value });
 
 /** Calls `cb` on every storage change. Returns the function that removes the listener. */
 export function onStorageChange(cb: () => void): () => void {
@@ -129,9 +130,8 @@ export async function readGainFilter(): Promise<GainFilter> {
   return toGainFilter(v);
 }
 
-export async function writeGainFilter(value: GainFilter): Promise<void> {
-  await browser.storage.local.set({ [MIN_GAIN_KEY]: value });
-}
+export const writeGainFilter = (value: GainFilter): Promise<void> =>
+  browser.storage.local.set({ [MIN_GAIN_KEY]: value });
 
 /** Calls `cb(filter)` when the "minimum gain" filter changes (other tabs included). */
 export function onGainFilterChange(cb: (filter: GainFilter) => void): () => void {
@@ -147,8 +147,27 @@ export async function readRarities(): Promise<string[]> {
   return toStrings(v);
 }
 
-export async function writeRarities(value: string[]): Promise<void> {
-  await browser.storage.local.set({ [RARITIES_KEY]: value });
+export const writeRarities = (value: string[]): Promise<void> =>
+  browser.storage.local.set({ [RARITIES_KEY]: value });
+
+/** Gain (%) at which the offer tint is at full intensity: the original fixed scale. */
+export const DEFAULT_TINT_FULL = 100;
+
+const toTintFull = (v: unknown): number =>
+  typeof v === "number" && Number.isFinite(v) && v > 0 ? v : DEFAULT_TINT_FULL;
+
+/** Stored tint scale in %. Default if missing, not a positive number, or corrupted. */
+export async function readTintFull(): Promise<number> {
+  const { [TINT_FULL_KEY]: v } = await browser.storage.local.get(TINT_FULL_KEY);
+  return toTintFull(v);
+}
+
+export const writeTintFull = (value: number): Promise<void> =>
+  browser.storage.local.set({ [TINT_FULL_KEY]: value });
+
+/** Calls `cb(pct)` when the tint scale changes (other tabs included). */
+export function onTintFullChange(cb: (pct: number) => void): () => void {
+  return onKeyChange(TINT_FULL_KEY, (v) => cb(toTintFull(v)));
 }
 
 /** Calls `cb(rarities)` when the rarity filter changes (other tabs included). */
@@ -172,9 +191,8 @@ export async function readWanted(): Promise<WantedCards> {
   return toWanted(v);
 }
 
-export async function writeWanted(value: WantedCards): Promise<void> {
-  await browser.storage.local.set({ [WANTED_KEY]: value });
-}
+export const writeWanted = (value: WantedCards): Promise<void> =>
+  browser.storage.local.set({ [WANTED_KEY]: value });
 
 /** Calls `cb(wanted)` when the wanted-cards list changes (other tabs included). */
 export function onWantedChange(cb: (wanted: WantedCards) => void): () => void {
