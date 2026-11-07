@@ -82,7 +82,7 @@ const ACTION_SELECTOR = 'button, [role="button"], a:not([href^="/wiki/"])';
 const normalize = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
 
 /** Name of a card: its image's `alt`, otherwise its `title` without the site's " (tu l'as)" suffix (owned cards). */
-function cardName(card: Card): string {
+export function cardName(card: Card): string {
   return card.el.querySelector("img")?.alt || card.el.title.replace(/\s*\([^)]*\)\s*$/, "");
 }
 

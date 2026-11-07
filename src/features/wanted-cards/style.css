@@ -1,0 +1,26 @@
+/* Offer proposing a wanted card, and that card (attributes set by the wanted-cards feature). */
+li[data-kv-wanted] {
+  outline: 2px solid #3ddc84;
+  outline-offset: -2px;
+}
+li[data-kv-wanted] .give a[data-kv-wanted-card] {
+  outline: 2px solid #3ddc84;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* "Only offers with a wanted card" filter: hides the others. */
+li[data-kv-hide-wanted] {
+  display: none !important;
+}
+
+/* Offers not filtered yet (the runtime sets data-kv-seen once done): hidden, no flicker. */
+html[data-kv-filter-wanted] li[id^="offre-"]:not([data-kv-seen]) {
+  display: none !important;
+}
+
+.kv-wanted-input {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 8px;
+}
