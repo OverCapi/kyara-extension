@@ -36,5 +36,6 @@
   "rarity.mythic": "Mythic",
   "rarity.hint": "Offered card's rarity. No selection = all rarities.",
   "load.loading": "Loading…",
-  "load.none": "No other offer matches the filters."
+  "load.none": "No other offer matches the filters.",
+  "pending.title": "Loading prices…"
 }

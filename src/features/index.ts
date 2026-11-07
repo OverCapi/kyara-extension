@@ -3,6 +3,7 @@ import { gainFilter } from "./gain-filter";
 import { giveButtons } from "./give-buttons";
 import { loadMore } from "./load-more";
 import { marketTooltip } from "./market-tooltip";
+import { pricesPending } from "./prices-pending";
 import { profitTint } from "./profit-tint";
 import { rarityFilter } from "./rarity-filter";
 import { rarityRing } from "./rarity-ring";
@@ -19,4 +20,5 @@ export const features: Feature[] = [
   rarityFilter,
   loadMore,
   marketTooltip,
+  pricesPending,
 ];
