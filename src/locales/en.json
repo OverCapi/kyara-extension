@@ -35,6 +35,10 @@
   "rarity.legendary": "Legendary",
   "rarity.mythic": "Mythic",
   "rarity.hint": "Offered card's rarity. No selection = all rarities.",
+  "panel.cat.wanted": "Wanted cards",
+  "wanted.placeholder": "Add a card name, then Enter",
+  "wanted.only": "Only offers with a wanted card",
+  "wanted.remove": "Remove {name}",
   "load.loading": "Loading…",
   "load.none": "No other offer matches the filters.",
   "pending.title": "Loading prices…"

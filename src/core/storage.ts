@@ -4,6 +4,7 @@
 //   "noTint"  "profit colors off" preference (boolean)
 //   "minGain" "minimum gain" filter (GainFilter; old format: number of %, > 0 = on)
 //   "rarities" shown rarities (list of strings; empty = all)
+//   "wanted"  wanted cards list (WantedCards)
 // These keys are the same as in the old version: the already filled cache stays valid.
 // Reads validate the data's shape: a corrupted value is ignored, never propagated.
 import { browser } from "wxt/browser";
@@ -32,6 +33,7 @@ export interface PriceStore {
 const NO_TINT_KEY = "noTint";
 const MIN_GAIN_KEY = "minGain";
 const RARITIES_KEY = "rarities";
+const WANTED_KEY = "wanted";
 export const priceKey = (id: number): string => `p:${id}`;
 export const fairKey = (id: number): string => `f:${id}`;
 
@@ -152,4 +154,29 @@ export async function writeRarities(value: string[]): Promise<void> {
 /** Calls `cb(rarities)` when the rarity filter changes (other tabs included). */
 export function onRaritiesChange(cb: (rarities: string[]) => void): () => void {
   return onKeyChange(RARITIES_KEY, (v) => cb(toStrings(v)));
+}
+
+/** Cards the user is looking for (names as typed) and whether to hide offers without one. */
+export interface WantedCards {
+  names: string[];
+  only: boolean;
+}
+
+function toWanted(v: unknown): WantedCards {
+  return isObject(v) ? { names: toStrings(v.names), only: v.only === true } : { names: [], only: false };
+}
+
+/** Stored wanted-cards list. Empty and off by default or if the value is corrupted. */
+export async function readWanted(): Promise<WantedCards> {
+  const { [WANTED_KEY]: v } = await browser.storage.local.get(WANTED_KEY);
+  return toWanted(v);
+}
+
+export async function writeWanted(value: WantedCards): Promise<void> {
+  await browser.storage.local.set({ [WANTED_KEY]: value });
+}
+
+/** Calls `cb(wanted)` when the wanted-cards list changes (other tabs included). */
+export function onWantedChange(cb: (wanted: WantedCards) => void): () => void {
+  return onKeyChange(WANTED_KEY, (v) => cb(toWanted(v)));
 }

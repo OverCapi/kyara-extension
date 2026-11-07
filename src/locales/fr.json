@@ -35,6 +35,10 @@
   "rarity.legendary": "Légendaire",
   "rarity.mythic": "Mythique",
   "rarity.hint": "Rareté de la carte proposée. Aucune sélection = toutes les raretés.",
+  "panel.cat.wanted": "Cartes recherchées",
+  "wanted.placeholder": "Ajoute un nom de carte, puis Entrée",
+  "wanted.only": "Seulement les offres avec une carte recherchée",
+  "wanted.remove": "Retirer {name}",
   "load.loading": "Chargement…",
   "load.none": "Aucune autre offre ne correspond aux filtres.",
   "pending.title": "Chargement des prix…"

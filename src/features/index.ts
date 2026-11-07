@@ -9,6 +9,7 @@ import { rarityFilter } from "./rarity-filter";
 import { rarityRing } from "./rarity-ring";
 import { tradeBadges } from "./trade-badges";
 import type { Feature } from "./types";
+import { wantedCards } from "./wanted-cards";
 
 // loadMore after the filters: it counts the offers they hid.
 export const features: Feature[] = [
@@ -18,6 +19,7 @@ export const features: Feature[] = [
   profitTint,
   gainFilter,
   rarityFilter,
+  wantedCards,
   loadMore,
   marketTooltip,
   pricesPending,

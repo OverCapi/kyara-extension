@@ -18,6 +18,7 @@ describe("features", () => {
       "rarity-filter",
       "rarity-ring",
       "trade-badges",
+      "wanted-cards",
     ]);
   });
 });
