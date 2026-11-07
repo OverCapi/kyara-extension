@@ -3,6 +3,7 @@
 //   "f:<id>"  fair-play price   (FairEntry)
 //   "noTint"  "profit colors off" preference (boolean)
 //   "minGain" "minimum gain" filter (GainFilter; old format: number of %, > 0 = on)
+//   "tintFull" gain (%) at which the offer tint is at full intensity (number)
 //   "rarities" shown rarities (list of strings; empty = all)
 // These keys are the same as in the old version: the already filled cache stays valid.
 // Reads validate the data's shape: a corrupted value is ignored, never propagated.
@@ -32,6 +33,7 @@ export interface PriceStore {
 const NO_TINT_KEY = "noTint";
 const MIN_GAIN_KEY = "minGain";
 const RARITIES_KEY = "rarities";
+const TINT_FULL_KEY = "tintFull";
 export const priceKey = (id: number): string => `p:${id}`;
 export const fairKey = (id: number): string => `f:${id}`;
 
@@ -147,6 +149,27 @@ export async function readRarities(): Promise<string[]> {
 
 export async function writeRarities(value: string[]): Promise<void> {
   await browser.storage.local.set({ [RARITIES_KEY]: value });
+}
+
+/** Gain (%) at which the offer tint is at full intensity: the original fixed scale. */
+export const DEFAULT_TINT_FULL = 100;
+
+const toTintFull = (v: unknown): number =>
+  typeof v === "number" && Number.isFinite(v) && v > 0 ? v : DEFAULT_TINT_FULL;
+
+/** Stored tint scale in %. Default if missing, not a positive number, or corrupted. */
+export async function readTintFull(): Promise<number> {
+  const { [TINT_FULL_KEY]: v } = await browser.storage.local.get(TINT_FULL_KEY);
+  return toTintFull(v);
+}
+
+export async function writeTintFull(value: number): Promise<void> {
+  await browser.storage.local.set({ [TINT_FULL_KEY]: value });
+}
+
+/** Calls `cb(pct)` when the tint scale changes (other tabs included). */
+export function onTintFullChange(cb: (pct: number) => void): () => void {
+  return onKeyChange(TINT_FULL_KEY, (v) => cb(toTintFull(v)));
 }
 
 /** Calls `cb(rarities)` when the rarity filter changes (other tabs included). */

@@ -8,45 +8,6 @@ html[data-kv-hold-gain] li[id^="offre-"]:not([data-kv-seen]) {
   display: none !important;
 }
 
-/* Threshold slider, under the mode pills. */
-.kv-level {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 10px;
-  color: var(--fg2, #c9c5ce);
-  font-weight: 700;
-}
-.kv-level span {
-  min-width: 110px;
-}
-.kv-level input[type="range"] {
-  flex: 1 1 auto;
-  height: 6px;
-  margin: 0;
-  appearance: none;
-  border-radius: 3px;
-  background: linear-gradient(
-    to right,
-    var(--acc, #ff4d2e) var(--kv-fill, 0%),
-    var(--line2, #2e2b36) var(--kv-fill, 0%)
-  );
-  cursor: pointer;
-}
-.kv-level input::-webkit-slider-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--fg, #edeae4);
-  appearance: none;
-}
-.kv-level input::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--fg, #edeae4);
-}
 /* Filter on Off: slider greyed out (its value stays stored). */
 .kv-level input[type="range"]:disabled {
   opacity: 0.4;

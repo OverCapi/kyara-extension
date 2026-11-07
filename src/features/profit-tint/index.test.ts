@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeBrowser } from "wxt/testing/fake-browser";
-import { readNoTint, writeNoTint } from "../../core/storage";
+import { readNoTint, readTintFull, writeNoTint, writeTintFull } from "../../core/storage";
 import { makeSnapshot, startFeature } from "../../test/helpers";
 import { profitTint } from "./index";
 
@@ -73,5 +73,46 @@ describe("profit-tint: pill", () => {
     const { page } = startFeature(profitTint);
     page.invalidate();
     expect(button()).toBeNull();
+  });
+});
+
+describe("profit-tint: color scale slider", () => {
+  const slider = () => document.querySelector<HTMLInputElement>('.kv-level input[type="range"]');
+  const label = () => document.querySelector(".kv-level span")?.textContent;
+  const bg = (snap: ReturnType<typeof makeSnapshot>) => snap.offers[0]?.li.style.getPropertyValue("--kv-bg");
+  // +50 % gain: 7.5 for 5
+  const half = () => makeSnapshot([{ give: 1, wants: [2] }], { fair: { 1: 7.5, 2: 5 }, free: [2] });
+
+  it("registered as a category, default 100 %", async () => {
+    const { filters } = startFeature(profitTint);
+    expect(filters.categories.map((c) => c.title)).toEqual(["Couleur des offres"]);
+    await vi.waitFor(() => expect(label()).toBe("Couleur max à ±100 %"));
+    expect(slider()?.value).toBe("100");
+  });
+
+  it("moving the slider recolors the current offers live and is stored", async () => {
+    const snap = half();
+    startFeature(profitTint).emit(snap);
+    expect(bg(snap)).toBe("rgba(90, 190, 255, 0.23)");
+    const el = slider();
+    if (!el) throw new Error("slider missing");
+    el.value = "50";
+    el.dispatchEvent(new Event("input"));
+    expect(bg(snap)).toBe("rgba(90, 190, 255, 0.45)");
+    expect(label()).toBe("Couleur max à ±50 %");
+    await vi.waitFor(async () => expect(await readTintFull()).toBe(50));
+  });
+
+  it("stored value applied at load; another tab followed; out of range clamped", async () => {
+    await writeTintFull(25);
+    const snap = half();
+    startFeature(profitTint).emit(snap);
+    await vi.waitFor(() => expect(slider()?.value).toBe("25"));
+    expect(bg(snap)).toBe("rgba(90, 190, 255, 0.45)");
+    await writeTintFull(200); // change from another tab
+    await vi.waitFor(() => expect(slider()?.value).toBe("200"));
+    expect(bg(snap)).toBe("rgba(90, 190, 255, 0.11)");
+    await writeTintFull(5000);
+    await vi.waitFor(() => expect(label()).toBe("Couleur max à ±200 %"));
   });
 });
