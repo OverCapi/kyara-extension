@@ -1,0 +1,80 @@
+/* Design picker: floating bar bottom right, in the site's colors. Only the active design shows its name. */
+.kv-design {
+  position: fixed;
+  z-index: 2147483646;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid var(--line2, #2e2b36);
+  border-radius: var(--r-pill, 999px);
+  background: #15141ae6;
+  box-shadow: var(--sh-2, 0 18px 40px #0000008c);
+  font: 500 var(--t-sm, 12px) / 1.4 var(--body, system-ui, sans-serif);
+  backdrop-filter: blur(14px);
+}
+.kv-design[hidden] {
+  display: none;
+}
+.kv-design-title {
+  padding: 0 10px 0 12px;
+  color: var(--fg2, #b7b2bd);
+}
+.kv-design button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-pill, 999px);
+  background: none;
+  color: var(--fg2, #b7b2bd);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.kv-design button:hover {
+  background: #ffffff14;
+  color: var(--fg, #edeae4);
+}
+.kv-design button:focus-visible {
+  outline: 2px solid var(--fg, #edeae4);
+  outline-offset: 1px;
+}
+.kv-design button[aria-pressed="true"] {
+  background: var(--acc, #ff4d2e);
+  color: #17090a;
+  font-weight: 700;
+}
+.kv-design button span {
+  display: none;
+}
+.kv-design button[aria-pressed="true"] span {
+  display: inline;
+}
+.kv-design svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Phone: full width, above the site's bottom bar. */
+@media (max-width: 760px) {
+  .kv-design {
+    right: 16px;
+    bottom: 92px;
+    left: 16px;
+    justify-content: space-between;
+  }
+  .kv-design-title {
+    display: none;
+  }
+}

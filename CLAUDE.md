@@ -61,13 +61,15 @@ kyara-extension/
     │   ├── rarity-filter/   # Filtre par rareté de la carte proposée (puces multi-sélection)
     │   ├── load-more/       # Clique « Voir plus d'offres » tant qu'un filtre laisse trop peu d'offres visibles, le bouton affichant « Chargement… » pendant le chargement
     │   ├── market-tooltip/  # Infobulle "Min marché" au survol
-    │   └── free-packs/      # Option « ×N » (boosters gratuits) dans le sélecteur de la page d'ouverture
+    │   ├── free-packs/      # Option « ×N » (boosters gratuits) dans le sélecteur de la page d'ouverture
+    │   └── profile-showcase/ # Refonte de la page profil : vitrine mise en avant, plusieurs designs, barre de choix flottante
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)
     │   ├── api.ts           # Appels à /api avec le jeton et le device id du site
     │   ├── parse.ts         # Lecture des réponses JSON (prix, fair-play, annonces)
     │   ├── dom.ts           # Lecture des offres (cartes, boutons « Donner »), marquage data-kv-offer
     │   ├── page-dom.ts      # Autres éléments du site : barre de filtres, tableau, « Voir plus », sélecteur de boosters
+    │   ├── profile-dom.ts   # Page profil : zones de la page et cartes de la vitrine, lues sur la page puis marquées data-kv-*
     │   ├── packs.ts         # Boosters gratuits par pack, réécriture de la requête d'ouverture
     │   ├── fetch-hook.ts    # Script DANS la page (MAIN world) : enveloppe fetch (boosters gratuits)
     │   ├── prices.ts        # Valeur d'une carte et analyse de rentabilité d'une offre
@@ -82,6 +84,7 @@ kyara-extension/
     ├── core/                # Outils génériques, sans rien de spécifique à Kyara
     │   ├── i18n.ts          # t() / tn() : lit les textes de locales/*.json selon la langue du navigateur
     │   ├── storage.ts       # Accès typé à browser.storage (clés, types, TTL)
+    │   ├── storage-design.ts # Design choisi pour la page profil (fichier séparé : storage.ts est à sa taille max)
     │   ├── storage-sync.ts  # Écriture d'un réglage + tri des échos de storage.onChanged (curseur, puces)
     │   ├── page.ts          # UN MutationObserver partagé + debounce, éléments flottants ajoutés à <html>
     │   ├── errors.ts        # safe() / safeAsync() : barrière anti-crash
@@ -228,9 +231,9 @@ Objectif : **zéro crash, zéro erreur, zéro warning** dans la console de la pa
 
 Le site change souvent (classes Svelte, mise en page). Un changement ne doit jamais casser l'extension, ni dépenser quoi que ce soit à la place de l'utilisateur.
 
-- **Tout ce qui dépend du DOM du site vit dans `kyara/dom.ts` et `kyara/page-dom.ts`.** Aucune feature, aucun CSS ne cible une classe ou un id du site.
+- **Tout ce qui dépend du DOM du site vit dans `kyara/dom.ts`, `kyara/page-dom.ts` et `kyara/profile-dom.ts`.** Aucune feature, aucun CSS ne cible une classe ou un id du site.
 - **Chaque recherche a un repli** : d'abord le balisage actuel du site, puis un repli fondé sur ce qui ne peut pas changer sans que la page change de sens (liens `/wiki/<id>`, leur ordre, la flèche ⇄, le texte d'un bouton, les boutons « ×N »). Un test couvre le repli.
-- **Le CSS des features cible nos attributs** (`data-kv-offer`, `data-kv-offers`, `data-kv-thumbs`, `data-kv-max`…), posés par le JS. Seule exception : les règles « pas de clignotement » gardent aussi `li[id^="offre-"]`, pour cacher les offres dès le premier affichage.
+- **Le CSS des features cible nos attributs** (`data-kv-offer`, `data-kv-offers`, `data-kv-thumbs`, `data-kv-max`…), posés par le JS. Seules exceptions : les règles « pas de clignotement » gardent aussi `li[id^="offre-"]`, pour cacher les offres dès le premier affichage, et la page profil masque `main` 1,5 s au plus avant le marquage.
 - **Un repli qui déclenche une action** (clic automatique, envoi d'une requête) exige deux indices concordants (ex. bouton après la liste ET texte « plus »). Dans le doute, ne rien faire.
 - **Donnée inconnue ≠ donnée fausse** : un filtre ne doit pas tout cacher parce qu'une lecture échoue (ex. rareté : couleur, sinon texte).
 - **Argent / ressources** : si le site change une requête que l'extension modifie (ouverture de boosters), la requête est refusée plutôt qu'envoyée telle quelle.

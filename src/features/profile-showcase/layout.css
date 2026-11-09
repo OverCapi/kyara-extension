@@ -1,0 +1,117 @@
+/* Profile page layout: the side column becomes a wide header, over an ambient backdrop of the focused card.
+   :not(#_) raises the specificity above the site's own rules, without one !important per declaration. */
+@keyframes kv-prof-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes kv-prof-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* No flash of the old layout: hidden until marked, and in any case for 1.5 s at most (the site may have changed). */
+html[data-kv-design]:not([data-kv-prof-ready]) main {
+  animation: kv-prof-reveal 0.01s 1.5s both;
+}
+
+html[data-kv-design]:not(#_) {
+  [data-kv-prof="page"] {
+    position: relative;
+    isolation: isolate;
+  }
+  [data-kv-prof="page"]::before,
+  [data-kv-prof="page"]::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    height: 760px;
+    translate: -50% 0;
+    background-position: 50% 20%;
+    background-size: cover;
+    filter: blur(70px) saturate(1.5) brightness(0.42);
+    mask-image: linear-gradient(#000 35%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.7s ease;
+  }
+  [data-kv-prof="page"]::before {
+    background-image: var(--kv-bd-a);
+  }
+  [data-kv-prof="page"]::after {
+    background-image: var(--kv-bd-b);
+  }
+  [data-kv-prof="page"][data-kv-bd="a"]::before,
+  [data-kv-prof="page"][data-kv-bd="b"]::after {
+    opacity: 0.85;
+  }
+
+  /* the site's banner strip: an owner's image keeps its height, otherwise the backdrop replaces it */
+  [data-kv-prof="banner"] {
+    height: 40px;
+    border: 0;
+    background: none;
+  }
+  [data-kv-prof="banner"]:has(> *) {
+    height: 230px;
+  }
+  [data-kv-prof="root"] {
+    display: block;
+  }
+  [data-kv-prof="side"] {
+    position: static;
+    top: auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 28px 40px;
+    width: auto;
+    max-width: none;
+    margin: 0 0 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    animation: kv-prof-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  [data-kv-prof="head"] {
+    flex: 1 1 460px;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 28px;
+    min-width: 0;
+  }
+  [data-kv-prof="id"] {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  [data-kv-prof="stats"] {
+    flex: 0 1 420px;
+    min-width: 0;
+    margin: 0;
+    border: 1px solid #ffffff14;
+    border-radius: var(--r-lg, 14px);
+    background: #100f15b8;
+    backdrop-filter: blur(14px);
+  }
+  [data-kv-prof="main"] {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  html[data-kv-design]:not(#_) [data-kv-prof="head"] {
+    flex-wrap: wrap;
+  }
+}

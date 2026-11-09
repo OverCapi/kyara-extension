@@ -15,6 +15,7 @@ describe("features", () => {
       "load-more",
       "market-tooltip",
       "prices-pending",
+      "profile-showcase",
       "profit-tint",
       "rarity-filter",
       "rarity-ring",

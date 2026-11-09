@@ -50,5 +50,12 @@
   "packs.free_one": "{count} free",
   "packs.free_other": "{count} free",
   "packs.free_title": "Open only your free boosters (no chakra spent)",
-  "packs.refused": "Opening cancelled by Kyara Extension: the site changed, nothing was spent."
+  "packs.refused": "Opening cancelled by Kyara Extension: the site changed, nothing was spent.",
+  "profile.design.title": "Kyara Extension: profile page design",
+  "profile.design.short": "Design",
+  "profile.design.stage": "Stage",
+  "profile.design.ribbon": "Ribbon",
+  "profile.design.fan": "Fan",
+  "profile.design.prism": "Prism",
+  "profile.design.site": "Original site"
 }

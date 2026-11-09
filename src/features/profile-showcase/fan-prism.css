@@ -1,0 +1,85 @@
+/* Fan and prism designs. Scoped to data-kv-design on <html>, set by index.ts.
+   :not(#_) raises the specificity above the site's own rules. */
+/* ÉVENTAIL: a hand of whole cards, as the site draws them. */
+html[data-kv-design="fan"]:not(#_) {
+  [data-kv-show-list] {
+    display: flex;
+    justify-content: center;
+    height: 440px;
+    padding-top: 60px;
+    container-type: inline-size;
+    overflow: visible;
+  }
+  [data-kv-show-case] {
+    --kv-off: calc(var(--kv-i) - (var(--kv-n) - 1) / 2);
+    --kv-w: min(262px, calc(100cqi / (var(--kv-n) * 0.66 + 0.34)));
+    z-index: var(--kv-i);
+    flex: none;
+    align-items: stretch;
+    width: var(--kv-w);
+    margin-inline: calc(var(--kv-w) * -0.24);
+    transform-origin: 50% 200%;
+    transform: rotate(calc(var(--kv-off) * 4deg));
+    animation-name: kv-show-deal;
+  }
+  [data-kv-show-case]:hover,
+  [data-kv-show-case]:focus-visible {
+    z-index: 20;
+    transform: rotate(0deg) translateY(-44px) scale(1.14);
+    filter: drop-shadow(0 26px 34px color-mix(in srgb, var(--kv-rar) 60%, #000));
+  }
+  [data-kv-show-wrap="outer"] {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    transform: none;
+  }
+  [data-kv-show-wrap="outer"]::before,
+  [data-kv-show-wrap="outer"]::after,
+  [data-kv-show-wrap="outer"] > [data-kv-show-extra] {
+    display: none;
+  }
+}
+
+/* PRISME: rotating iridescent rims, floating cases, a halo of the rarity's color. */
+html[data-kv-design="prism"]:not(#_) {
+  [data-kv-show-list] {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 26px;
+    margin-top: 10px;
+  }
+  [data-kv-show-case] {
+    height: 372px;
+    overflow: visible;
+    background: conic-gradient(from var(--kv-spin), var(--kv-rar), #4dd6ff, #b072ff, #ff4d9e, var(--kv-rar));
+    box-shadow: none;
+    animation:
+      kv-show-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both calc(var(--kv-i, 0) * 70ms),
+      kv-show-spin 6s linear infinite,
+      kv-show-float 6s ease-in-out calc(var(--kv-i, 0) * -0.75s) infinite alternate;
+  }
+  [data-kv-show-case]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 12px;
+    border-radius: inherit;
+    background: inherit;
+    filter: blur(26px);
+    opacity: 0.55;
+    transition: opacity 0.4s;
+  }
+  [data-kv-show-case]:hover::before {
+    opacity: 1;
+  }
+  [data-kv-show-case]::after {
+    inset: 3px;
+    border-radius: 15px;
+  }
+  [data-kv-show-card] {
+    inset: 3px;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+}
