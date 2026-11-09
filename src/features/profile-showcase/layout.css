@@ -37,7 +37,7 @@ html[data-kv-design]:not(#_) {
     translate: -50% 0;
     background-position: 50% 20%;
     background-size: cover;
-    filter: blur(70px) saturate(1.5) brightness(0.42);
+    filter: blur(70px) saturate(1.3) brightness(0.4);
     mask-image: linear-gradient(#000 35%, transparent);
     opacity: 0;
     pointer-events: none;
@@ -66,13 +66,17 @@ html[data-kv-design]:not(#_) {
   [data-kv-prof="root"] {
     display: block;
   }
+  /* header: identity and any other row of the site on the left, stats on the right */
   [data-kv-prof="side"] {
+    --mut: #c9c5ce;
+    --dim: #a7a2ad;
+    --line: #ffffff24;
     position: static;
     top: auto;
-    display: flex;
-    flex-flow: row wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
     align-items: center;
-    gap: 28px 40px;
+    gap: 16px 32px;
     width: auto;
     max-width: none;
     margin: 0 0 28px;
@@ -82,8 +86,10 @@ html[data-kv-design]:not(#_) {
     box-shadow: none;
     animation: kv-prof-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
+  [data-kv-prof="side"] > * {
+    grid-column: 1;
+  }
   [data-kv-prof="head"] {
-    flex: 1 1 460px;
     flex-flow: row nowrap;
     align-items: center;
     gap: 28px;
@@ -93,20 +99,37 @@ html[data-kv-design]:not(#_) {
     flex: 1 1 auto;
     min-width: 0;
   }
-  [data-kv-prof="stats"] {
-    flex: 0 1 420px;
+  [data-kv-prof="side"] > [data-kv-prof="stats"] {
+    grid-column: 2;
+    grid-row: 1 / span 3;
     min-width: 0;
     margin: 0;
-    border: 1px solid #ffffff14;
+  }
+  /* the site's tabs sit on an opaque band: a glass bar lets the backdrop through */
+  [data-kv-prof="tabs"] {
+    padding: 4px 6px 0;
+    border: 1px solid #ffffff1a;
     border-radius: var(--r-lg, 14px);
-    background: #100f15b8;
-    backdrop-filter: blur(14px);
+    background: #100f15a6;
+    backdrop-filter: blur(16px);
   }
   [data-kv-prof="main"] {
     width: auto;
     max-width: none;
     margin: 0;
     padding: 0;
+  }
+}
+
+@media (max-width: 980px) {
+  html[data-kv-design]:not(#_) {
+    [data-kv-prof="side"] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    [data-kv-prof="side"] > [data-kv-prof="stats"] {
+      grid-column: 1;
+      grid-row: auto;
+    }
   }
 }
 

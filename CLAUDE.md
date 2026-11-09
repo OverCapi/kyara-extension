@@ -70,6 +70,7 @@ kyara-extension/
     │   ├── dom.ts           # Lecture des offres (cartes, boutons « Donner »), marquage data-kv-offer
     │   ├── page-dom.ts      # Autres éléments du site : barre de filtres, tableau, « Voir plus », sélecteur de boosters
     │   ├── profile-dom.ts   # Page profil : zones de la page et cartes de la vitrine, lues sur la page puis marquées data-kv-*
+    │   ├── profile-stats.ts # Page profil : tuiles et éléments du bloc de stats, marqués data-kv-stat*
     │   ├── packs.ts         # Boosters gratuits par pack, réécriture de la requête d'ouverture
     │   ├── fetch-hook.ts    # Script DANS la page (MAIN world) : enveloppe fetch (boosters gratuits)
     │   ├── prices.ts        # Valeur d'une carte et analyse de rentabilité d'une offre
@@ -231,7 +232,7 @@ Objectif : **zéro crash, zéro erreur, zéro warning** dans la console de la pa
 
 Le site change souvent (classes Svelte, mise en page). Un changement ne doit jamais casser l'extension, ni dépenser quoi que ce soit à la place de l'utilisateur.
 
-- **Tout ce qui dépend du DOM du site vit dans `kyara/dom.ts`, `kyara/page-dom.ts` et `kyara/profile-dom.ts`.** Aucune feature, aucun CSS ne cible une classe ou un id du site.
+- **Tout ce qui dépend du DOM du site vit dans `kyara/dom.ts`, `kyara/page-dom.ts`, `kyara/profile-dom.ts` et `kyara/profile-stats.ts`.** Aucune feature, aucun CSS ne cible une classe ou un id du site.
 - **Chaque recherche a un repli** : d'abord le balisage actuel du site, puis un repli fondé sur ce qui ne peut pas changer sans que la page change de sens (liens `/wiki/<id>`, leur ordre, la flèche ⇄, le texte d'un bouton, les boutons « ×N »). Un test couvre le repli.
 - **Le CSS des features cible nos attributs** (`data-kv-offer`, `data-kv-offers`, `data-kv-thumbs`, `data-kv-max`…), posés par le JS. Seules exceptions : les règles « pas de clignotement » gardent aussi `li[id^="offre-"]`, pour cacher les offres dès le premier affichage, et la page profil masque `main` 1,5 s au plus avant le marquage.
 - **Un repli qui déclenche une action** (clic automatique, envoi d'une requête) exige deux indices concordants (ex. bouton après la liste ET texte « plus »). Dans le doute, ne rien faire.

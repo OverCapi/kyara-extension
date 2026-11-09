@@ -17,11 +17,13 @@ import {
   markShowcase,
   type ProfileLayout,
 } from "../../kyara/profile-dom";
+import { markProfileStats } from "../../kyara/profile-stats";
 import type { Feature } from "../types";
 import { createAmbient } from "./ambient";
 import { type ProfileDesign, toDesign } from "./designs";
 import { createDesignPicker } from "./picker";
 import "./layout.css";
+import "./stats.css";
 import "./poster.css";
 import "./stage.css";
 import "./ribbon.css";
@@ -58,6 +60,7 @@ export const profileShowcase: Feature = {
       html.toggleAttribute(READY_ATTR, layout !== null);
       if (!layout) return;
       markProfileLayout(layout);
+      if (layout.stats) markProfileStats(layout.stats);
       const cases = findShowcase();
       markShowcase(cases);
       const hero = cases.find((c) => c.el.hasAttribute("data-kv-show-hero"))?.art?.sm;

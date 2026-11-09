@@ -26,7 +26,7 @@ function siteCase(opts: { fav?: boolean; sleeve?: string; src?: string } = {}): 
 function renderSite(cases: string): void {
   document.body.innerHTML =
     `<main><section class="band"></section><div class="wrap"><aside class="side"><div class="head"><div class="id"><h1>Kin-5</h1></div></div>` +
-    `<div class="kpis"></div></aside><div class="main"><section><h2>Sa vitrine</h2>` +
+    `<div class="kpis"></div></aside><div class="main"><div class="ptabs"><button>A</button></div><section><h2>Sa vitrine</h2>` +
     `<div class="cases">${cases}</div></section></div></div></main>`;
 }
 
@@ -67,6 +67,28 @@ describe("findProfileLayout", () => {
     renderSite(siteCase());
     document.querySelector("aside")?.setAttribute("class", "x1");
     expect(findProfileLayout()?.side.className).toBe("x1");
+  });
+  it("owner's profile: the links row after the stats is not taken for the stats", () => {
+    renderSite(siteCase());
+    const links = document.createElement("div");
+    links.className = "side-links";
+    document.querySelector("aside")?.append(links);
+    expect(findProfileLayout()?.stats?.className).toBe("kpis");
+  });
+  it("fallback: stats are the second element of the column, classes renamed", () => {
+    renderSite(siteCase());
+    document.querySelector(".kpis")?.setAttribute("class", "x2");
+    document.querySelector("aside")?.append(document.createElement("div"));
+    expect(findProfileLayout()?.stats?.className).toBe("x2");
+  });
+  it("tabs: site markup, then a first row of buttons, otherwise nothing", () => {
+    renderSite(siteCase());
+    expect(findProfileLayout()?.tabs?.className).toBe("ptabs");
+    const tabs = document.querySelector(".ptabs");
+    tabs?.setAttribute("class", "x3");
+    expect(findProfileLayout()?.tabs).toBeNull(); // a single button: not a row of tabs
+    tabs?.append(document.createElement("button"));
+    expect(findProfileLayout()?.tabs?.className).toBe("x3");
   });
   it("aside with one child: no stats", () => {
     document.body.innerHTML = `<section><div><aside><h1>A</h1></aside><div></div></div></section>`;
@@ -124,7 +146,7 @@ describe("marks", () => {
     renderSite(siteCase());
     const layout = findProfileLayout();
     if (layout) markProfileLayout(layout);
-    for (const part of ["page", "banner", "root", "side", "head", "id", "stats", "main"]) {
+    for (const part of ["page", "banner", "root", "side", "head", "id", "stats", "tabs", "main"]) {
       expect(document.querySelector(`[data-kv-prof="${part}"]`)).not.toBeNull();
     }
   });

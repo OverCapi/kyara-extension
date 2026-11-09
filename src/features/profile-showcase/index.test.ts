@@ -16,7 +16,7 @@ function renderProfile(ids: number[] = [1, 2]): void {
         `<img src="https://cdn.kyara.games/cards/sm/${id}.webp"></div></div></span></button>`,
     )
     .join("");
-  document.body.innerHTML = `<section><div><aside class="side"><h1>K</h1></aside><div><div class="cases">${cases}</div></div></div></section>`;
+  document.body.innerHTML = `<section><div><aside class="side"><h1>K</h1><div class="kpis"><div></div><div></div></div></aside><div><div class="cases">${cases}</div></div></div></section>`;
 }
 
 async function start(design?: string) {
@@ -71,6 +71,7 @@ describe("profile-showcase", () => {
     expect(html.hasAttribute("data-kv-prof-ready")).toBe(true);
     expect(picker()?.hidden).toBe(false);
     expect(document.querySelectorAll("[data-kv-show-case]")).toHaveLength(2);
+    expect(document.querySelector("[data-kv-stat=coll]")).not.toBeNull();
     expect(document.querySelector("[data-kv-prof=page]")?.getAttribute("data-kv-bd")).toBe("a");
   });
   it("reads the stored design", async () => {

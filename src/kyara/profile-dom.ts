@@ -26,6 +26,8 @@ export interface ProfileLayout {
   side: HTMLElement;
   head: Element | null;
   stats: Element | null;
+  /** Section tabs of the main column, `null` if not found. */
+  tabs: Element | null;
   main: HTMLElement;
 }
 
@@ -67,8 +69,18 @@ export function findProfileLayout(root: ParentNode = document): ProfileLayout | 
   const main = side?.nextElementSibling;
   if (!side || !wrap || !page || !(main instanceof HTMLElement)) return null;
   const head = side.firstElementChild;
-  const stats = side.lastElementChild === head ? null : side.lastElementChild;
-  return { page, banner: wrap.previousElementSibling, root: wrap, side, head, stats, main };
+  // not the last child: the owner's own profile has a row of links after the stats
+  const stats = side.querySelector(":scope > .kpis") ?? side.children[1] ?? null;
+  const tabs = findProfileTabs(main);
+  return { page, banner: wrap.previousElementSibling, root: wrap, side, head, stats, tabs, main };
+}
+
+/** Section tabs. Site markup: `.ptabs`. Fallback: first element of the column, if it is a row of buttons. */
+function findProfileTabs(main: Element): Element | null {
+  const marked = main.querySelector(".ptabs");
+  if (marked) return marked;
+  const first = main.firstElementChild;
+  return first && first.querySelectorAll(":scope > button").length >= 2 ? first : null;
 }
 
 /** Fallback: buttons with a card image, next to a heading saying "vitrine" (empty on the other tabs). */
@@ -108,6 +120,7 @@ export function markProfileLayout(layout: ProfileLayout): void {
   layout.head?.setAttribute("data-kv-prof", "head");
   layout.head?.lastElementChild?.setAttribute("data-kv-prof", "id");
   layout.stats?.setAttribute("data-kv-prof", "stats");
+  layout.tabs?.setAttribute("data-kv-prof", "tabs");
   layout.main.setAttribute("data-kv-prof", "main");
 }
 
