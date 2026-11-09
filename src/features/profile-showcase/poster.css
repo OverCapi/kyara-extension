@@ -1,4 +1,4 @@
-/* Shared look of the profile designs. Stage, ribbon and prism turn each case into a poster filled by the card's
+/* Shared look of the profile designs. Every design but fan turns each case into a poster filled by the card's
    art; fan keeps the site's whole card. Everything is scoped to data-kv-design on <html>, set by index.ts.
    :not(#_) raises the specificity above the site's own rules. */
 @property --kv-spin {
@@ -15,12 +15,6 @@
   from {
     opacity: 0;
     transform: translateY(26px) scale(0.96);
-  }
-}
-@keyframes kv-show-deal {
-  from {
-    opacity: 0;
-    transform: translateY(120px) rotate(0deg);
   }
 }
 @keyframes kv-show-float {

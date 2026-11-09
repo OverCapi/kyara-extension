@@ -56,6 +56,8 @@
   "profile.design.stage": "Stage",
   "profile.design.ribbon": "Ribbon",
   "profile.design.fan": "Fan",
+  "profile.design.mosaic": "Mosaic",
+  "profile.design.orbit": "Orbit",
   "profile.design.prism": "Prism",
   "profile.design.site": "Original site"
 }

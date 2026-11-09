@@ -2,7 +2,7 @@
 // Pure data, no side effects. The look of each design lives in the CSS files next to it.
 import type { MessageKey } from "../../core/i18n";
 
-export type ProfileDesign = "stage" | "ribbon" | "fan" | "prism" | "site";
+export type ProfileDesign = "stage" | "ribbon" | "mosaic" | "fan" | "orbit" | "prism" | "site";
 
 /** Rectangle of a picker icon, on an 18×18 grid: x, y, width, height. */
 export type IconRect = readonly [x: number, y: number, w: number, h: number];
@@ -36,12 +36,30 @@ export const DESIGNS: readonly DesignInfo[] = [
     ],
   },
   {
+    id: "mosaic",
+    label: "profile.design.mosaic",
+    icon: [
+      [1, 1, 9, 9],
+      [12, 1, 5, 16],
+      [1, 12, 9, 5],
+    ],
+  },
+  {
     id: "fan",
     label: "profile.design.fan",
     icon: [
       [2, 5, 4, 11],
       [7, 2, 4, 14],
       [12, 5, 4, 11],
+    ],
+  },
+  {
+    id: "orbit",
+    label: "profile.design.orbit",
+    icon: [
+      [6, 3, 6, 12],
+      [1, 5, 3, 8],
+      [14, 5, 3, 8],
     ],
   },
   {

@@ -27,7 +27,10 @@ import "./stats.css";
 import "./poster.css";
 import "./stage.css";
 import "./ribbon.css";
-import "./fan-prism.css";
+import "./mosaic.css";
+import "./fan.css";
+import "./orbit.css";
+import "./prism.css";
 import "./responsive.css";
 import "./picker.css";
 

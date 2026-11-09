@@ -7,21 +7,26 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       grid-auto-rows: 240px;
       gap: 12px;
+      width: auto;
       height: auto;
+      margin-inline: 0;
       padding: 0;
     }
     [data-kv-show-case],
     [data-kv-show-case]:hover {
       width: auto;
       height: auto;
+      max-width: none;
       margin: 0;
       transform: none;
+      translate: none;
     }
     [data-kv-show-hero] {
       grid-column: span 2;
       grid-row: span 2;
     }
-    [data-kv-show-case]:nth-child(8):last-child:not([data-kv-show-hero]) {
+    [data-kv-show-case]:nth-child(8):last-child:not([data-kv-show-hero]),
+    [data-kv-show-case]:nth-child(4n + 3):not([data-kv-show-hero]) {
       grid-column: auto;
     }
   }
@@ -29,6 +34,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   html[data-kv-design]:not(#_) [data-kv-show-case],
+  html[data-kv-design]:not(#_) [data-kv-show-part="art"],
+  html[data-kv-design]:not(#_) [data-kv-show-wrap],
   html[data-kv-design]:not(#_) [data-kv-prof="side"] {
     animation: none;
     transition-duration: 0.01ms;

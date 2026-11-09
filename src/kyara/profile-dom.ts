@@ -165,12 +165,14 @@ function markArt({ el, art }: ShowcaseCase): void {
 }
 
 /**
- * Marks every showcase card for the design CSS: position (`--kv-i`, `--kv-n`), art, parts, and the hero
+ * Marks every showcase card for the design CSS: position (`--kv-i`, `--kv-n`, also on the list), art, parts, and the hero
  * (`data-kv-show-hero`: the site's favourite, otherwise the first card).
  */
 export function markShowcase(cases: ShowcaseCase[]): void {
   const hero = cases.find((c) => c.el.classList.contains("fav")) ?? cases[0];
-  cases[0]?.el.parentElement?.setAttribute("data-kv-show-list", "");
+  const list = cases[0]?.el.parentElement;
+  list?.setAttribute("data-kv-show-list", "");
+  list?.style.setProperty("--kv-n", String(cases.length)); // the fan's columns
   cases.forEach((showcase, i) => {
     const { el } = showcase;
     el.setAttribute("data-kv-show-case", "");

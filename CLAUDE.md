@@ -62,7 +62,7 @@ kyara-extension/
     │   ├── load-more/       # Clique « Voir plus d'offres » tant qu'un filtre laisse trop peu d'offres visibles, le bouton affichant « Chargement… » pendant le chargement
     │   ├── market-tooltip/  # Infobulle "Min marché" au survol
     │   ├── free-packs/      # Option « ×N » (boosters gratuits) dans le sélecteur de la page d'ouverture
-    │   └── profile-showcase/ # Refonte de la page profil : vitrine mise en avant, plusieurs designs, barre de choix flottante
+    │   └── profile-showcase/ # Refonte de la page profil : stats, vitrine mise en avant, 6 designs (CSS par design), barre de choix flottante
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)
     │   ├── api.ts           # Appels à /api avec le jeton et le device id du site

@@ -1,0 +1,44 @@
+/* Prism design. Scoped to data-kv-design on <html>, set by index.ts.
+   :not(#_) raises the specificity above the site's own rules. */
+/* PRISME: rotating iridescent rims, floating cases, a halo of the rarity's color. */
+html[data-kv-design="prism"]:not(#_) {
+  [data-kv-show-list] {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 26px;
+    margin-top: 10px;
+  }
+  [data-kv-show-case] {
+    height: 372px;
+    overflow: visible;
+    background: conic-gradient(from var(--kv-spin), var(--kv-rar), #4dd6ff, #b072ff, #ff4d9e, var(--kv-rar));
+    box-shadow: none;
+    animation:
+      kv-show-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both calc(var(--kv-i, 0) * 70ms),
+      kv-show-spin 6s linear infinite,
+      kv-show-float 6s ease-in-out calc(var(--kv-i, 0) * -0.75s) infinite alternate;
+  }
+  [data-kv-show-case]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 12px;
+    border-radius: inherit;
+    background: inherit;
+    filter: blur(26px);
+    opacity: 0.55;
+    transition: opacity 0.4s;
+  }
+  [data-kv-show-case]:hover::before {
+    opacity: 1;
+  }
+  [data-kv-show-case]::after {
+    inset: 3px;
+    border-radius: 15px;
+  }
+  [data-kv-show-card] {
+    inset: 3px;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+}

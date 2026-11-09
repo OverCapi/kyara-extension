@@ -165,6 +165,7 @@ describe("marks", () => {
     expect(el?.querySelector(".tcg-name")?.getAttribute("data-kv-show-part")).toBe("name");
     expect(el?.querySelector(".art")?.getAttribute("data-kv-show-part")).toBe("art");
     expect(document.querySelector(".cases")?.hasAttribute("data-kv-show-list")).toBe(true);
+    expect(document.querySelector<HTMLElement>(".cases")?.style.getPropertyValue("--kv-n")).toBe("2");
   });
   it("hero: the first card without a favourite, otherwise the favourite", () => {
     renderSite(siteCase() + siteCase());
