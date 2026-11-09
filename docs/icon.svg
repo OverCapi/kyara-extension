@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Source of the extension icon (public/icon/*.png, resized from a 512 px render): trade arrows around a value diamond. -->
+  <rect width="128" height="128" rx="28" fill="#1b1a20"/>
+  <g fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 32H96M84 20l12 12-12 12" stroke="#ff4d2e"/>
+    <path d="M100 96H32M44 84 32 96l12 12" stroke="#4ade80"/>
+  </g>
+  <path d="M64 47 81 64 64 81 47 64Z" fill="#edeae4"/>
+</svg>

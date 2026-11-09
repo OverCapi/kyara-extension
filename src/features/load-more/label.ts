@@ -5,7 +5,7 @@
 import { safe } from "../../core/errors";
 import { t } from "../../core/i18n";
 import { listen, type PageContext } from "../../core/page";
-import { findLoadMore } from "../../kyara/dom";
+import { findLoadMore } from "../../kyara/page-dom";
 
 /** Call on every render with the number of offers: restores the original text if that number changed. */
 export type OffersArrived = (total: number) => void;

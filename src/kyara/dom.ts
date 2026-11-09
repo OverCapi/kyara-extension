@@ -1,11 +1,18 @@
-// Reads the kyara.games DOM: offers of the Trades tab and the cards they contain.
-// If the site changes its structure, this is where (and the only place) the selectors are updated.
-// Read only: nothing is changed in the site's DOM.
+// Reading the offers of the Trades tab from the site's DOM. The ONLY place that knows how an offer looks.
+// Each lookup tries the site's current markup first, then a fallback based on what cannot change without
+// the page changing meaning (card links, their order, the button texts): a site update degrades
+// gracefully instead of breaking every feature. Other page elements (filter bar, board, booster picker):
+// page-dom.ts.
+// DOM effect: markOffers() only (data-kv-offer / data-kv-offers attributes, used by the features' CSS).
 
-export const OFFER_SELECTOR = 'li[id^="offre-"]';
+const OFFER_SELECTOR = 'li[id^="offre-"]';
 const CARD_SELECTOR = 'a[href^="/wiki/"]';
-/** Card link inside an offer (used to detect hovering). */
-export const OFFER_CARD_SELECTOR = `${OFFER_SELECTOR} ${CARD_SELECTOR}`;
+/** Set by markOffers on each offer: the features' CSS targets it instead of the site's markup. */
+export const OFFER_ATTR = "data-kv-offer";
+/** Set by markOffers on the list holding the offers: hides new offers before the features ran (CSS). */
+export const OFFER_LIST_ATTR = "data-kv-offers";
+/** Card link inside an offer (used to detect hovering): the site's markup, or an offer marked by markOffers. */
+export const OFFER_CARD_SELECTOR = `${OFFER_SELECTOR} ${CARD_SELECTOR}, [${OFFER_ATTR}] ${CARD_SELECTOR}`;
 
 /** A card: its link in the page + its id (last segment of the /wiki/<id> URL). */
 export interface Card {
@@ -27,44 +34,53 @@ export function cardId(a: Element): number | null {
   return /^\d+$/.test(segment) ? Number(segment) : null;
 }
 
-function toCard(a: Element | null): Card | null {
+function toCard(a: Element | null | undefined): Card | null {
   const id = a ? cardId(a) : null;
   return a instanceof HTMLAnchorElement && id !== null ? { el: a, id } : null;
 }
+const toCards = (links: Iterable<Element>) => [...links].map(toCard).filter((c): c is Card => c !== null);
 
-/** Reads an offer. Links without a valid id are ignored. */
+/**
+ * Offers of the page. Site markup: `<li id="offre-…">`. Fallback: list items with at least 2 card links
+ * and the ⇄ trade arrow.
+ */
+export function findOfferItems(root: ParentNode = document): HTMLElement[] {
+  const byId = [...root.querySelectorAll<HTMLElement>(OFFER_SELECTOR)];
+  if (byId.length > 0) return byId;
+  return [...root.querySelectorAll<HTMLElement>("li")].filter(
+    (li) => li.querySelectorAll(CARD_SELECTOR).length >= 2 && (li.textContent ?? "").includes("⇄"),
+  );
+}
+
+/**
+ * Reads an offer. Site markup: card links in `.give` and `.want`. Fallback: the first card link is the
+ * offered card, the next ones the wanted cards (the page's reading order). Invalid links are ignored.
+ */
 export function readOffer(li: HTMLElement): Offer {
-  const give = toCard(li.querySelector(`.give ${CARD_SELECTOR}`));
-  const wants = [...li.querySelectorAll(`.want ${CARD_SELECTOR}`)]
-    .map(toCard)
-    .filter((c): c is Card => c !== null);
+  // the fallback only applies when the site's containers are gone, not when a side is empty
+  const marked = li.querySelector(".give") !== null && li.querySelector(".want") !== null;
+  const all = toCards(li.querySelectorAll(CARD_SELECTOR));
+  const give = marked ? toCard(li.querySelector(`.give ${CARD_SELECTOR}`)) : (all[0] ?? null);
+  const wants = marked ? toCards(li.querySelectorAll(`.want ${CARD_SELECTOR}`)) : all.slice(1);
   return { li, give, wants, free: readGiveButtons({ li, wants }).map((b) => b.card) };
-}
-
-/** Filter bar of the Trades tab (search + pills), a wrapping flex row. `null` if missing. */
-export function findOfferFilters(root: ParentNode = document): HTMLElement | null {
-  // parent of .pills rather than :has(), which keeps the selector cheap on every render
-  return root.querySelector(".filters > .pills")?.parentElement ?? null;
-}
-
-/** "Voir plus d'offres" (load more) button under the offer list, `null` when there is nothing left to load. */
-export function findLoadMore(root: ParentNode = document): HTMLButtonElement | null {
-  return root.querySelector<HTMLButtonElement>(".board > button.more");
-}
-
-/** Board holding the offer list and the load more button. `null` if missing. */
-export function findOfferBoard(root: ParentNode = document): HTMLElement | null {
-  return root.querySelector<HTMLElement>(".board");
 }
 
 /** Every offer shown in the page. */
 export function readOffers(root: ParentNode = document): Offer[] {
-  return [...root.querySelectorAll<HTMLElement>(OFFER_SELECTOR)].map(readOffer);
+  return findOfferItems(root).map(readOffer);
+}
+
+/** Marks the offers and their list (OFFER_ATTR / OFFER_LIST_ATTR) for the features' CSS. */
+export function markOffers(offers: Offer[]): void {
+  for (const { li } of offers) {
+    li.toggleAttribute(OFFER_ATTR, true);
+    li.parentElement?.toggleAttribute(OFFER_LIST_ATTR, true);
+  }
 }
 
 /** Ids of every card in an offer (offered + wanted). */
 export function offerIds(offer: Offer): number[] {
-  return [...(offer.give ? [offer.give] : []), ...offer.wants].map((c) => c.id);
+  return offerCards(offer).map((c) => c.id);
 }
 
 /** Every card in an offer (offered + wanted). */
@@ -72,9 +88,18 @@ export function offerCards(offer: Offer): Card[] {
   return offer.give ? [offer.give, ...offer.wants] : offer.wants;
 }
 
-/** Arrow (⇄) between the offered and the wanted cards. `null` if missing. */
+/** Container of the wanted cards (the site's `.thumbs` row): parent of the first wanted card. `null` if none. */
+export function findWantsRow(offer: Offer): HTMLElement | null {
+  return offer.wants[0]?.el.parentElement ?? null;
+}
+
+/** Arrow (⇄) between the offered and the wanted cards: `.arrow`, otherwise the element showing ⇄. `null` if missing. */
 export function findOfferArrow(offer: Offer): HTMLElement | null {
-  return offer.li.querySelector<HTMLElement>(".arrow");
+  const marked = offer.li.querySelector<HTMLElement>(".arrow");
+  if (marked) return marked;
+  return (
+    [...offer.li.querySelectorAll<HTMLElement>("*")].find((el) => el.textContent?.trim() === "⇄") ?? null
+  );
 }
 
 /** Clickable elements of an offer that can be a give button (card links excluded: they have no text). */
@@ -97,7 +122,6 @@ export interface GiveButton {
  * the card name (`title` of the card link). Longest name first, so "Saki Aoi" wins over "Saki".
  * Other buttons ("Proposer autre chose") are ignored.
  */
-// ponytail: matched by name, since the buttons carry no card id; switch to an id if the site adds one.
 export function readGiveButtons(offer: Pick<Offer, "li" | "wants">): GiveButton[] {
   const named = offer.wants
     .map((card) => ({ card, name: normalize(cardName(card)) }))

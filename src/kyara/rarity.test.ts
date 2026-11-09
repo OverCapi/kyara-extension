@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { renderOffers } from "../test/helpers";
 import { readOffers } from "./dom";
-import { offerRarity, RARITIES, rarityColor, rarityCssColor, rarityPalette, rgbKey } from "./rarity";
+import {
+  offerRarity,
+  RARITIES,
+  rarityColor,
+  rarityCssColor,
+  rarityFromText,
+  rarityPalette,
+  rgbKey,
+} from "./rarity";
 
 describe("rarityColor", () => {
   it.each([
@@ -52,6 +60,26 @@ describe("rarityPalette / offerRarity", () => {
     renderOffers([{ give: 1, shadow: shadowOf("rgb(1, 1, 1)") }, { give: 2 }, { wants: [3] }]);
     const palette = rarityPalette();
     expect(readOffers().map((o) => offerRarity(o, palette))).toEqual([null, null, null]);
+  });
+  it("color not recognized (site changed): the rarity name under the offered card", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2], shadow: shadowOf("rgb(1, 1, 1)") }]);
+    li?.querySelector(".give")?.append("Épique · Gate");
+    const offer = readOffers()[0];
+    expect(offer && offerRarity(offer, rarityPalette())).toBe("epic");
+  });
+});
+
+describe("rarityFromText", () => {
+  it("the first rarity name followed by ·, whole word only", () => {
+    expect(rarityFromText("Youji Itami Rare · Gate par x · expire")).toBe("rare");
+    expect(rarityFromText("Peu commune · Haikyu")).toBe("uncommon");
+    expect(rarityFromText("Commune · A Mythique · B")).toBe("common");
+    expect(rarityFromText("LÉGENDAIRE · X")).toBe("legendary");
+  });
+  it("no rarity name, or a name inside another word, or without ·: null", () => {
+    expect(rarityFromText("Rarement · x")).toBeNull();
+    expect(rarityFromText("Exemplaire mythique")).toBeNull();
+    expect(rarityFromText("")).toBeNull();
   });
 });
 

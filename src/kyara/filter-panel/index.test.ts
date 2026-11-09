@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeCtx } from "../../test/helpers";
 import { createFilterPanel } from "./index";
 
@@ -10,9 +10,10 @@ const bar = () => {
   const el = document.createElement("div");
   el.className = "filters";
   el.innerHTML =
-    '<input type="search"><div class="pills"><button type="button">Que je cherche</button></div>';
+    '<div class="line"><div class="sbox"><input type="search"></div><button type="button">Proposer une carte</button></div>' +
+    '<div class="pills"><button type="button">Que je cherche</button></div>';
   document.body.append(el);
-  return el;
+  return { bar: el, pills: el.querySelector(".pills") as HTMLElement };
 };
 const menu = () => document.querySelector<HTMLElement>(".kv-menu");
 const button = () => document.querySelector<HTMLButtonElement>(".kv-menu-btn");
@@ -28,9 +29,9 @@ describe("createFilterPanel: placement", () => {
     const filters = bar();
     panel.attach(filters);
     panel.attach(filters);
-    expect(filters.lastElementChild).toBe(menu());
+    expect(filters.bar.lastElementChild).toBe(menu());
     expect(document.querySelectorAll(".kv-menu")).toHaveLength(1);
-    expect(filters.hasAttribute("data-kv-panel")).toBe(true);
+    expect(filters.pills.hasAttribute("data-kv-panel")).toBe(true);
   });
   it("attach(null) removes the button; a new bar gets it back", () => {
     const panel = createFilterPanel(fakeCtx());
@@ -39,7 +40,7 @@ describe("createFilterPanel: placement", () => {
     expect(menu()).toBeNull();
     const fresh = bar();
     panel.attach(fresh);
-    expect(fresh.lastElementChild).toBe(menu());
+    expect(fresh.bar.lastElementChild).toBe(menu());
   });
   it("extension reload: button removed and the site's pills restored", () => {
     const page = fakeCtx();
@@ -48,7 +49,16 @@ describe("createFilterPanel: placement", () => {
     panel.attach(filters);
     page.invalidate();
     expect(menu()).toBeNull();
-    expect(filters.hasAttribute("data-kv-panel")).toBe(false);
+    expect(filters.pills.hasAttribute("data-kv-panel")).toBe(false);
+  });
+  it("the site rebuilds its bar: the old pills row is released", () => {
+    const panel = createFilterPanel(fakeCtx());
+    const old = bar();
+    panel.attach(old);
+    const fresh = bar();
+    panel.attach(fresh);
+    expect(old.pills.hasAttribute("data-kv-panel")).toBe(false);
+    expect(fresh.pills.hasAttribute("data-kv-panel")).toBe(true);
   });
   it("reload before any attach: no error", () => {
     const page = fakeCtx();
@@ -77,6 +87,20 @@ describe("createFilterPanel: popover", () => {
     expect(button()?.getAttribute("aria-expanded")).toBe("true");
     button()?.click();
     expect(popover()?.hidden).toBe(true);
+  });
+  it("opens toward the side with room: rightward on the left half, leftward on the right half", () => {
+    open();
+    const at = (left: number) =>
+      vi
+        .spyOn(button() as HTMLElement, "getBoundingClientRect")
+        .mockReturnValue({ left, width: 36 } as DOMRect);
+    at(10);
+    button()?.click();
+    expect(menu()?.dataset.kvAlign).toBe("start");
+    button()?.click();
+    at(window.innerWidth - 50);
+    button()?.click();
+    expect(menu()?.dataset.kvAlign).toBe("end");
   });
   const press = (el: Element | null | undefined) =>
     el?.dispatchEvent(new Event("pointerdown", { bubbles: true }));

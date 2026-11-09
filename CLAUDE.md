@@ -44,6 +44,7 @@ kyara-extension/
 ├── biome.json
 ├── tsconfig.json
 ├── package.json
+├── public/icon/         # Icônes de l'extension (16 à 128 px, détectées par WXT). Source : docs/icon.svg
 └── src/
     ├── entrypoints/         # Points d'entrée UNIQUEMENT : ils branchent, ils ne contiennent pas de logique
     │   ├── background.ts    # Démarre le cache passif
@@ -59,14 +60,18 @@ kyara-extension/
     │   ├── gain-filter/     # Filtre "Gain min" (Off / Neutre et + / Positif + curseur) et tri par rentabilité
     │   ├── rarity-filter/   # Filtre par rareté de la carte proposée (puces multi-sélection)
     │   ├── load-more/       # Clique « Voir plus d'offres » tant qu'un filtre laisse trop peu d'offres visibles, le bouton affichant « Chargement… » pendant le chargement
-    │   └── market-tooltip/  # Infobulle "Min marché" au survol
+    │   ├── market-tooltip/  # Infobulle "Min marché" au survol
+    │   └── free-packs/      # Option « ×N » (boosters gratuits) dans le sélecteur de la page d'ouverture
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)
     │   ├── api.ts           # Appels à /api avec le jeton et le device id du site
     │   ├── parse.ts         # Lecture des réponses JSON (prix, fair-play, annonces)
-    │   ├── dom.ts           # Sélecteurs CSS du site, lecture des cartes d'une offre et des cartes données possibles (boutons « Donner »)
+    │   ├── dom.ts           # Lecture des offres (cartes, boutons « Donner »), marquage data-kv-offer
+    │   ├── page-dom.ts      # Autres éléments du site : barre de filtres, tableau, « Voir plus », sélecteur de boosters
+    │   ├── packs.ts         # Boosters gratuits par pack, réécriture de la requête d'ouverture
+    │   ├── fetch-hook.ts    # Script DANS la page (MAIN world) : enveloppe fetch (boosters gratuits)
     │   ├── prices.ts        # Valeur d'une carte et analyse de rentabilité d'une offre
-    │   ├── rarity.ts        # Raretés : retrouvées d'après la couleur du box-shadow des cartes
+    │   ├── rarity.ts        # Raretés : d'après la couleur du box-shadow des cartes, sinon le texte « Rare · … »
     │   ├── filter-panel/    # Bouton "filtre" + fenêtre à 2 sections (Kyara / extension), catégories
     │   ├── offers.ts        # Instantané partagé : offres + prix
     │   ├── fair-play.ts     # Demande les prix fair-play manquants (lots, TTL, réessais)
@@ -169,7 +174,8 @@ L'extension tourne sur chaque page de kyara.games. Elle ne doit jamais ralentir 
 - **Pas de dépendance npm dans le content script** sans raison forte. Vérifier la taille du bundle après chaque `pnpm build`.
 - **Un seul `MutationObserver`**, avec debounce (≈300 ms) : on ne recalcule pas à chaque mutation du DOM.
 - **Ne jamais ajouter de nœuds dans l'arbre DOM géré par le site.** On pose des attributs `data-kv-*`, et le CSS les affiche. Les éléments flottants (pastille, infobulle) sont ajoutés à `<html>`, hors de l'arbre du site.
-  - Seule exception voulue : le bouton du panneau de filtres (`kyara/filter-panel/`), placé dans la barre de filtres du site. Il est réinséré à chaque rendu si le site le retire. Les pastilles d'origine du site sont cachées par CSS (attribut `data-kv-panel` sur la barre) et reflétées dans le panneau : un clic sur la copie clique l'original, rien n'est déplacé.
+  - Exception voulue n° 2 : l'option « ×N » de `features/free-packs/`, placée dans le sélecteur de boosters du site, réinsérée à chaque rendu.
+  - Exception voulue n° 1 : le bouton du panneau de filtres (`kyara/filter-panel/`), placé dans la barre de filtres du site. Il est réinséré à chaque rendu si le site le retire. Les pastilles d'origine du site sont cachées par CSS (attribut `data-kv-panel` sur la rangée de pastilles) et reflétées dans le panneau : un clic sur la copie clique l'original, rien n'est déplacé.
 - **Requêtes réseau minimales** : lire d'abord le cache passif, regrouper les requêtes (max 200 ids, comme le site), ne pas réessayer un id en échec avant un délai, ne rien demander si l'onglet est caché.
 - **Lectures de stockage groupées** : un seul `storage.get([...clés])` par rendu, pas un appel par carte.
 - Écouteurs `scroll` et `mouseover` : `passive: true`, et le travail coûteux est différé (`setTimeout`).
@@ -215,6 +221,19 @@ Objectif : **zéro crash, zéro erreur, zéro warning** dans la console de la pa
 - Seules exceptions : les textes affichés à l'utilisateur, traduits dans `src/locales/*.json` (voir §6 bis), les textes du site recopiés tels quels (sélecteurs, libellés des pastilles du site dans les faux DOM de test), et ce fichier `CLAUDE.md`.
 - Tout le dépôt est déjà en anglais : ne jamais réintroduire de français.
 - Les réponses de Claude à l'utilisateur dans le chat restent en français.
+
+---
+
+## 5 quater. Robustesse aux mises à jour du site
+
+Le site change souvent (classes Svelte, mise en page). Un changement ne doit jamais casser l'extension, ni dépenser quoi que ce soit à la place de l'utilisateur.
+
+- **Tout ce qui dépend du DOM du site vit dans `kyara/dom.ts` et `kyara/page-dom.ts`.** Aucune feature, aucun CSS ne cible une classe ou un id du site.
+- **Chaque recherche a un repli** : d'abord le balisage actuel du site, puis un repli fondé sur ce qui ne peut pas changer sans que la page change de sens (liens `/wiki/<id>`, leur ordre, la flèche ⇄, le texte d'un bouton, les boutons « ×N »). Un test couvre le repli.
+- **Le CSS des features cible nos attributs** (`data-kv-offer`, `data-kv-offers`, `data-kv-thumbs`, `data-kv-max`…), posés par le JS. Seule exception : les règles « pas de clignotement » gardent aussi `li[id^="offre-"]`, pour cacher les offres dès le premier affichage.
+- **Un repli qui déclenche une action** (clic automatique, envoi d'une requête) exige deux indices concordants (ex. bouton après la liste ET texte « plus »). Dans le doute, ne rien faire.
+- **Donnée inconnue ≠ donnée fausse** : un filtre ne doit pas tout cacher parce qu'une lecture échoue (ex. rareté : couleur, sinon texte).
+- **Argent / ressources** : si le site change une requête que l'extension modifie (ouverture de boosters), la requête est refusée plutôt qu'envoyée telle quelle.
 
 ---
 

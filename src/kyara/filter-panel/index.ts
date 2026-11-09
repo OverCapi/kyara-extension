@@ -5,17 +5,25 @@
 // It is reinserted on every render if the site removes it; the original pills are hidden (data-kv-panel
 // attribute on the bar) while the panel is there, and everything is removed when the extension reloads.
 import { listen, onShortcut, type PageContext } from "../../core/page";
+import type { OfferFilters } from "../page-dom";
 import { createPillMirror } from "./mirror";
 import { buildMenu, makeCategory } from "./view";
 import "./style.css";
 
+/** On the site's pills row while the panel mirrors it: hidden by CSS. */
 const HOST_ATTR = "data-kv-panel";
 
 export interface FilterPanel {
   /** Places the button in the site's filter bar, or removes it if `filters` is `null`. */
-  attach(filters: HTMLElement | null): void;
+  attach(filters: OfferFilters | null): void;
   /** Adds a category (title + content) to the extension section. Called once at startup. */
   addCategory(title: string, el: HTMLElement): void;
+}
+
+/** "end" (popover opens leftward) when the button sits in the right half of the window, else "start". */
+function alignOf(button: HTMLElement): "start" | "end" {
+  const box = button.getBoundingClientRect();
+  return box.left + box.width / 2 > window.innerWidth / 2 ? "end" : "start";
 }
 
 /** Creates the panel (not in the page yet: see `attach`). */
@@ -27,6 +35,8 @@ export function createFilterPanel(page: PageContext): FilterPanel {
   let isOpen = false;
   const setOpen = (open: boolean) => {
     isOpen = open;
+    // the site moves its filter bar around: open toward the side with room, measured at each opening
+    if (open) menu.root.dataset.kvAlign = alignOf(menu.button);
     menu.popover.hidden = !open;
     menu.button.setAttribute("aria-expanded", String(open));
   };
@@ -47,11 +57,12 @@ export function createFilterPanel(page: PageContext): FilterPanel {
 
   return {
     attach(filters) {
-      host = filters;
+      if (host !== filters?.pills) host?.removeAttribute(HOST_ATTR); // the site rebuilt its bar
+      host = filters?.pills ?? null;
       if (!filters) return menu.root.remove();
-      filters.setAttribute(HOST_ATTR, "");
-      if (menu.root.parentElement !== filters) filters.append(menu.root);
-      mirror.sync(filters);
+      filters.pills.setAttribute(HOST_ATTR, "");
+      if (menu.root.parentElement !== filters.bar) filters.bar.append(menu.root);
+      mirror.sync(filters.pills);
     },
     addCategory(title, el) {
       menu.extension.append(makeCategory(title, el));

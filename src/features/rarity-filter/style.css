@@ -4,7 +4,8 @@ li[data-kv-hide-rarity] {
 }
 
 /* Offers not filtered yet (the runtime sets data-kv-seen once done): hidden, no flicker. */
-html[data-kv-filter-rarity] li[id^="offre-"]:not([data-kv-seen]) {
+html[data-kv-filter-rarity] li[id^="offre-"]:not([data-kv-seen]),
+html[data-kv-filter-rarity] [data-kv-offers] > :not([data-kv-seen]) {
   display: none !important;
 }
 

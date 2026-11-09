@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 import { renderOffers } from "../test/helpers";
 import {
   cardId,
-  findLoadMore,
   findOfferArrow,
-  findOfferBoard,
-  findOfferFilters,
+  findOfferItems,
+  findWantsRow,
+  markOffers,
+  type Offer,
   offerCards,
   offerIds,
   readGiveButtons,
@@ -55,37 +56,14 @@ describe("readOffer / readOffers", () => {
   });
 });
 
-describe("findOfferFilters", () => {
-  it("finds the bar that holds the pills, ignores other .filters", () => {
-    document.body.innerHTML =
-      '<div class="filters"><input></div><div class="filters"><input><div class="pills"></div></div>';
-    expect(findOfferFilters()).toBe(document.querySelectorAll(".filters")[1]);
-  });
-  it("missing: null", () => {
-    document.body.innerHTML = "";
-    expect(findOfferFilters()).toBeNull();
-  });
-});
-
-describe("findLoadMore", () => {
-  it("finds the button under the offer list", () => {
-    document.body.innerHTML =
-      '<section class="board"><ul class="offers"></ul><button class="btn more">Voir plus</button></section>';
-    expect(findLoadMore()?.textContent).toBe("Voir plus");
-  });
-  it("missing (no more offers to load): null", () => {
-    document.body.innerHTML =
-      '<section class="board"><ul class="offers"></ul></section><button class="more">other</button>';
-    expect(findLoadMore()).toBeNull();
-  });
-});
-
 describe("findOfferArrow", () => {
   it("finds the arrow, null if missing", () => {
     const [li] = renderOffers([{ give: 1, wants: [2] }]);
     if (!li) throw new Error("no offer");
     expect(findOfferArrow(readOffer(li))?.textContent).toBe("⇄");
-    li.querySelector(".arrow")?.remove();
+    li.querySelector(".arrow")?.classList.remove("arrow"); // site renamed its class: found by its ⇄
+    expect(findOfferArrow(readOffer(li))?.textContent).toBe("⇄");
+    li.querySelector("div:not(.thumbs):not(.give):not(.want):not(.acts)")?.remove();
     expect(findOfferArrow(readOffer(li))).toBeNull();
   });
 });
@@ -134,15 +112,6 @@ describe("readGiveButtons", () => {
   });
 });
 
-describe("findOfferBoard", () => {
-  it("finds the board, null if missing", () => {
-    document.body.innerHTML = '<section class="board"></section>';
-    expect(findOfferBoard()?.tagName).toBe("SECTION");
-    document.body.innerHTML = "";
-    expect(findOfferBoard()).toBeNull();
-  });
-});
-
 describe("readOffer: free cards", () => {
   it("only wanted cards with a Donner button; owned but locked cards (no button) are not free", () => {
     const [li] = renderOffers([{ give: 1, wants: [2, 3, 4], free: [3] }]);
@@ -150,5 +119,42 @@ describe("readOffer: free cards", () => {
     li.querySelector('a[href="/wiki/2"]')?.setAttribute("title", "Carte 2 (tu l’as)"); // owned, locked
     li.querySelector(".acts")?.append("Tu n’as aucune de ces cartes libre.");
     expect(readOffer(li).free.map((c) => c.id)).toEqual([3]);
+  });
+});
+
+describe("site markup changed: fallbacks", () => {
+  /** Offer without the site's id and classes: only card links, their order and the ⇄ arrow. */
+  const bare = (
+    html = '<a href="/wiki/1" title="A"></a><span>⇄</span><a href="/wiki/2" title="B"></a><a href="/wiki/3" title="C"></a>',
+  ) => {
+    document.body.innerHTML = `<ul><li>${html}</li><li><a href="/wiki/9"></a> no arrow</li></ul>`;
+    return document.querySelector("li") as HTMLElement;
+  };
+  it("offers found without the offre- id: list items with 2+ card links and the arrow", () => {
+    const li = bare();
+    expect(findOfferItems()).toEqual([li]);
+  });
+  it("the site's id wins when present", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2] }]);
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      '<ul><li><a href="/wiki/7"></a>⇄<a href="/wiki/8"></a></li></ul>',
+    );
+    expect(findOfferItems()).toEqual([li]);
+  });
+  it("without .give / .want: first card offered, the others wanted", () => {
+    const offer = readOffer(bare());
+    expect(offer.give?.id).toBe(1);
+    expect(offer.wants.map((c) => c.id)).toEqual([2, 3]);
+  });
+  it("markOffers marks each offer and its list; findWantsRow = parent of the wanted cards", () => {
+    const [li] = renderOffers([{ give: 1, wants: [2, 3] }]);
+    if (!li) throw new Error("no offer");
+    const offers = readOffers();
+    markOffers(offers);
+    expect(li.hasAttribute("data-kv-offer")).toBe(true);
+    expect(li.parentElement?.hasAttribute("data-kv-offers")).toBe(true);
+    expect(findWantsRow(offers[0] as Offer)?.className).toBe("want");
+    expect(findWantsRow({ ...(offers[0] as Offer), wants: [] })).toBeNull();
   });
 });

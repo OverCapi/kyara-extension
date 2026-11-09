@@ -1,11 +1,11 @@
 /* Offer tint from the gain (computed by the profit-tint feature), layered over the site's background. */
-li[id^="offre-"] {
+[data-kv-offer] {
   background-image: linear-gradient(var(--kv-bg, transparent), var(--kv-bg, transparent)) !important;
   transition: background-image 0.3s;
 }
 
 /* Extension button = off: no more colored background (badges and rings stay). */
-html.kv-no-tint li[id^="offre-"] {
+html.kv-no-tint [data-kv-offer] {
   background-image: none !important;
 }
 

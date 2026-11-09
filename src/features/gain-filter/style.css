@@ -4,7 +4,8 @@ li[data-kv-hide-gain] {
 }
 
 /* Offers not sorted / filtered yet (the runtime sets data-kv-seen once done): hidden, no flicker. */
-html[data-kv-hold-gain] li[id^="offre-"]:not([data-kv-seen]) {
+html[data-kv-hold-gain] li[id^="offre-"]:not([data-kv-seen]),
+html[data-kv-hold-gain] [data-kv-offers] > :not([data-kv-seen]) {
   display: none !important;
 }
 

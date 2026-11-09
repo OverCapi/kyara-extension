@@ -9,6 +9,7 @@ describe("rarity-ring", () => {
     const give = snap.offers[0]?.give?.el;
     expect(give?.style.getPropertyValue("--kv-rar")).toBe("rgb(9, 8, 7)");
     expect(give?.hasAttribute("data-kv-rar")).toBe(true);
+    expect(snap.offers[0]?.wants[0]?.el.parentElement?.hasAttribute("data-kv-thumbs")).toBe(true);
   });
   it("card without a color: nothing", () => {
     const snap = makeSnapshot([{ give: 1, wants: [2] }]);

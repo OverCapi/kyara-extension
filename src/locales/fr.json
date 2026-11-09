@@ -45,5 +45,10 @@
   "wanted.remove": "Retirer {name}",
   "load.loading": "Chargement…",
   "load.none": "Aucune autre offre ne correspond aux filtres.",
-  "pending.title": "Chargement des prix…"
+  "pending.title": "Chargement des prix…",
+  "packs.count": "×{n}",
+  "packs.free_one": "{count} gratuit",
+  "packs.free_other": "{count} gratuits",
+  "packs.free_title": "Ouvrir seulement tes boosters gratuits (aucun chakra dépensé)",
+  "packs.refused": "Ouverture annulée par Kyara Extension : le site a changé, rien n'a été dépensé."
 }

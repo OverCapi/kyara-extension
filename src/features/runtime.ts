@@ -5,10 +5,11 @@
 import { safe } from "../core/errors";
 import { createLogger } from "../core/log";
 import { createPageWatcher, type PageContext } from "../core/page";
-import { findOfferFilters } from "../kyara/dom";
+import { markOffers } from "../kyara/dom";
 import { createFairPlayRequester } from "../kyara/fair-play";
 import { createFilterPanel } from "../kyara/filter-panel";
 import { buildSnapshot, type OffersSnapshot } from "../kyara/offers";
+import { findOfferFilters } from "../kyara/page-dom";
 import type { Feature, FeatureContext } from "./types";
 
 const log = createLogger("runtime");
@@ -38,6 +39,7 @@ export function startFeatures(page: PageContext, features: Feature[]): void {
   watcher.subscribe(async () => {
     const snapshot = await buildSnapshot();
     current = snapshot;
+    markOffers(snapshot.offers); // before the features: their CSS targets data-kv-offer
     safe("runtime:panel", filters.attach)(findOfferFilters());
     for (const listener of listeners) listener(snapshot);
     // filters and sorting are done: the offers can show (see data-kv-hold-* / data-kv-filter-*)

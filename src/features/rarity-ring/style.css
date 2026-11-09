@@ -1,9 +1,9 @@
 /* Ring around each card, in the site's rarity color (instead of the "owned" green). */
-li[id^="offre-"] a[data-kv-rar] img {
+[data-kv-offer] a[data-kv-rar] img {
   outline: 2px solid var(--kv-rar) !important;
   outline-offset: 1px;
 }
 /* The ring overflows by 3px on each side: widen the site's gap (6px) so they do not touch. */
-li[id^="offre-"] .thumbs {
+[data-kv-thumbs] {
   gap: 12px !important;
 }

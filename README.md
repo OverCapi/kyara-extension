@@ -2,7 +2,7 @@
 
 Firefox extension for [kyara.games](https://kyara.games): in the **Marché → Échanges** (Market → Trades) tab, it shows card values and the profitability of each offer, and lets you filter and sort offers.
 
-![Trades tab with the extension: gain badges, best gain under the arrow, sorted "Donner" buttons](docs/screenshot.webp)
+![Trades tab with the extension: gain badges, best gain under the arrow, sorted "Donner" buttons](docs/screenshot.png)
 
 - Badge on each card: `≈ G◆` on the offered card, `G − W` on the wanted cards (plus the gain in % on hover).
 - Under the ⇄ arrow: the best gain in % you can get from the offer.

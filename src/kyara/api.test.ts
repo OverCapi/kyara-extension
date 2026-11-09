@@ -10,7 +10,16 @@ describe("authHeaders", () => {
     localStorage.clear();
   });
   it("empty without a token", () => {
+    localStorage.setItem("theme", "dark");
     expect(authHeaders()).toEqual({});
+    localStorage.clear();
+  });
+  it("keys renamed by the site: found by their name", () => {
+    localStorage.setItem("theme", "dark");
+    localStorage.setItem("kg_auth_token", "tok2");
+    localStorage.setItem("kg_device_id", "dev2");
+    expect(authHeaders()).toEqual({ authorization: "Bearer tok2", "x-device-id": "dev2" });
+    localStorage.clear();
   });
   it("empty if localStorage is unreachable", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {

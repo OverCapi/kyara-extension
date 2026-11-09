@@ -1,16 +1,16 @@
 /* Compact give buttons with their gain, sorted by `order` (set by the feature).
    !important: the site's own button styles use scoped classes that could win otherwise. */
-li[id^="offre-"] :has(> [data-kv-give]) {
+[data-kv-offer] :has(> [data-kv-give]) {
   display: flex !important;
   flex-wrap: wrap;
   align-items: stretch !important; /* same height as "Proposer autre chose" */
   gap: 6px !important;
 }
 /* Other children ("Proposer autre chose", texts) after the give buttons. */
-li[id^="offre-"] :has(> [data-kv-give]) > :not([data-kv-give]) {
+[data-kv-offer] :has(> [data-kv-give]) > :not([data-kv-give]) {
   order: 9999;
 }
-li[id^="offre-"] [data-kv-give] {
+[data-kv-offer] [data-kv-give] {
   display: inline-flex !important;
   align-items: center;
   gap: 8px;
@@ -22,18 +22,18 @@ li[id^="offre-"] [data-kv-give] {
   font-size: 13px !important;
   white-space: nowrap;
 }
-li[id^="offre-"] [data-kv-give]:hover {
+[data-kv-offer] [data-kv-give]:hover {
   background: var(--acc-soft, #ff4d2e1f) !important;
 }
 /* Gain as colored text, no pill: green = you gain, red = you lose, gray = even. */
-li[id^="offre-"] [data-kv-give][data-kv-gain]::after {
+[data-kv-offer] [data-kv-give][data-kv-gain]::after {
   content: attr(data-kv-gain);
   font-weight: 700;
   color: var(--fg3, #8d8894);
 }
-li[id^="offre-"] [data-kv-give][data-kv-sign="1"]::after {
+[data-kv-offer] [data-kv-give][data-kv-sign="1"]::after {
   color: #4ade80;
 }
-li[id^="offre-"] [data-kv-give][data-kv-sign="-1"]::after {
+[data-kv-offer] [data-kv-give][data-kv-sign="-1"]::after {
   color: #f87171;
 }

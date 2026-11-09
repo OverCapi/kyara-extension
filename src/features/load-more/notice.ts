@@ -2,7 +2,7 @@
 // on the site's offer board (no node added). Removed when the extension reloads. Text: locales/*.json.
 import { t } from "../../core/i18n";
 import type { PageContext } from "../../core/page";
-import { findOfferBoard } from "../../kyara/dom";
+import { findOfferBoard } from "../../kyara/page-dom";
 
 const ATTR = "data-kv-empty";
 

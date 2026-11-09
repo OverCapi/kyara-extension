@@ -1,4 +1,5 @@
 // List of active features. To add a feature: create its folder, then add it here.
+import { freePacksOption } from "./free-packs";
 import { gainFilter } from "./gain-filter";
 import { giveButtons } from "./give-buttons";
 import { loadMore } from "./load-more";
@@ -23,4 +24,5 @@ export const features: Feature[] = [
   loadMore,
   marketTooltip,
   pricesPending,
+  freePacksOption,
 ];

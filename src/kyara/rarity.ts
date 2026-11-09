@@ -1,6 +1,8 @@
 // Card rarities. The site marks each card with an inline box-shadow in its rarity's color
 // (CSS variables --C/--U/--R/--E/--L/--M): the rarity is recovered from that color, which
-// works whatever the site's language. Read only: no side effects.
+// works whatever the site's language. Fallback when the color is not recognized (the site changed how it
+// paints cards): the rarity name the site writes under the offered card ("Rare · Gate").
+// Read only: no side effects.
 import type { Offer } from "./dom";
 
 export const RARITIES = ["common", "uncommon", "rare", "epic", "legendary", "mythic"] as const;
@@ -51,9 +53,26 @@ export function rarityPalette(root: Element = document.documentElement): Map<str
   return palette;
 }
 
-/** Rarity of an offer's offered card, `null` if unknown (no card, no recognized color). */
+/** The site's rarity names (French site), longest first: "peu commune" before "commune". */
+const SITE_NAMES: Array<[string, Rarity]> = [
+  ["peu commune", "uncommon"],
+  ["commune", "common"],
+  ["rare", "rare"],
+  ["épique", "epic"],
+  ["légendaire", "legendary"],
+  ["mythique", "mythic"],
+];
+const NAME_RE = new RegExp(`(?:^|[^\\p{L}])(${SITE_NAMES.map(([n]) => n).join("|")})\\s*·`, "iu");
+
+/** Rarity written in an offer's text ("Rare · Gate", first one = the offered card's), `null` if none. */
+export function rarityFromText(text: string): Rarity | null {
+  const name = NAME_RE.exec(text)?.[1]?.toLowerCase();
+  return SITE_NAMES.find(([n]) => n === name)?.[1] ?? null;
+}
+
+/** Rarity of an offer's offered card: from its color, otherwise from the offer's text. `null` if unknown. */
 export function offerRarity(offer: Offer, palette: Map<string, Rarity>): Rarity | null {
-  const shadow = offer.give?.el.querySelector("img")?.style.boxShadow ?? "";
-  const key = rgbKey(rarityColor(shadow) ?? "");
-  return key ? (palette.get(key) ?? null) : null;
+  if (!offer.give) return null;
+  const key = rgbKey(rarityColor(offer.give.el.querySelector("img")?.style.boxShadow ?? "") ?? "");
+  return (key ? palette.get(key) : undefined) ?? rarityFromText(offer.li.textContent ?? "");
 }

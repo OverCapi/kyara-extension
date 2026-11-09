@@ -2,7 +2,7 @@ import { vi } from "vitest";
 // Shared test tools.
 import type { PageContext } from "../core/page";
 import type { Feature } from "../features/types";
-import { readOffers } from "../kyara/dom";
+import { markOffers, readOffers } from "../kyara/dom";
 import type { FilterPanel } from "../kyara/filter-panel";
 import type { OffersSnapshot } from "../kyara/offers";
 
@@ -67,7 +67,9 @@ export function makeSnapshot(
 ): OffersSnapshot {
   renderOffers(specs.map((s) => ({ ...s, free: (opts.free ?? []).filter((id) => s.wants?.includes(id)) })));
   const fair = Object.fromEntries(Object.entries(opts.fair ?? {}).map(([id, v]) => [id, { v, t: 0 }]));
-  return { offers: readOffers(), store: { fair, market: {} } };
+  const offers = readOffers();
+  markOffers(offers); // like the runtime, before the features
+  return { offers, store: { fair, market: {} } };
 }
 
 const startedPages: Array<ReturnType<typeof fakeCtx>> = [];

@@ -15,12 +15,26 @@ export interface ApiResult {
   data: unknown;
 }
 
+/**
+ * A value of the site's localStorage: its known key, otherwise the first key matching `pattern` (the site
+ * renamed it). Only ever sent back to the same site's /api.
+ */
+function siteValue(known: string, pattern: RegExp): string | null {
+  const direct = localStorage.getItem(known);
+  if (direct) return direct;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && pattern.test(key)) return localStorage.getItem(key);
+  }
+  return null;
+}
+
 /** The site's auth headers. Empty if localStorage is unreachable or has no token. */
 export function authHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
   try {
-    const token = localStorage.getItem("kyara_token");
-    const device = localStorage.getItem("kyara_device");
+    const token = siteValue("kyara_token", /token/i);
+    const device = siteValue("kyara_device", /device/i);
     if (token) headers.authorization = `Bearer ${token}`;
     if (device) headers["x-device-id"] = device;
   } catch (err) {

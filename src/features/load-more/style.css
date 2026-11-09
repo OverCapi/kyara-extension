@@ -1,5 +1,5 @@
 /* "No offer matches the filters" notice at the end of the offer board (load-more feature). */
-.board[data-kv-empty]::after {
+[data-kv-empty]::after {
   content: attr(data-kv-empty);
   display: block;
   order: 99999; /* after the offers, even when they are sorted with `order` */

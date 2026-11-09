@@ -45,5 +45,10 @@
   "wanted.remove": "Remove {name}",
   "load.loading": "Loading…",
   "load.none": "No other offer matches the filters.",
-  "pending.title": "Loading prices…"
+  "pending.title": "Loading prices…",
+  "packs.count": "×{n}",
+  "packs.free_one": "{count} free",
+  "packs.free_other": "{count} free",
+  "packs.free_title": "Open only your free boosters (no chakra spent)",
+  "packs.refused": "Opening cancelled by Kyara Extension: the site changed, nothing was spent."
 }

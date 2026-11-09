@@ -9,7 +9,7 @@
 // DOM effect: clicks on the site's button, button text while loading, data-kv-empty on the offer board.
 // ponytail: fixed minimum and cap; expose them in the panel if tuning them becomes useful.
 import { listen } from "../../core/page";
-import { findLoadMore } from "../../kyara/dom";
+import { findLoadMore } from "../../kyara/page-dom";
 import type { Feature } from "../types";
 import { countVisible, isFiltering } from "./count";
 import { watchLoadMoreLabel } from "./label";

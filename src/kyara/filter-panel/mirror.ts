@@ -7,18 +7,20 @@ import { t } from "../../core/i18n";
 import { makePill } from "./pill";
 import { makeCategory, pillRow } from "./view";
 
-const COUNTER = ".n";
-
 interface Mirrored {
   source: HTMLButtonElement;
   copy: HTMLButtonElement;
 }
 
+/** The pill carries a counter ("Mes offres 0"): a child element showing only a number (the site's `.n`). */
+const hasCounter = (pill: Element) =>
+  [...pill.children].some((c) => /^\d+$/.test(c.textContent?.trim() ?? ""));
+
 const labelOf = (pill: Element) => (pill.textContent ?? "").replace(/\s+/g, " ").trim();
 
 export interface PillMirror {
-  /** Aligns the copy with the current pills of `filters` (rebuilt only if they changed). */
-  sync(filters: HTMLElement): void;
+  /** Aligns the copy with the current pills of the site's pills row (rebuilt only if they changed). */
+  sync(row: HTMLElement): void;
 }
 
 /** Fills `host` with copies of the site's pills. */
@@ -45,8 +47,8 @@ export function createPillMirror(host: HTMLElement): PillMirror {
   const rebuild = (pills: HTMLButtonElement[]) => {
     mirrored = pills.map(copyOf);
     const groups: Array<[string, Mirrored[]]> = [
-      [t("panel.cat.cards"), mirrored.filter((m) => !m.source.querySelector(COUNTER))],
-      [t("panel.cat.mine"), mirrored.filter((m) => m.source.querySelector(COUNTER))],
+      [t("panel.cat.cards"), mirrored.filter((m) => !hasCounter(m.source))],
+      [t("panel.cat.mine"), mirrored.filter((m) => hasCounter(m.source))],
     ];
     host.replaceChildren(
       ...groups
@@ -56,8 +58,8 @@ export function createPillMirror(host: HTMLElement): PillMirror {
   };
 
   return {
-    sync(filters) {
-      const pills = [...filters.querySelectorAll<HTMLButtonElement>(":scope > .pills > button")];
+    sync(row) {
+      const pills = [...row.querySelectorAll<HTMLButtonElement>(":scope > button")];
       const next = pills.map(labelOf).join("|");
       // the site's pills can be recreated (re-render) without changing text
       if (next !== signature || mirrored.some((m) => !m.source.isConnected)) {

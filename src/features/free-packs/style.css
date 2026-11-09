@@ -1,0 +1,8 @@
+/* Cost tag of the "Ouvrir" button while the free-only option is chosen: the site's text hidden, ours shown. */
+[data-kv-tag] {
+  font-size: 0 !important;
+}
+[data-kv-tag]::after {
+  content: attr(data-kv-tag);
+  font-size: var(--kv-fs, 13px);
+}

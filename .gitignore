@@ -7,3 +7,7 @@ coverage
 .firefox-profile
 .env
 .vitest
+.claude/agents/
+CLAUDE.local.md
+.claude/worktrees/
+.claude/settings.local.json

@@ -33,13 +33,13 @@ a[data-kv][data-kv-pct]:hover::after {
 }
 
 /* Best gain you can get from this offer, under the ⇄ arrow. */
-.arrow[data-kv-max] {
+[data-kv-max] {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
 }
-.arrow[data-kv-max]::after {
+[data-kv-max]::after {
   content: attr(data-kv-max);
   padding: 0 6px;
   border-radius: 4px;
@@ -50,11 +50,11 @@ a[data-kv][data-kv-pct]:hover::after {
   background: rgba(0, 0, 0, 0.8);
   color: #ddd;
 }
-.arrow[data-kv-sign="1"]::after {
+[data-kv-max][data-kv-sign="1"]::after {
   background: #1f9d55;
   color: #fff;
 }
-.arrow[data-kv-sign="-1"]::after {
+[data-kv-max][data-kv-sign="-1"]::after {
   background: #c0392b;
   color: #fff;
 }

@@ -3,7 +3,7 @@ li[data-kv-wanted] {
   outline: 2px solid #3ddc84;
   outline-offset: -2px;
 }
-li[data-kv-wanted] .give a[data-kv-wanted-card] {
+li[data-kv-wanted] a[data-kv-wanted-card] {
   outline: 2px solid #3ddc84;
   outline-offset: 2px;
   border-radius: 6px;
@@ -15,12 +15,33 @@ li[data-kv-hide-wanted] {
 }
 
 /* Offers not filtered yet (the runtime sets data-kv-seen once done): hidden, no flicker. */
-html[data-kv-filter-wanted] li[id^="offre-"]:not([data-kv-seen]) {
+html[data-kv-filter-wanted] li[id^="offre-"]:not([data-kv-seen]),
+html[data-kv-filter-wanted] [data-kv-offers] > :not([data-kv-seen]) {
   display: none !important;
 }
 
+/* Text field styled like the site's search field (same variables, compact for the panel). */
 .kv-wanted-input {
   box-sizing: border-box;
   width: 100%;
-  margin-bottom: 8px;
+  height: 36px;
+  margin: 0 0 8px;
+  padding: 0 12px;
+  border: 1px solid var(--line2, #2e2b36);
+  border-radius: var(--r-md, 10px);
+  background: #17161d;
+  color: var(--fg, #edeae4);
+  font: 400 13px / 1.4 var(--body, system-ui, sans-serif);
+  outline: none;
+  appearance: none;
+}
+.kv-wanted-input::placeholder {
+  color: #8a8590;
+  opacity: 1;
+}
+.kv-wanted-input:hover {
+  border-color: var(--line3, #3a3742);
+}
+.kv-wanted-input:focus-visible {
+  border-color: var(--acc, #ff4d2e);
 }

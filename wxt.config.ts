@@ -23,6 +23,8 @@ export default defineConfig({
         ? ["webRequest", "webRequestBlocking", "storage", "https://kyara.games/*"]
         : ["storage"],
     host_permissions: browser === "firefox" ? undefined : ["https://kyara.games/*"],
+    // script injected into the page by inject.content.ts (fetch hook, see kyara/fetch-hook.ts)
+    web_accessible_resources: [{ resources: ["page-hook.js"], matches: ["https://kyara.games/*"] }],
     // Listed on addons.mozilla.org: AMO delivers updates, so no update_url (AMO rejects it for listed add-ons).
     // Keep this id: copies installed from the old GitHub releases share it and update from AMO.
     // data_collection_permissions: the extension sends nothing anywhere except kyara.games' own API.
