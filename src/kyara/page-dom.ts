@@ -14,15 +14,22 @@ export interface OfferFilters {
 const sitePills = (root: Element) =>
   [...root.querySelectorAll<HTMLButtonElement>("button[aria-pressed]")].filter((b) => !b.closest(".kv-menu"));
 
+/** Site windows (modals): their search fields and toggles are never the Trades filter bar. */
+const DIALOG = 'dialog, [role="dialog"], [aria-modal="true"]';
+const inDialog = (el: Element) => el.closest(DIALOG) !== null;
+
 /**
  * Filter bar of the Trades tab. Site markup: `.filters > .pills`. Fallback: the closest ancestor of the
  * search field holding at least 2 toggle buttons; the pills row is their parent. `null` if missing.
+ * Never inside a site window (modal), and the fallback needs offers on the page and stops below <body>:
+ * the filter button is put in the bar and the pills row is hidden, so a wrong guess would hide part of the site.
  */
 export function findOfferFilters(root: ParentNode = document): OfferFilters | null {
-  const pills = root.querySelector<HTMLElement>(".filters > .pills");
+  const pills = [...root.querySelectorAll<HTMLElement>(".filters > .pills")].find((el) => !inDialog(el));
   if (pills?.parentElement) return { bar: pills.parentElement, pills };
-  const search = root.querySelector('input[type="search"]');
-  for (let el = search?.parentElement; el; el = el.parentElement) {
+  if (findOfferItems(root).length === 0) return null;
+  const search = [...root.querySelectorAll('input[type="search"]')].find((el) => !inDialog(el));
+  for (let el = search?.parentElement; el && el !== document.body; el = el.parentElement) {
     const found = sitePills(el);
     const row = found[0]?.parentElement;
     if (found.length >= 2 && row) return { bar: el, pills: row };

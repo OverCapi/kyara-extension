@@ -21,14 +21,37 @@ describe("findOfferFilters", () => {
     document.body.innerHTML =
       '<div class="mode"><button aria-pressed="true">Cartes</button><button aria-pressed="false">Éveil</button></div>' +
       '<div id="bar"><div class="line"><div><input type="search"></div><button>Proposer</button></div>' +
-      '<div id="row"><button aria-pressed="false">A</button><button aria-pressed="false">B</button></div></div>';
+      '<div id="row"><button aria-pressed="false">A</button><button aria-pressed="false">B</button></div></div>' +
+      '<ul><li id="offre-1"></li></ul>';
     const found = findOfferFilters();
     expect(found?.bar.id).toBe("bar");
     expect(found?.pills.id).toBe("row");
   });
   it("the extension's own toggles do not count", () => {
     document.body.innerHTML =
-      '<div><input type="search"><div class="kv-menu"><button aria-pressed="false"></button><button aria-pressed="false"></button></div></div>';
+      '<div><input type="search"><div class="kv-menu"><button aria-pressed="false"></button><button aria-pressed="false"></button></div></div>' +
+      '<ul><li id="offre-1"></li></ul>';
+    expect(findOfferFilters()).toBeNull();
+  });
+  it("a site window (modal) with a search field is never the filter bar: profile 'Choisir ma vitrine'", () => {
+    document.body.innerHTML =
+      '<nav><button aria-pressed="true">FR</button><button aria-pressed="false">EN</button></nav>' +
+      '<div class="back"><div role="dialog" aria-modal="true"><label><input type="search"></label>' +
+      '<div class="filters"><div class="pills"></div></div>' +
+      '<div><button aria-pressed="false">A</button><button aria-pressed="false">B</button></div></div></div>';
+    expect(findOfferFilters()).toBeNull();
+    document.body.insertAdjacentHTML("beforeend", '<ul><li id="offre-1"></li></ul>');
+    expect(findOfferFilters()).toBeNull();
+  });
+  it("fallback without offers on the page (profile, other pages): null", () => {
+    document.body.innerHTML =
+      '<div><input type="search"><div><button aria-pressed="false">A</button><button aria-pressed="false">B</button></div></div>';
+    expect(findOfferFilters()).toBeNull();
+  });
+  it("fallback stops below <body>: toggles elsewhere on the page are not the pills", () => {
+    document.body.innerHTML =
+      '<nav><button aria-pressed="true">FR</button><button aria-pressed="false">EN</button></nav>' +
+      '<div><input type="search"></div><ul><li id="offre-1"></li></ul>';
     expect(findOfferFilters()).toBeNull();
   });
   it("missing: null", () => {
