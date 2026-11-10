@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- HTML twin of CHANGELOG.md: keep both in sync. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kyara Extension Changelog</title>
+  <meta name="description" content="All notable changes to Kyara Extension, version by version.">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a class="brand" href="index.html"><img src="icon.svg" alt="">Kyara Extension</a>
+      <nav>
+        <a href="index.html">README</a>
+        <a href="changelog.html" aria-current="page">Changelog</a>
+      </nav>
+      <button id="theme" type="button">☾</button>
+    </div>
+  </header>
+
+  <main>
+    <h1>Changelog</h1>
+    <p>All notable changes to Kyara Extension. Format based on <a href="https://keepachangelog.com">Keep a Changelog</a>, versions follow <a href="https://semver.org">Semantic Versioning</a>.</p>
+
+    <section class="release">
+      <h2><a href="https://github.com/OverCapi/kyara-extension/compare/v0.3.0...dev">Unreleased</a></h2>
+      <p class="tag added">Added</p>
+      <ul>
+        <li>Booster page: "×N" option in the count picker that opens only your free boosters, without spending chakra. The site's chakra warning is skipped while it is chosen. If the site changes its opening request, the opening is cancelled and nothing is spent.</li>
+        <li>Wanted cards: list card names in the filter panel to highlight offers proposing them, with a toggle to hide the other offers.</li>
+        <li>Adjustable tint scale: choose the gain (10 to 200 %, default 100 %) at which an offer's color reaches full intensity.</li>
+        <li>Keyboard shortcuts: <kbd>F</kbd> opens or closes the filter panel, <kbd>P</kbd> turns profitability colors on or off.</li>
+        <li>Small spinner at the bottom right while fair-play prices are loading.</li>
+        <li>Extension icons.</li>
+      </ul>
+      <p class="tag changed">Changed</p>
+      <ul>
+        <li>Rarity ring: falls back to the "Rare · …" text when the card's color is unknown.</li>
+        <li>More robust to site updates: every site element is found with a fallback, and the extension's CSS no longer targets the site's classes.</li>
+      </ul>
+    </section>
+
+    <section class="release">
+      <h2><a href="https://github.com/OverCapi/kyara-extension/releases/tag/v0.3.0">0.3.0</a> <time datetime="2026-11-06">2026-11-06</time></h2>
+      <p class="tag added">Added</p>
+      <ul>
+        <li>"Donner" (give) buttons labelled with the gain (<code>+9◆ +5 %</code>, green or red) and sorted from most to least profitable.</li>
+        <li>Gain in % on the badges and under the ⇄ arrow.</li>
+        <li>"No other offer matches the filters" message when a load brings nothing.</li>
+        <li>Screenshot in the README.</li>
+      </ul>
+      <p class="tag changed">Changed</p>
+      <ul>
+        <li>Only cards you can actually give count in the gain (owned and not locked).</li>
+        <li>"Voir plus d'offres" loads 10 new visible offers per click, and waits for prices between loads.</li>
+        <li>Fewer fair-play price requests: only visible offers you can accept.</li>
+      </ul>
+      <p class="tag fixed">Fixed</p>
+      <ul>
+        <li>Give buttons are matched to owned cards despite the site's "(tu l'as)" suffix.</li>
+      </ul>
+    </section>
+
+    <section class="release">
+      <h2>0.2.1 <time datetime="2026-11-06">2026-11-06</time></h2>
+      <p class="note">No GitHub release: shipped with 0.3.0.</p>
+      <p class="tag changed">Changed</p>
+      <ul>
+        <li>Listed submission to addons.mozilla.org (store description in <code>amo-metadata.json</code>).</li>
+        <li>Whole repository translated to English.</li>
+      </ul>
+    </section>
+
+    <section class="release">
+      <h2><a href="https://github.com/OverCapi/kyara-extension/releases/tag/v0.2.0">0.2.0</a> <time datetime="2026-11-06">2026-11-06</time></h2>
+      <p class="tag added">Added</p>
+      <ul>
+        <li>Filter panel: funnel button next to the search field, with the site's filters and the extension's filters.</li>
+        <li>Rarity filter (multi-select) and sort by profitability.</li>
+        <li>Automatic "Voir plus d'offres" while a filter leaves too few visible offers, with a "Loading…" text on the button.</li>
+        <li>Automatic Firefox updates.</li>
+        <li>Release script (<code>pnpm release</code>).</li>
+      </ul>
+    </section>
+
+    <section class="release">
+      <h2><a href="https://github.com/OverCapi/kyara-extension/releases/tag/v0.1.0">0.1.0</a> <time datetime="2026-11-05">2026-11-05</time></h2>
+      <p class="tag added">Added</p>
+      <ul>
+        <li>First version: card values (<code>≈ G◆</code>, <code>G − W</code>), offer background tinted by profitability with an on/off pill, rarity ring, minimum market price on hover, "Gain min" filter.</li>
+        <li>Rewrite on WXT + TypeScript, with Vitest tests and Biome.</li>
+      </ul>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

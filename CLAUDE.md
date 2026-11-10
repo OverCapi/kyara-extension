@@ -261,6 +261,16 @@ But : comprendre un fichier **sans lire son code**. Les commentaires sont en **a
 
 ---
 
+## 6 ter. Docs : chaque Markdown pour humains a son jumeau HTML
+
+- **Tout fichier `.md` destiné à être lu par un humain a son équivalent HTML dans `docs/`** : `README.md` → `docs/index.html`, `CHANGELOG.md` → `docs/changelog.html`, `X.md` → `docs/x.html`.
+- Les pages partagent `docs/style.css` et `docs/script.js` (thème clair/sombre, bouton « Copy » sur les blocs de code). Pas de build, pas de dépendance : HTML/CSS/JS natifs, ouverts directement dans le navigateur.
+- **Toute modification d'un `.md` concerné est reportée dans son HTML dans le même changement**, et inversement. Un nouveau `.md` ajoute sa page HTML, un lien dans la `<nav>` de chaque page et une ligne dans le tableau « Documentation » du README (et de `docs/index.html`).
+- Non concernés : fichiers pour Claude ou les outils (`CLAUDE.md`, `CLAUDE.local.md`, `.claude/**`), notes personnelles non versionnées (`IDEA.md`).
+- `CHANGELOG.md` suit [Keep a Changelog](https://keepachangelog.com) : chaque feature ou correction ajoute une ligne sous `[Unreleased]` ; `pnpm release` se fait après avoir renommé `[Unreleased]` en version datée.
+
+---
+
 ## 7. Tests
 
 Les tests doivent être **complets** : chaque module de `core/`, `kyara/` et `features/` a son fichier `*.test.ts` à côté de lui.

@@ -1,0 +1,128 @@
+<!doctype html>
+<!-- HTML twin of README.md: keep both in sync. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kyara Extension</title>
+  <meta name="description" content="Firefox extension for kyara.games: card values, trade profitability, filters and free boosters.">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a class="brand" href="index.html"><img src="icon.svg" alt="">Kyara Extension</a>
+      <nav>
+        <a href="index.html" aria-current="page">README</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <button id="theme" type="button">☾</button>
+    </div>
+  </header>
+
+  <main>
+    <h1>Kyara Extension</h1>
+    <p>Firefox extension for <a href="https://kyara.games">kyara.games</a>: in the <strong>Marché → Échanges</strong> (Market → Trades) tab, it shows card values and the profitability of each offer, and lets you filter and sort offers. On the booster page, it can open only your free boosters.</p>
+    <p>Version history: <a href="changelog.html">Changelog</a>.</p>
+
+    <img class="shot" src="screenshot.png" alt="Trades tab with the extension: gain badges, best gain under the arrow, sorted &quot;Donner&quot; buttons">
+
+    <h2>Features</h2>
+
+    <h3>Trades tab</h3>
+    <ul>
+      <li>Badge on each card: <code>≈ G◆</code> on the offered card, <code>G − W</code> on the wanted cards (plus the gain in % on hover).</li>
+      <li>Under the ⇄ arrow: the best gain in % you can get from the offer.</li>
+      <li>"Donner" (give) buttons: compact, labelled with the gain (<code>+9◆ +5 %</code>, green or red) and sorted from most to least profitable.</li>
+      <li>Only cards you can actually give count (owned and not locked: the ones with a "Donner" button).</li>
+      <li>Offer background tinted from blue (gain) to red (loss), based on the best relative gain among those cards. The color reaches full intensity at ±100 % by default (adjustable from 10 to 200 % in the filter panel). "Profitability on/off" pill at the bottom left.</li>
+      <li>Ring around cards in their rarity's official color (read from the card's color, or from its "Rare · …" text).</li>
+      <li>Hovering a card: current minimum price on the market.</li>
+      <li>Small spinner at the bottom right while prices are loading.</li>
+    </ul>
+
+    <h3>Filter panel</h3>
+    <p>A funnel icon button, right of the search field, opens a popover with two sections.</p>
+    <ul>
+      <li><em>Kyara filters</em>: the site's pills (Que je n'ai pas, Que je peux accepter…), mirrored as is and grouped into categories.</li>
+      <li><em>Extension filters</em>:
+        <ul>
+          <li><strong>Profitability</strong>: Off / Neutral and up / Positive, plus a minimum gain slider (1 % steps);</li>
+          <li><strong>Rarity</strong>: one or more rarities of the offered card (none checked = all);</li>
+          <li><strong>Wanted cards</strong>: a list of card names (case and accents ignored). Offers proposing one of them are highlighted, and a toggle can hide all the others;</li>
+          <li><strong>Sort</strong>: offers ranked from most to least profitable;</li>
+          <li><strong>Offer colors</strong>: gain at which the tint reaches full intensity.</li>
+        </ul>
+      </li>
+    </ul>
+    <p>Filtered or sorted offers never show before being processed (no flicker). When a filter is on, "Voir plus d'offres" (load more) keeps loading until 10 offers are visible at page load, and 10 new visible offers after each click (at most 25 loads in a row, waiting for prices between loads). The button shows a loading text meanwhile, and "No other offer matches the filters" shows when a load brings nothing.</p>
+
+    <h3>Keyboard shortcuts</h3>
+    <table>
+      <thead><tr><th>Key</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>F</kbd></td><td>Open or close the filter panel</td></tr>
+        <tr><td><kbd>P</kbd></td><td>Turn profitability colors on or off</td></tr>
+      </tbody>
+    </table>
+    <p>Shortcuts are ignored while typing in a text field, or with Ctrl, Alt or Cmd held.</p>
+
+    <h3>Booster page</h3>
+    <ul>
+      <li>A "×N" option in the booster count picker opens exactly your free boosters, without spending chakra. The site's chakra warning is skipped while this option is chosen.</li>
+      <li>If the site changes its opening request, the extension cancels the opening instead of sending it as is: nothing is spent.</li>
+    </ul>
+
+    <h3>General</h3>
+    <ul>
+      <li>Unknown values show nothing (never a <code>?</code>).</li>
+      <li>Texts in French and English, depending on the browser language.</li>
+    </ul>
+    <p>This is not a bot: the extension never acts on your behalf. It reads the responses the site already loads, and only makes a few grouped requests (<code>/api/fair-play/prices</code>, max 200 ids) limited to visible offers you can accept (paused 5 min after a failed response), plus one request per hovered card.</p>
+    <p>Stack: <a href="https://wxt.dev">WXT</a> + TypeScript. Project rules: <a href="../CLAUDE.md">CLAUDE.md</a>.</p>
+    <p>Displayed texts live in <a href="../src/locales/en.json"><code>src/locales/en.json</code></a> and <a href="../src/locales/fr.json"><code>src/locales/fr.json</code></a>: no visible text is written in the code.</p>
+
+    <h2>Development</h2>
+    <pre><code>pnpm install</code></pre>
+    <pre><code>pnpm dev</code></pre>
+    <p><code>pnpm dev</code> opens Firefox on the Trades tab with the extension, and reloads it on every change. Firefox uses a separate profile, kept in <code>.firefox-profile/</code> (not versioned): log in to kyara.games only once. <code>[kyara-extension:…]</code> logs show in the page console (F12) and in <code>about:debugging</code> → Inspect for the background script.</p>
+    <pre><code>pnpm build:debug</code></pre>
+    <p>Non-minified build with logs, in <code>.output/firefox-mv2-dev/</code>.</p>
+
+    <h2>Installation (production build)</h2>
+    <pre><code>pnpm build</code></pre>
+    <ol>
+      <li>Open <code>about:debugging#/runtime/this-firefox</code>.</li>
+      <li>"Load Temporary Add-on…" → pick <code>.output/firefox-mv2/manifest.json</code>.</li>
+      <li>Private browsing: <code>about:addons</code> → Kyara Extension → "Run in Private Windows" → Allow.</li>
+    </ol>
+    <p>The production build contains no logs.</p>
+
+    <h2>Release</h2>
+    <pre><code>pnpm release</code></pre>
+    <p>Run from an up-to-date <code>main</code>, after bumping <code>"version"</code> in <code>package.json</code> and adding its entry to <a href="../CHANGELOG.md">CHANGELOG.md</a> (and <a href="changelog.html">changelog.html</a>). The script checks the code, submits the version to addons.mozilla.org with its sources and <a href="../amo-metadata.json"><code>amo-metadata.json</code></a> (AMO keys in <code>.env</code>, see <a href="../scripts/release.sh"><code>scripts/release.sh</code></a>), then creates a GitHub release (tag + changelog). Once Mozilla approves the version, it is published on the store and installed copies update themselves.</p>
+
+    <h2>Chrome (partial)</h2>
+    <pre><code>pnpm build:chrome</code></pre>
+    <p>Chrome build (Manifest V3) in <code>.output/chrome-mv3/</code>, to load through <code>chrome://extensions</code> → Developer mode → "Load unpacked". The passive price cache only exists on Firefox: on Chrome, prices only come from the fair-play requests, so fewer badges. Firefox stays the reference target.</p>
+
+    <h2>Tests and checks</h2>
+    <pre><code>pnpm test</code></pre>
+    <pre><code>pnpm test:coverage</code></pre>
+    <pre><code>pnpm check</code></pre>
+
+    <h2>Documentation</h2>
+    <p>Every Markdown file meant for humans has an HTML twin in <code>docs/</code>, sharing <code>style.css</code> and <code>script.js</code>:</p>
+    <table>
+      <thead><tr><th>Markdown</th><th>HTML</th></tr></thead>
+      <tbody>
+        <tr><td><a href="../README.md">README.md</a></td><td><a href="index.html">docs/index.html</a></td></tr>
+        <tr><td><a href="../CHANGELOG.md">CHANGELOG.md</a></td><td><a href="changelog.html">docs/changelog.html</a></td></tr>
+      </tbody>
+    </table>
+    <p>Open the HTML files directly in a browser: no build needed.</p>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
