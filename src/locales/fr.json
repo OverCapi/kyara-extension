@@ -56,8 +56,17 @@
   "profile.design.stage": "Scène",
   "profile.design.ribbon": "Ruban",
   "profile.design.fan": "Éventail",
-  "profile.design.mosaic": "Mosaïque",
   "profile.design.orbit": "Orbite",
   "profile.design.prism": "Prisme",
-  "profile.design.site": "Site d'origine"
+  "profile.design.site": "Site d'origine",
+  "profile.design.gallery": "Galerie",
+  "profile.sec.collection": "Collection",
+  "profile.sec.unique": "{owned} / {total} cartes uniques",
+  "profile.sec.universes": "Ses univers",
+  "profile.sec.trades": "Échanges",
+  "profile.sec.wants_m": "Il cherche",
+  "profile.sec.wants_f": "Elle cherche",
+  "profile.sec.offers_m": "Il échange",
+  "profile.sec.offers_f": "Elle échange",
+  "profile.sec.no_trades": "Aucune carte recherchée ni proposée pour l'instant."
 }

@@ -1,5 +1,5 @@
-/* Shared look of the profile designs. Every design but fan turns each case into a poster filled by the card's
-   art; fan keeps the site's whole card. Everything is scoped to data-kv-design on <html>, set by index.ts.
+/* Shared look of the profile designs. Every design but fan and gallery turns each case into a poster filled by
+   the card's art; fan and gallery keep the site's whole card. Everything is scoped to data-kv-design on <html>, set by index.ts.
    :not(#_) raises the specificity above the site's own rules. */
 @property --kv-spin {
   syntax: "<angle>";
@@ -36,7 +36,7 @@ html[data-kv-design]:not(#_) [data-kv-show-case] {
 
 /* Poster: the wrappers vanish, the art fills the case, name and stats sit on it. */
 /* :where() so that this rule weighs the same as the per-design rules, which come later and win. */
-html[data-kv-design]:where(:not([data-kv-design="fan"])):not(#_) {
+html[data-kv-design]:where(:not([data-kv-design="fan"], [data-kv-design="gallery"])):not(#_) {
   [data-kv-show-wrap] {
     display: contents;
   }
@@ -179,5 +179,20 @@ html[data-kv-design]:where(:not([data-kv-design="fan"])):not(#_) {
     padding: 3px 8px;
     border-radius: 6px;
     background: #ffffff1f;
+  }
+}
+
+/* Whole-card designs (fan, gallery): the site's frame around the card goes, the card and its sleeve stay. */
+html:is([data-kv-design="fan"], [data-kv-design="gallery"]):not(#_) {
+  [data-kv-show-wrap="outer"] {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    transform: none;
+  }
+  [data-kv-show-wrap="outer"]::before,
+  [data-kv-show-wrap="outer"]::after,
+  [data-kv-show-wrap="outer"] > [data-kv-show-extra] {
+    display: none;
   }
 }

@@ -22,17 +22,20 @@ import type { Feature } from "../types";
 import { createAmbient } from "./ambient";
 import { type ProfileDesign, toDesign } from "./designs";
 import { createDesignPicker } from "./picker";
-import "./layout.css";
-import "./stats.css";
-import "./poster.css";
-import "./stage.css";
-import "./ribbon.css";
-import "./mosaic.css";
-import "./fan.css";
-import "./orbit.css";
-import "./prism.css";
-import "./responsive.css";
-import "./picker.css";
+import { createProfileSections } from "./sections";
+import "./styles/page/layout.css";
+import "./styles/page/stats.css";
+import "./styles/designs/poster.css";
+import "./styles/designs/stage.css";
+import "./styles/designs/ribbon.css";
+import "./styles/designs/gallery.css";
+import "./styles/designs/fan.css";
+import "./styles/designs/orbit.css";
+import "./styles/designs/prism.css";
+import "./sections/sections.css";
+import "./sections/themes.css";
+import "./styles/page/responsive.css";
+import "./styles/page/picker.css";
 
 const DESIGN_ATTR = "data-kv-design";
 /** Set once the page is marked: until then the CSS keeps the page hidden, for a moment at most. */
@@ -50,6 +53,7 @@ export const profileShowcase: Feature = {
   setup(ctx) {
     const html = document.documentElement;
     const ambient = createAmbient();
+    const sections = createProfileSections(ctx.page);
     let design: ProfileDesign | null = null; // null until the stored choice is read
     let layout: ProfileLayout | null = null;
 
@@ -60,6 +64,7 @@ export const profileShowcase: Feature = {
       picker.select(design);
       layout = onProfile ? findProfileLayout() : null;
       picker.setVisible(layout !== null);
+      sections.update(layout, design !== "site");
       html.toggleAttribute(READY_ATTR, layout !== null);
       if (!layout) return;
       markProfileLayout(layout);

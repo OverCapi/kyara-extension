@@ -65,20 +65,11 @@ html[data-kv-design="fan"]:not(#_) {
     translate: -12px 0;
   }
 
-  /* the site's frame around the card goes; the card itself breathes */
+  /* the card breathes (the frame around it is removed in poster.css) */
   [data-kv-show-wrap="outer"] {
-    padding: 0;
-    background: none;
-    box-shadow: none;
-    transform: none;
     animation: kv-fan-breathe 3.6s ease-in-out calc(var(--kv-i, 0) * -0.45s) infinite alternate;
   }
   [data-kv-show-case]:hover [data-kv-show-wrap="outer"] {
     animation-play-state: paused;
-  }
-  [data-kv-show-wrap="outer"]::before,
-  [data-kv-show-wrap="outer"]::after,
-  [data-kv-show-wrap="outer"] > [data-kv-show-extra] {
-    display: none;
   }
 }

@@ -1,5 +1,5 @@
-/* ORBITE: the posters turn slowly on a 3D ring, always facing the viewer: the ones at the back look smaller and
-   dimmer, seen slightly from above. The ring stops while the pointer (or the keyboard focus) is on it. Nothing
+/* ORBITE: the posters turn slowly on a 3D ring, always facing the viewer and fully opaque: the ones at the back
+   look smaller, seen slightly from above, and the front ones cover them. The ring stops while the pointer (or the keyboard focus) is on it. Nothing
    leaves the ring's own box.
    :not(#_) raises the specificity above the site's own rules. */
 @property --kv-orbit {
@@ -15,6 +15,9 @@
 @keyframes kv-orbit-in {
   from {
     opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -38,8 +41,6 @@ html[data-kv-design="orbit"]:not(#_) {
     margin-left: -110px;
     --kv-r: max(200px, var(--kv-n) * 40px);
     transform: rotateY(var(--kv-a)) translateZ(var(--kv-r)) rotateY(calc(-1 * var(--kv-a)));
-    /* 1 in front, fading towards the back */
-    opacity: calc(0.3 + 0.7 * (cos(var(--kv-a)) + 1) / 2);
     animation:
       kv-orbit-in 0.8s ease-out both calc(var(--kv-i, 0) * 70ms),
       kv-orbit-spin 40s linear infinite;
@@ -79,7 +80,6 @@ html[data-kv-design="orbit"]:not(#_) {
       top: auto;
       left: auto;
       margin-left: 0;
-      opacity: 1;
       animation: kv-orbit-in 0.8s ease-out both calc(var(--kv-i, 0) * 70ms);
     }
   }

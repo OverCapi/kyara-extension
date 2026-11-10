@@ -56,8 +56,17 @@
   "profile.design.stage": "Stage",
   "profile.design.ribbon": "Ribbon",
   "profile.design.fan": "Fan",
-  "profile.design.mosaic": "Mosaic",
   "profile.design.orbit": "Orbit",
   "profile.design.prism": "Prism",
-  "profile.design.site": "Original site"
+  "profile.design.site": "Original site",
+  "profile.design.gallery": "Gallery",
+  "profile.sec.collection": "Collection",
+  "profile.sec.unique": "{owned} / {total} unique cards",
+  "profile.sec.universes": "Their universes",
+  "profile.sec.trades": "Trades",
+  "profile.sec.wants_m": "Looking for",
+  "profile.sec.wants_f": "Looking for",
+  "profile.sec.offers_m": "Trading away",
+  "profile.sec.offers_f": "Trading away",
+  "profile.sec.no_trades": "No card wanted or offered yet."
 }
