@@ -3,6 +3,7 @@ import {
   cardArt,
   findProfileLayout,
   findShowcase,
+  findShowcaseEditButton,
   isProfilePath,
   markProfileLayout,
   markShowcase,
@@ -206,5 +207,18 @@ describe("marks", () => {
   });
   it("no case: nothing happens", () => {
     expect(() => markShowcase([])).not.toThrow();
+  });
+});
+
+describe("findShowcaseEditButton", () => {
+  it("site markup, then the button's text, otherwise nothing", () => {
+    document.body.innerHTML =
+      '<div class="show-h"><h2>Vitrine</h2><button>✎ Choisir ma vitrine</button></div>';
+    expect(findShowcaseEditButton()?.textContent).toContain("Choisir");
+    document.body.innerHTML =
+      '<div class="x"><button>Autre</button><button>✎ Choisir ma vitrine</button></div>';
+    expect(findShowcaseEditButton()?.textContent).toContain("Choisir");
+    document.body.innerHTML = '<div class="show-h"><h2>Sa vitrine</h2></div><button>Bloquer</button>';
+    expect(findShowcaseEditButton()).toBeNull();
   });
 });

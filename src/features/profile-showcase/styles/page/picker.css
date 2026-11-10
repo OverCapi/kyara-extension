@@ -1,35 +1,36 @@
-/* Design picker: floating bar bottom right, in the site's colors. Only the active design shows its name. */
+/* Design picker: a compact pill next to the site's "Choisir ma vitrine" button, in the site's colours.
+   Only the active design shows its name; the others show their icon (name in the tooltip). */
 .kv-design {
-  position: fixed;
-  z-index: 2147483646;
-  right: 20px;
-  bottom: 20px;
-  display: flex;
+  display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  padding: 5px;
+  gap: 2px;
+  padding: 3px;
   border: 1px solid var(--line2, #2e2b36);
   border-radius: var(--r-pill, 999px);
-  background: #15141ae6;
-  box-shadow: var(--sh-2, 0 18px 40px #0000008c);
+  background: #15141acc;
   font: 500 var(--t-sm, 12px) / 1.4 var(--body, system-ui, sans-serif);
-  backdrop-filter: blur(14px);
+  vertical-align: middle;
+  backdrop-filter: blur(10px);
 }
-.kv-design[hidden] {
-  display: none;
+/* the site's showcase header spreads its items apart: keep the title on the left, the button and the picker
+   together on the right (wrapping under the title when the row is too narrow). :not(#_) outweighs the site. */
+:has(> .kv-design):not(#_) {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
-.kv-design-title {
-  padding: 0 10px 0 12px;
-  color: var(--fg2, #b7b2bd);
+:has(> .kv-design):not(#_) > :first-child {
+  margin-right: auto;
 }
 .kv-design button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0 12px;
+  gap: 6px;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 9px;
   border: 0;
   border-radius: var(--r-pill, 999px);
   background: none;
@@ -61,20 +62,18 @@
 }
 .kv-design svg {
   flex: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
-/* Phone: full width, above the site's bottom bar. */
+/* Phone: on its own line under the title, buttons large enough for a finger. */
 @media (max-width: 760px) {
   .kv-design {
-    right: 16px;
-    bottom: 92px;
-    left: 16px;
-    justify-content: space-between;
+    margin: 8px 0 0;
   }
-  .kv-design-title {
-    display: none;
+  .kv-design button {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

@@ -62,7 +62,7 @@ kyara-extension/
     │   ├── load-more/       # Clique « Voir plus d'offres » tant qu'un filtre laisse trop peu d'offres visibles, le bouton affichant « Chargement… » pendant le chargement
     │   ├── market-tooltip/  # Infobulle "Min marché" au survol
     │   ├── free-packs/      # Option « ×N » (boosters gratuits) dans le sélecteur de la page d'ouverture
-    │   └── profile-showcase/ # Refonte de la page profil : stats, vitrine (6 designs, styles/), Collection et Échanges sur la même page (sections/), barre de choix
+    │   └── profile-showcase/ # Refonte de la page profil : stats, vitrine (6 designs, styles/), Collection et Échanges sur la même page (sections/), choix du design à côté de « Choisir ma vitrine »
     │
     ├── kyara/               # Tout ce qui dépend du site kyara.games (si le site change, on modifie ici)
     │   ├── api.ts           # Appels à /api avec le jeton et le device id du site
@@ -181,6 +181,7 @@ L'extension tourne sur chaque page de kyara.games. Elle ne doit jamais ralentir 
 - **Un seul `MutationObserver`**, avec debounce (≈300 ms) : on ne recalcule pas à chaque mutation du DOM.
 - **Ne jamais ajouter de nœuds dans l'arbre DOM géré par le site.** On pose des attributs `data-kv-*`, et le CSS les affiche. Les éléments flottants (pastille, infobulle) sont ajoutés à `<html>`, hors de l'arbre du site.
   - Exception voulue n° 2 : l'option « ×N » de `features/free-packs/`, placée dans le sélecteur de boosters du site, réinsérée à chaque rendu.
+  - Exception voulue n° 4 : la rangée de choix du design (`features/profile-showcase/picker.ts`), placée juste après le bouton « Choisir ma vitrine » de son propre profil, réinsérée à chaque rendu.
   - Exception voulue n° 3 : les sections Collection et Échanges de `features/profile-showcase/sections/`, placées à la fin de la colonne principale de la page profil, réinsérées à chaque rendu.
   - Exception voulue n° 1 : le bouton du panneau de filtres (`kyara/filter-panel/`), placé dans la barre de filtres du site. Il est réinséré à chaque rendu si le site le retire. Les pastilles d'origine du site sont cachées par CSS (attribut `data-kv-panel` sur la rangée de pastilles) et reflétées dans le panneau : un clic sur la copie clique l'original, rien n'est déplacé.
 - **Requêtes réseau minimales** : lire d'abord le cache passif, regrouper les requêtes (max 200 ids, comme le site), ne pas réessayer un id en échec avant un délai, ne rien demander si l'onglet est caché.

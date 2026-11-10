@@ -1,13 +1,17 @@
-// Design picker of the profile page: a small floating bar, bottom right, one button per design.
-// Appended to <html>, outside the site's tree. Shows the name of the active design only, to stay compact.
+// Design picker of the profile page: a compact row of buttons, one per design, placed right after the site's
+// "Choisir ma vitrine" button (so only on one's own profile: the chosen design then applies to every profile).
+// Deliberate EXCEPTION n°4 to the "no node in the site's DOM" rule, put back on every render.
+// Shows the name of the active design only, to stay compact.
 import { t } from "../../core/i18n";
-import { listen, mountFloating, type PageContext } from "../../core/page";
+import { listen, type PageContext } from "../../core/page";
 import { DESIGNS, type DesignInfo, type ProfileDesign } from "./designs";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 export interface DesignPicker {
-  setVisible(visible: boolean): void;
+  /** Puts the picker right after `anchor` (the "Choisir ma vitrine" button); `null`: removed. */
+  place(anchor: Element | null): void;
+  /** Shows which design is active. */
   select(design: ProfileDesign): void;
 }
 
@@ -39,24 +43,21 @@ function makeButton(info: DesignInfo): HTMLButtonElement {
   return button;
 }
 
-/** Creates the bar, hidden. `onPick` is called when the user chooses a design. */
+/** Creates the picker, not placed. `onPick` is called when the user chooses a design. */
 export function createDesignPicker(page: PageContext, onPick: (design: ProfileDesign) => void): DesignPicker {
   const bar = document.createElement("div");
-  const title = document.createElement("span");
   const buttons = new Map(DESIGNS.map((info) => [info.id, makeButton(info)]));
   bar.className = "kv-design";
-  bar.hidden = true;
   bar.setAttribute("role", "group");
   bar.setAttribute("aria-label", t("profile.design.title"));
-  title.className = "kv-design-title";
-  title.textContent = t("profile.design.short");
-  bar.append(title, ...buttons.values());
-  mountFloating(page, bar);
+  bar.append(...buttons.values());
+  page.onInvalidated(() => bar.remove());
 
   for (const [id, button] of buttons) listen(page, button, "click", () => onPick(id));
   return {
-    setVisible(visible) {
-      bar.hidden = !visible;
+    place(anchor) {
+      if (!anchor) bar.remove();
+      else if (anchor.nextElementSibling !== bar) anchor.after(bar);
     },
     select(design) {
       for (const [id, button] of buttons) button.setAttribute("aria-pressed", String(id === design));

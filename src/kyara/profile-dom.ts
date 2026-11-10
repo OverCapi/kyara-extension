@@ -83,6 +83,16 @@ function findProfileTabs(main: Element): Element | null {
   return first && first.querySelectorAll(":scope > button").length >= 2 ? first : null;
 }
 
+/**
+ * "Choisir ma vitrine" button, only on one's own profile. Site markup: `.show-h > button`. Fallback: a button
+ * whose text says to choose the showcase. `null` if missing (someone else's profile).
+ */
+export function findShowcaseEditButton(root: ParentNode = document): HTMLButtonElement | null {
+  const marked = root.querySelector<HTMLButtonElement>(".show-h > button");
+  const all = [...root.querySelectorAll<HTMLButtonElement>("button")];
+  return marked ?? all.find((b) => /choisir.*vitrine|edit.*showcase/i.test(b.textContent ?? "")) ?? null;
+}
+
 /** Fallback: buttons with a card image, next to a heading saying "vitrine" (empty on the other tabs). */
 function fallbackCases(root: ParentNode): HTMLElement[] {
   const heading = [...root.querySelectorAll("h2")].find((h) => /vitrine|showcase/i.test(h.textContent ?? ""));

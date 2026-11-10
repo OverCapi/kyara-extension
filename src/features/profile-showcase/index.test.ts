@@ -16,7 +16,7 @@ function renderProfile(ids: number[] = [1, 2]): void {
         `<img src="https://cdn.kyara.games/cards/sm/${id}.webp"></div></div></span></button>`,
     )
     .join("");
-  document.body.innerHTML = `<section><div><aside class="side"><h1>K</h1><div class="kpis"><div></div><div></div></div></aside><div><div class="cases">${cases}</div></div></div></section>`;
+  document.body.innerHTML = `<section><div><aside class="side"><h1>K</h1><div class="kpis"><div></div><div></div></div></aside><div><section><div class="show-h"><h2>Tes plus belles cartes</h2><button>✎ Choisir ma vitrine</button></div><div class="cases">${cases}</div></section></div></div></section>`;
 }
 
 async function start(design?: string) {
@@ -69,7 +69,7 @@ describe("profile-showcase", () => {
     f.emit({ offers: [], store: { fair: {}, market: {} } });
     expect(html.getAttribute("data-kv-design")).toBe(DEFAULT_DESIGN);
     expect(html.hasAttribute("data-kv-prof-ready")).toBe(true);
-    expect(picker()?.hidden).toBe(false);
+    expect(picker()?.previousElementSibling?.textContent).toContain("Choisir ma vitrine");
     expect(document.querySelectorAll("[data-kv-show-case]")).toHaveLength(2);
     expect(document.querySelector("[data-kv-stat=coll]")).not.toBeNull();
     expect(document.querySelector("[data-kv-prof=page]")?.getAttribute("data-kv-bd")).toBe("a");
@@ -96,7 +96,7 @@ describe("profile-showcase", () => {
     await start();
     designButton("site")?.click();
     expect(html.hasAttribute("data-kv-design")).toBe(false);
-    expect(picker()?.hidden).toBe(false);
+    expect(picker()).not.toBeNull();
     expect(designButton("site")?.getAttribute("aria-pressed")).toBe("true");
   });
   it("follows a change from another tab", async () => {
@@ -104,12 +104,19 @@ describe("profile-showcase", () => {
     await browser.storage.local.set({ profileDesign: "fan" });
     await vi.waitFor(() => expect(html.getAttribute("data-kv-design")).toBe("fan"));
   });
+  it('someone else\'s profile (no "Choisir ma vitrine" button): redesign, but no picker', async () => {
+    document.querySelector(".show-h button")?.remove();
+    const f = startFeature(profileShowcase);
+    await vi.waitFor(() => expect(html.getAttribute("data-kv-design")).toBe(DEFAULT_DESIGN));
+    f.emit({ offers: [], store: { fair: {}, market: {} } });
+    expect(picker()).toBeNull();
+  });
   it("outside a profile: no redesign, no picker", async () => {
     window.history.replaceState({}, "", "/marche");
     await start();
     expect(html.hasAttribute("data-kv-design")).toBe(false);
     expect(html.hasAttribute("data-kv-prof-ready")).toBe(false);
-    expect(picker()?.hidden).toBe(true);
+    expect(picker()).toBeNull();
   });
   it("leaving the profile removes the redesign", async () => {
     const f = await start();
@@ -120,7 +127,7 @@ describe("profile-showcase", () => {
   it("site changed: profile path without the layout, no picker and nothing marked", async () => {
     document.body.innerHTML = "<p>?</p>";
     await start();
-    expect(picker()?.hidden).toBe(true);
+    expect(picker()).toBeNull();
     expect(document.querySelector("[data-kv-show-case]")).toBeNull();
   });
   it("the backdrop follows the hovered or focused card", async () => {

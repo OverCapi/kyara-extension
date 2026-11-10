@@ -1,5 +1,5 @@
 /* ORBITE: the posters turn slowly on a 3D ring, always facing the viewer and fully opaque: the ones at the back
-   look smaller, seen slightly from above, and the front ones cover them. The ring stops while the pointer (or the keyboard focus) is on it. Nothing
+   look smaller, seen slightly from above, and the front ones cover them. The ring stops while the pointer (or the keyboard focus) is on it, all cards together. Nothing
    leaves the ring's own box.
    :not(#_) raises the specificity above the site's own rules. */
 @property --kv-orbit {
@@ -41,17 +41,24 @@ html[data-kv-design="orbit"]:not(#_) {
     margin-left: -110px;
     --kv-r: max(200px, var(--kv-n) * 40px);
     transform: rotateY(var(--kv-a)) translateZ(var(--kv-r)) rotateY(calc(-1 * var(--kv-a)));
+    /* never transition the position: it changes on every frame of the spin, a transition makes the card lag
+       behind the others (gaps change, cards pass over each other) */
+    transition:
+      scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.3s;
     animation:
       kv-orbit-in 0.8s ease-out both calc(var(--kv-i, 0) * 70ms),
       kv-orbit-spin 40s linear infinite;
   }
+  /* the ring stops under the pointer, or while a card has the keyboard focus (a click leaves the focus on the
+     card: :focus-within would keep the ring stopped after the card's zoom is closed) */
   [data-kv-show-list]:hover [data-kv-show-case],
-  [data-kv-show-list]:focus-within [data-kv-show-case] {
+  [data-kv-show-list]:has(:focus-visible) [data-kv-show-case] {
     animation-play-state: running, paused;
   }
   [data-kv-show-case]:hover,
   [data-kv-show-case]:focus-visible {
-    transform: rotateY(var(--kv-a)) translateZ(var(--kv-r)) rotateY(calc(-1 * var(--kv-a))) scale(1.06);
+    scale: 1.06;
     box-shadow:
       0 30px 60px -20px color-mix(in srgb, var(--kv-rar) 60%, #000),
       inset 0 0 0 2px var(--kv-rar);

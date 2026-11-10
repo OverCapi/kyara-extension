@@ -1,6 +1,6 @@
 // Redesign of the public profile page: the showcase cards take center stage, with their full art, and the
 // profile becomes a wide header over an ambient backdrop. Several designs, chosen live from a small floating
-// bar (designs.ts, picker.ts); "site" keeps the site's own look.
+// row next to the "Choisir ma vitrine" button (designs.ts, picker.ts); "site" keeps the site's own look.
 // Only attributes and CSS variables go on the site's nodes (kyara/profile-dom.ts); the CSS does the rest.
 // Every redesign rule is scoped to data-kv-design on <html>: removing it restores the site at once.
 // Storage: profileDesign key. Network: the large card images, loaded by the browser from the site's CDN.
@@ -12,6 +12,7 @@ import { createStorageSync } from "../../core/storage-sync";
 import {
   findProfileLayout,
   findShowcase,
+  findShowcaseEditButton,
   isProfilePath,
   markProfileLayout,
   markShowcase,
@@ -63,7 +64,7 @@ export const profileShowcase: Feature = {
       applyDesignAttr(design, onProfile);
       picker.select(design);
       layout = onProfile ? findProfileLayout() : null;
-      picker.setVisible(layout !== null);
+      picker.place(layout ? findShowcaseEditButton() : null);
       sections.update(layout, design !== "site");
       html.toggleAttribute(READY_ATTR, layout !== null);
       if (!layout) return;
