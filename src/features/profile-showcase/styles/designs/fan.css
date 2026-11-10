@@ -1,0 +1,75 @@
+/* ÉVENTAIL: a hand of whole cards, as the site draws them. Each card sits in a grid column and only overlaps its
+   neighbours, so the hand never grows wider than the page. The cards are dealt from the middle, breathe gently,
+   and the hovered card rises while its neighbours make room.
+   :not(#_) raises the specificity above the site's own rules. */
+@keyframes kv-fan-deal {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--kv-off) * -62%)) translateY(60px) scale(0.9);
+  }
+}
+@keyframes kv-fan-breathe {
+  to {
+    translate: 0 -6px;
+  }
+}
+
+html[data-kv-design="fan"]:not(#_) {
+  [data-kv-show-list] {
+    display: grid;
+    grid-template-columns: repeat(var(--kv-n, 8), minmax(0, 1fr));
+    align-items: end;
+    box-sizing: border-box;
+    width: min(100% - 64px, var(--kv-n, 8) * 150px);
+    margin: 10px auto 0;
+    /* room for the first and last cards: they overhang their column by 30 %, plus their tilt */
+    padding: 56px calc(30% / var(--kv-n, 8) + 40px) 28px;
+  }
+  [data-kv-show-case] {
+    --kv-off: calc(var(--kv-i) - (var(--kv-n) - 1) / 2);
+    --kv-abs: max(var(--kv-off), -1 * var(--kv-off));
+    z-index: var(--kv-i);
+    justify-self: center;
+    align-items: stretch;
+    width: 160%;
+    max-width: 250px;
+    margin-inline: -30%;
+    transform-origin: 50% 100%;
+    transform: translateY(calc(var(--kv-abs) * var(--kv-abs) * 4px)) rotate(calc(var(--kv-off) * 3.5deg));
+    transition:
+      transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+      translate 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: kv-fan-deal 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--kv-i, 0) * 60ms);
+  }
+  [data-kv-show-case]:hover,
+  [data-kv-show-case]:focus-visible {
+    z-index: 30;
+    transform: translateY(-30px) rotate(0deg) scale(1.08);
+  }
+  [data-kv-show-case]:hover [data-kv-show-card],
+  [data-kv-show-case]:focus-visible [data-kv-show-card] {
+    box-shadow: 0 28px 50px -14px color-mix(in srgb, var(--kv-rar) 70%, #000);
+  }
+  /* the neighbours step aside */
+  [data-kv-show-case]:hover + [data-kv-show-case] {
+    translate: 26px 0;
+  }
+  [data-kv-show-case]:hover + * + [data-kv-show-case] {
+    translate: 12px 0;
+  }
+  [data-kv-show-case]:has(+ [data-kv-show-case]:hover) {
+    translate: -26px 0;
+  }
+  [data-kv-show-case]:has(+ * + [data-kv-show-case]:hover) {
+    translate: -12px 0;
+  }
+
+  /* the card breathes (the frame around it is removed in poster.css) */
+  [data-kv-show-wrap="outer"] {
+    animation: kv-fan-breathe 3.6s ease-in-out calc(var(--kv-i, 0) * -0.45s) infinite alternate;
+  }
+  [data-kv-show-case]:hover [data-kv-show-wrap="outer"] {
+    animation-play-state: paused;
+  }
+}

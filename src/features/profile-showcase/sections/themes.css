@@ -1,0 +1,122 @@
+/* The Collection and Trades sections follow the chosen design: an accent colour for the bars, and card strips
+   that echo the showcase (strips that open, a hand of cards, a cover flow, framed pictures, iridescent rims). */
+html[data-kv-design="ribbon"] .kv-psecs {
+  --kv-accent: var(--gold, #f5c518);
+}
+html[data-kv-design="gallery"] .kv-psecs {
+  --kv-accent: #e8d6ad;
+}
+html[data-kv-design="fan"] .kv-psecs {
+  --kv-accent: var(--wish, #ff4d9e);
+}
+html[data-kv-design="orbit"] .kv-psecs {
+  --kv-accent: var(--cyan, #4dd6ff);
+}
+html[data-kv-design="prism"] .kv-psecs {
+  --kv-accent: var(--E, #b072ff);
+}
+
+/* RUBAN: the strip becomes narrow bands that open under the pointer */
+html[data-kv-design="ribbon"] .kv-strip {
+  display: flex;
+  height: 230px;
+  overflow: hidden;
+}
+html[data-kv-design="ribbon"] .kv-tile {
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: auto;
+  transition: flex-grow 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html[data-kv-design="ribbon"] .kv-tile:hover,
+html[data-kv-design="ribbon"] .kv-tile:focus-visible {
+  flex-grow: 3.5;
+  transform: none;
+}
+html[data-kv-design="ribbon"] .kv-tile:not(:hover, :focus-visible) :is(.kv-tile-name, .kv-tile-sub) {
+  opacity: 0;
+}
+
+/* ÉVENTAIL: overlapping cards, slightly tilted, that rise and straighten */
+html[data-kv-design="fan"] .kv-strip {
+  gap: 0;
+  padding: 26px 24px 14px;
+}
+html[data-kv-design="fan"] .kv-tile {
+  margin-left: -34px;
+  rotate: -2deg;
+}
+html[data-kv-design="fan"] .kv-tile:nth-child(even) {
+  rotate: 2deg;
+}
+html[data-kv-design="fan"] .kv-tile:first-child {
+  margin-left: 0;
+}
+html[data-kv-design="fan"] .kv-tile:hover,
+html[data-kv-design="fan"] .kv-tile:focus-visible {
+  z-index: 2;
+  rotate: 0deg;
+  transform: translateY(-16px) scale(1.06);
+}
+
+/* ORBITE: a cover flow, the tiles turned in depth until hovered */
+html[data-kv-design="orbit"] .kv-strip {
+  padding-block: 18px;
+  perspective: 900px;
+}
+html[data-kv-design="orbit"] .kv-tile {
+  transform: rotateY(24deg);
+}
+html[data-kv-design="orbit"] .kv-tile:hover,
+html[data-kv-design="orbit"] .kv-tile:focus-visible {
+  transform: rotateY(0deg) scale(1.06);
+}
+
+/* GALERIE: framed pictures with a passe-partout, lit from above */
+html[data-kv-design="gallery"] .kv-psec {
+  background:
+    radial-gradient(60% 50% at 50% 0, #fff3d914, transparent 70%),
+    linear-gradient(160deg, #1b1922c7, #100f15c7);
+}
+html[data-kv-design="gallery"] .kv-tile {
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 5px #efe5cf1f,
+    0 0 0 6px #efe5cf40,
+    0 16px 26px -14px #000;
+}
+html[data-kv-design="gallery"] .kv-strip {
+  gap: 22px;
+  padding: 14px 10px 20px;
+}
+
+/* PRISME: iridescent turning rims */
+html[data-kv-design="prism"] .kv-tile {
+  padding: 2px;
+  background: conic-gradient(
+    from var(--kv-spin),
+    var(--kv-rar, #fff),
+    #4dd6ff,
+    #b072ff,
+    #ff4d9e,
+    var(--kv-rar, #fff)
+  );
+  animation:
+    kv-psec-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both calc(min(var(--kv-i, 0), 12) * 40ms + 0.2s),
+    kv-show-spin 6s linear infinite;
+}
+html[data-kv-design="prism"] .kv-tile img {
+  inset: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  border-radius: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kv-psec,
+  .kv-tile,
+  .kv-rbar,
+  .kv-uni-bar i {
+    animation: none;
+  }
+}

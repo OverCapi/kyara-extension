@@ -50,5 +50,22 @@
   "packs.free_one": "{count} gratuit",
   "packs.free_other": "{count} gratuits",
   "packs.free_title": "Ouvrir seulement tes boosters gratuits (aucun chakra dépensé)",
-  "packs.refused": "Ouverture annulée par Kyara Extension : le site a changé, rien n'a été dépensé."
+  "packs.refused": "Ouverture annulée par Kyara Extension : le site a changé, rien n'a été dépensé.",
+  "profile.design.title": "Kyara Extension : design de la page profil",
+  "profile.design.stage": "Scène",
+  "profile.design.ribbon": "Ruban",
+  "profile.design.fan": "Éventail",
+  "profile.design.orbit": "Orbite",
+  "profile.design.prism": "Prisme",
+  "profile.design.site": "Site d'origine",
+  "profile.design.gallery": "Galerie",
+  "profile.sec.collection": "Collection",
+  "profile.sec.unique": "{owned} / {total} cartes uniques",
+  "profile.sec.universes": "Ses univers",
+  "profile.sec.trades": "Échanges",
+  "profile.sec.wants_m": "Il cherche",
+  "profile.sec.wants_f": "Elle cherche",
+  "profile.sec.offers_m": "Il échange",
+  "profile.sec.offers_f": "Elle échange",
+  "profile.sec.no_trades": "Aucune carte recherchée ni proposée pour l'instant."
 }

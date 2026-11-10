@@ -1,0 +1,310 @@
+/* Collection and Trades sections under the showcase (sections/view.ts): glass panels like the stats, a rarity
+   bar, universe progress and strips of card tiles. Hidden without a design (the site's own look). The look per
+   design is in themes.css. */
+@keyframes kv-psec-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes kv-psec-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+html:not([data-kv-design]) [data-kv-sections] {
+  display: none;
+}
+
+.kv-psecs {
+  --kv-accent: var(--acc, #ff4d2e);
+  display: grid;
+  /* minmax(0, …): the card strips scroll inside their section instead of widening it */
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 28px;
+  margin: 56px 0 24px;
+  color: var(--fg, #edeae4);
+  font-family: var(--body, system-ui, sans-serif);
+}
+.kv-psec {
+  min-width: 0;
+  scroll-margin-top: 140px;
+  padding: 24px;
+  border: 1px solid #ffffff1a;
+  border-radius: var(--r-xl, 18px);
+  background: linear-gradient(160deg, #1b1922c7, #100f15c7);
+  box-shadow:
+    inset 0 1px #ffffff14,
+    0 24px 50px -30px #000;
+  backdrop-filter: blur(14px);
+  animation: kv-psec-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.kv-psec + .kv-psec {
+  animation-delay: 0.12s;
+}
+.kv-psec-h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 18px;
+}
+.kv-psec-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font: 800 22px / 1.2 var(--disp, system-ui, sans-serif);
+}
+h3.kv-psec-title {
+  margin: 26px 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.kv-psec-count,
+.kv-badge {
+  color: var(--fg2, #b7b2bd);
+  font: 500 12px var(--mono, monospace);
+}
+.kv-badge {
+  padding: 2px 8px;
+  border-radius: var(--r-pill, 999px);
+  background: #ffffff14;
+}
+.kv-psec-empty {
+  margin: 0;
+  color: var(--fg2, #b7b2bd);
+}
+
+/* rarity colours, from the site's own variables */
+[data-kv-sections] [data-kv-r="M"] {
+  --kv-rar: var(--M, #ff4d2e);
+}
+[data-kv-sections] [data-kv-r="L"] {
+  --kv-rar: var(--L, #f5c518);
+}
+[data-kv-sections] [data-kv-r="E"] {
+  --kv-rar: var(--E, #b072ff);
+}
+[data-kv-sections] [data-kv-r="R"] {
+  --kv-rar: var(--R, #4d9bff);
+}
+[data-kv-sections] [data-kv-r="U"] {
+  --kv-rar: var(--U, #3fbf7f);
+}
+[data-kv-sections] [data-kv-r="C"] {
+  --kv-rar: var(--C, #b5b1bb);
+}
+
+.kv-rbar {
+  display: flex;
+  gap: 3px;
+  height: 12px;
+  overflow: hidden;
+  border-radius: var(--r-pill, 999px);
+  transform-origin: left;
+  animation: kv-psec-grow 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+}
+.kv-rbar > span {
+  flex: var(--kv-w) 1 0;
+  min-width: 4px;
+  background: var(--kv-rar);
+  box-shadow: 0 0 12px var(--kv-rar);
+}
+.kv-rchips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.kv-rchips li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #ffffff12;
+  border-radius: var(--r-md, 10px);
+  background: #ffffff0a;
+}
+.kv-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--kv-rar);
+  box-shadow: 0 0 10px var(--kv-rar);
+}
+.kv-rchip-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--fg2, #b7b2bd);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kv-rchips b {
+  font: 700 14px var(--mono, monospace);
+}
+.kv-rchips small {
+  color: var(--fg2, #b7b2bd);
+  font: 500 11px var(--mono, monospace);
+}
+
+.kv-unis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kv-unis li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  padding: 12px 14px;
+  border: 1px solid #ffffff12;
+  border-radius: var(--r-md, 10px);
+  background: #ffffff0a;
+}
+.kv-uni-name {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kv-uni-count {
+  color: var(--fg2, #b7b2bd);
+  font: 500 12px var(--mono, monospace);
+}
+.kv-uni-bar {
+  grid-column: 1 / -1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--r-pill, 999px);
+  background: #ffffff14;
+}
+.kv-uni-bar i {
+  display: block;
+  width: var(--kv-p);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--kv-accent),
+    color-mix(in srgb, var(--kv-accent) 40%, var(--gold, #f5c518))
+  );
+  transform-origin: left;
+  animation: kv-psec-grow 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--kv-i, 0) * 60ms + 0.3s);
+}
+.kv-unis li[data-kv-done] i {
+  background: var(--gold, #f5c518);
+  box-shadow: 0 0 10px var(--gold, #f5c518);
+}
+
+/* card tiles: whole art, name on it, a strip that scrolls sideways */
+.kv-strip {
+  display: grid;
+  grid-auto-columns: 132px;
+  grid-auto-flow: column;
+  gap: 12px;
+  padding: 6px 2px 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.kv-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 7;
+  overflow: hidden;
+  border-radius: var(--r-lg, 14px);
+  background: #1c1a23;
+  color: #fff;
+  text-decoration: none;
+  scroll-snap-align: start;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--kv-rar, #fff) 60%, #fff2),
+    0 12px 24px -16px #000;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s;
+  animation: kv-psec-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(min(var(--kv-i, 0), 12) * 40ms + 0.2s);
+}
+.kv-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+.kv-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 52%, #08060cf0);
+}
+.kv-tile-name,
+.kv-tile-sub {
+  position: absolute;
+  z-index: 1;
+  left: 10px;
+  right: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kv-tile-name {
+  bottom: 24px;
+  font: 700 12px / 1.2 var(--disp, system-ui, sans-serif);
+  text-shadow: 0 1px 6px #000;
+}
+.kv-tile-sub {
+  bottom: 9px;
+  color: #ddd8e2;
+  font-size: 10px;
+}
+.kv-tile-spare {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  right: 8px;
+  padding: 2px 7px;
+  border-radius: var(--r-pill, 999px);
+  background: var(--kv-rar, #fff);
+  color: #120b08;
+  font: 800 11px var(--mono, monospace);
+}
+.kv-tile:hover,
+.kv-tile:focus-visible {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 0 0 2px var(--kv-rar, #fff),
+    0 18px 30px -14px color-mix(in srgb, var(--kv-rar, #fff) 60%, #000);
+}
+.kv-tile:focus-visible {
+  outline: 2px solid var(--fg, #edeae4);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .kv-psec {
+    padding: 16px;
+  }
+  .kv-strip {
+    grid-auto-columns: 112px;
+  }
+  .kv-unis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

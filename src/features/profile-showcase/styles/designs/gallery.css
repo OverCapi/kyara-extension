@@ -1,0 +1,83 @@
+/* GALERIE: a museum wall. The site's whole cards hang in a centred row, each under its own spotlight with a
+   shadow on the floor. The lights switch on one after the other; hovering a card lifts it into its light.
+   :not(#_) raises the specificity above the site's own rules. */
+@keyframes kv-gallery-hang {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) rotate(-2deg);
+  }
+}
+@keyframes kv-gallery-light {
+  from {
+    opacity: 0;
+  }
+}
+
+html[data-kv-design="gallery"]:not(#_) {
+  [data-kv-show-list] {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 72px 44px;
+    margin-top: 10px;
+    padding: 56px 0 36px;
+  }
+  [data-kv-show-case] {
+    flex: 0 0 200px;
+    align-items: stretch;
+    width: 200px;
+    animation: kv-gallery-hang 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--kv-i, 0) * 90ms);
+  }
+  [data-kv-show-hero] {
+    flex-basis: 236px;
+    width: 236px;
+  }
+  /* the spotlight: a cone of light from above, tinted by the card's rarity */
+  [data-kv-show-case]::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -56px;
+    left: -45%;
+    right: -45%;
+    height: calc(100% + 96px);
+    background: linear-gradient(color-mix(in srgb, var(--kv-rar) 22%, #fff0d466), transparent 72%);
+    filter: blur(10px);
+    clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+    opacity: 0.45;
+    pointer-events: none;
+    transition: opacity 0.4s;
+    animation: kv-gallery-light 1.2s ease-out both;
+    animation-delay: calc(var(--kv-i, 0) * 90ms + 0.4s);
+  }
+  /* its shadow on the floor */
+  [data-kv-show-case]::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 12%;
+    right: 12%;
+    bottom: -30px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, #000d, transparent);
+    pointer-events: none;
+    transition:
+      transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.45s;
+  }
+  [data-kv-show-case]:hover,
+  [data-kv-show-case]:focus-visible {
+    transform: translateY(-12px);
+  }
+  [data-kv-show-case]:hover::before,
+  [data-kv-show-case]:focus-visible::before {
+    opacity: 1;
+  }
+  [data-kv-show-case]:hover::after,
+  [data-kv-show-case]:focus-visible::after {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
+}

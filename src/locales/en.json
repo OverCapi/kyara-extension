@@ -50,5 +50,22 @@
   "packs.free_one": "{count} free",
   "packs.free_other": "{count} free",
   "packs.free_title": "Open only your free boosters (no chakra spent)",
-  "packs.refused": "Opening cancelled by Kyara Extension: the site changed, nothing was spent."
+  "packs.refused": "Opening cancelled by Kyara Extension: the site changed, nothing was spent.",
+  "profile.design.title": "Kyara Extension: profile page design",
+  "profile.design.stage": "Stage",
+  "profile.design.ribbon": "Ribbon",
+  "profile.design.fan": "Fan",
+  "profile.design.orbit": "Orbit",
+  "profile.design.prism": "Prism",
+  "profile.design.site": "Original site",
+  "profile.design.gallery": "Gallery",
+  "profile.sec.collection": "Collection",
+  "profile.sec.unique": "{owned} / {total} unique cards",
+  "profile.sec.universes": "Their universes",
+  "profile.sec.trades": "Trades",
+  "profile.sec.wants_m": "Looking for",
+  "profile.sec.wants_f": "Looking for",
+  "profile.sec.offers_m": "Trading away",
+  "profile.sec.offers_f": "Trading away",
+  "profile.sec.no_trades": "No card wanted or offered yet."
 }

@@ -6,8 +6,8 @@
 //   "tintFull" gain (%) at which the offer tint is at full intensity (number)
 //   "rarities" shown rarities (list of strings; empty = all)
 //   "wanted"  wanted cards list (WantedCards)
-// These keys are the same as in the old version: the already filled cache stays valid.
-// Reads validate the data's shape: a corrupted value is ignored, never propagated.
+//   "profileDesign" chosen design of the profile page (see storage-design.ts)
+// Same keys as the old version (the cache stays valid). Reads validate the shape: corrupted values are ignored.
 import { browser } from "wxt/browser";
 
 /** Market medians of a card. `t` = write time (ms). */
@@ -85,7 +85,7 @@ export function onStorageChange(cb: () => void): () => void {
 }
 
 /** Calls `cb(newValue)` when this key changes (other tabs included). */
-function onKeyChange(key: string, cb: (value: unknown) => void): () => void {
+export function onKeyChange(key: string, cb: (value: unknown) => void): () => void {
   const listener = (changes: Record<string, { newValue?: unknown }>) => {
     if (key in changes) cb(changes[key]?.newValue);
   };

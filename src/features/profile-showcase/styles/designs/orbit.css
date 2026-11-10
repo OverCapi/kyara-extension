@@ -1,0 +1,93 @@
+/* ORBITE: the posters turn slowly on a 3D ring, always facing the viewer and fully opaque: the ones at the back
+   look smaller, seen slightly from above, and the front ones cover them. The ring stops while the pointer (or the keyboard focus) is on it, all cards together. Nothing
+   leaves the ring's own box.
+   :not(#_) raises the specificity above the site's own rules. */
+@property --kv-orbit {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes kv-orbit-spin {
+  to {
+    --kv-orbit: 360deg;
+  }
+}
+@keyframes kv-orbit-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html[data-kv-design="orbit"]:not(#_) {
+  [data-kv-show-list] {
+    position: relative;
+    display: block;
+    height: 480px;
+    margin-top: 10px;
+    perspective: 1800px;
+    perspective-origin: 50% -10%;
+    transform-style: preserve-3d;
+  }
+  [data-kv-show-case] {
+    --kv-a: calc(var(--kv-i) * 360deg / var(--kv-n) + var(--kv-orbit));
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    width: 220px;
+    height: 330px;
+    margin-left: -110px;
+    --kv-r: max(200px, var(--kv-n) * 40px);
+    transform: rotateY(var(--kv-a)) translateZ(var(--kv-r)) rotateY(calc(-1 * var(--kv-a)));
+    /* never transition the position: it changes on every frame of the spin, a transition makes the card lag
+       behind the others (gaps change, cards pass over each other) */
+    transition:
+      scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.3s;
+    animation:
+      kv-orbit-in 0.8s ease-out both calc(var(--kv-i, 0) * 70ms),
+      kv-orbit-spin 40s linear infinite;
+  }
+  /* the ring stops under the pointer, or while a card has the keyboard focus (a click leaves the focus on the
+     card: :focus-within would keep the ring stopped after the card's zoom is closed) */
+  [data-kv-show-list]:hover [data-kv-show-case],
+  [data-kv-show-list]:has(:focus-visible) [data-kv-show-case] {
+    animation-play-state: running, paused;
+  }
+  [data-kv-show-case]:hover,
+  [data-kv-show-case]:focus-visible {
+    scale: 1.06;
+    box-shadow:
+      0 30px 60px -20px color-mix(in srgb, var(--kv-rar) 60%, #000),
+      inset 0 0 0 2px var(--kv-rar);
+  }
+}
+
+/* Tablet: a smaller ring, so that it stays inside the column. */
+@media (max-width: 980px) {
+  html[data-kv-design="orbit"]:not(#_) [data-kv-show-case] {
+    --kv-r: min(var(--kv-n) * 40px, 26vw);
+    width: 180px;
+    height: 270px;
+    margin-left: -90px;
+  }
+}
+
+/* Phone: no ring, the shared poster grid (responsive.css) with nothing left from the 3D. */
+@media (max-width: 760px) {
+  html[data-kv-design="orbit"]:not(#_) {
+    [data-kv-show-list] {
+      perspective: none;
+      transform-style: flat;
+    }
+    [data-kv-show-case] {
+      position: relative;
+      top: auto;
+      left: auto;
+      margin-left: 0;
+      animation: kv-orbit-in 0.8s ease-out both calc(var(--kv-i, 0) * 70ms);
+    }
+  }
+}

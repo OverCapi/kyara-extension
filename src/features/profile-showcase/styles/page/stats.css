@@ -1,0 +1,194 @@
+/* Profile stats: separate glass tiles over the backdrop instead of one dark table. The collection ring fills up,
+   the rank bar grows and shimmers, and the tiles enter in turn. Same for every design.
+   :not(#_) raises the specificity above the site's own rules. */
+@keyframes kv-stat-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes kv-stat-ring {
+  from {
+    stroke-dasharray: 0, 100;
+  }
+}
+@keyframes kv-stat-grow {
+  from {
+    width: 0;
+  }
+}
+@keyframes kv-stat-shimmer {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 250% 0;
+  }
+}
+
+html[data-kv-design]:not(#_) {
+  [data-kv-prof="stats"] {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    overflow: visible;
+  }
+
+  [data-kv-stat] {
+    --kv-stat-c: var(--acc, #ff4d2e);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #ffffff1f;
+    border-radius: var(--r-lg, 14px);
+    background:
+      radial-gradient(
+        110% 130% at 0 0,
+        color-mix(in srgb, var(--kv-stat-c) 24%, transparent),
+        transparent 62%
+      ),
+      linear-gradient(160deg, #1b1922d1, #100f15d1);
+    box-shadow:
+      inset 0 1px #ffffff1a,
+      0 16px 34px -22px #000;
+    backdrop-filter: blur(14px);
+    transition:
+      translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+      border-color 0.3s;
+    animation: kv-stat-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--kv-i, 0) * 70ms + 0.1s);
+  }
+  [data-kv-stat]:hover {
+    border-color: color-mix(in srgb, var(--kv-stat-c) 60%, #ffffff1f);
+    translate: 0 -2px;
+  }
+  [data-kv-stat="coll"],
+  [data-kv-stat="rank"] {
+    grid-column: 1 / -1;
+  }
+  [data-kv-stat="coll"] {
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+  }
+  [data-kv-stat="small"]:nth-child(3) {
+    --kv-stat-c: var(--cyan, #4dd6ff);
+  }
+  [data-kv-stat="small"]:nth-child(4) {
+    --kv-stat-c: var(--E, #b072ff);
+  }
+  [data-kv-stat="rank"] {
+    --kv-stat-c: var(--gold, #f5c518);
+    gap: 8px;
+  }
+
+  [data-kv-stat-part="value"] {
+    color: var(--fg, #edeae4);
+    font: 700 22px / 1.1 var(--disp, system-ui, sans-serif);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  [data-kv-stat="coll"] [data-kv-stat-part="value"] {
+    font-size: 30px;
+  }
+  [data-kv-stat-part="total"] {
+    margin-left: 6px;
+    color: var(--mut, #c9c5ce);
+    font: 500 14px var(--mono, monospace);
+    letter-spacing: 0;
+  }
+  [data-kv-stat-accent] [data-kv-stat-part="value"] {
+    background: linear-gradient(100deg, var(--acc, #ff4d2e), var(--gold, #f5c518) 55%, var(--wish, #ff4d9e));
+    background-clip: text;
+    color: transparent;
+  }
+  [data-kv-stat-part="label"] {
+    color: var(--mut, #c9c5ce);
+    font-size: 12px;
+  }
+
+  [data-kv-stat-part="ring"] {
+    width: 84px;
+    height: 84px;
+    overflow: visible;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--acc, #ff4d2e) 70%, transparent));
+  }
+  [data-kv-stat-part="ring-bg"] {
+    stroke: #ffffff1f;
+  }
+  [data-kv-stat-part="ring-fg"] {
+    stroke: var(--acc, #ff4d2e);
+    animation: kv-stat-ring 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+  }
+  [data-kv-stat-part="ring-pct"] {
+    font: 700 13px var(--disp, system-ui, sans-serif);
+    letter-spacing: -0.03em;
+  }
+
+  [data-kv-stat-part="seal"] {
+    min-width: 32px;
+    height: 32px;
+    border-color: color-mix(in srgb, var(--gold, #f5c518) 60%, transparent);
+    background: color-mix(in srgb, var(--gold, #f5c518) 16%, transparent);
+    color: var(--gold, #f5c518);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--gold, #f5c518) 35%, transparent);
+  }
+  [data-kv-stat-part="rank"] {
+    font-size: 16px;
+  }
+  [data-kv-stat-part="bar"] {
+    height: 8px;
+    background: #ffffff1f;
+  }
+  [data-kv-stat-part="fill"] {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, var(--acc, #ff4d2e), var(--gold, #f5c518));
+    box-shadow: 0 0 12px color-mix(in srgb, var(--gold, #f5c518) 60%, transparent);
+    animation: kv-stat-grow 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+  }
+  [data-kv-stat-part="fill"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, #ffffff80, transparent);
+    animation: kv-stat-shimmer 3.2s ease-in-out 1.5s infinite;
+  }
+}
+
+@media (max-width: 520px) {
+  html[data-kv-design]:not(#_) {
+    [data-kv-stat] {
+      padding: 12px;
+    }
+    [data-kv-stat-part="value"] {
+      font-size: 17px;
+    }
+    [data-kv-stat="coll"] [data-kv-stat-part="value"] {
+      font-size: 24px;
+    }
+    [data-kv-stat-part="ring"] {
+      width: 68px;
+      height: 68px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-kv-design]:not(#_) {
+    [data-kv-stat],
+    [data-kv-stat-part="ring-fg"],
+    [data-kv-stat-part="fill"],
+    [data-kv-stat-part="fill"]::after {
+      animation: none;
+    }
+  }
+}

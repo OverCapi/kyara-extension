@@ -1,0 +1,55 @@
+/* Ribbon design. Scoped to data-kv-design on <html>, set by index.ts.
+   :not(#_) raises the specificity above the site's own rules. */
+/* RUBAN: strips that open on hover; the first one is open at rest. */
+html[data-kv-design="ribbon"]:not(#_) {
+  [data-kv-show-list] {
+    display: flex;
+    gap: 10px;
+    height: 600px;
+    margin-top: 10px;
+  }
+  [data-kv-show-case] {
+    flex: 1 1 0;
+  }
+  [data-kv-show-case]:hover {
+    transform: none;
+  }
+  :is([data-kv-show-list]:not(:hover) [data-kv-show-case]:first-child, [data-kv-show-case]:hover) {
+    flex-grow: 4.6;
+  }
+  [data-kv-show-part="name"],
+  [data-kv-show-part="type"],
+  [data-kv-show-part="stats"] {
+    min-width: 260px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  [data-kv-show-part="name"] {
+    font-size: 26px;
+    white-space: nowrap;
+  }
+  [data-kv-show-part="stats"] {
+    display: flex;
+  }
+  :is([data-kv-show-list]:not(:hover) [data-kv-show-case]:first-child, [data-kv-show-case]:hover)
+    :is([data-kv-show-part="name"], [data-kv-show-part="type"], [data-kv-show-part="stats"]) {
+    opacity: 1;
+    transition-delay: 0.18s;
+  }
+  [data-kv-show-part="gem"] {
+    right: auto;
+    left: 50%;
+    translate: -50% 0;
+  }
+  [data-kv-show-part="kana"] {
+    top: auto;
+    bottom: 16px;
+    left: 50%;
+    color: #ffffffd9;
+    translate: -50% 0;
+  }
+  :is([data-kv-show-list]:not(:hover) [data-kv-show-case]:first-child, [data-kv-show-case]:hover)
+    [data-kv-show-part="kana"] {
+    opacity: 0;
+  }
+}
