@@ -26,9 +26,16 @@
     <p>All notable changes to Kyara Extension. Format based on <a href="https://keepachangelog.com">Keep a Changelog</a>, versions follow <a href="https://semver.org">Semantic Versioning</a>.</p>
 
     <section class="release">
-      <h2><a href="https://github.com/OverCapi/kyara-extension/compare/v0.3.0...dev">Unreleased</a></h2>
+      <h2><a href="https://github.com/OverCapi/kyara-extension/compare/v0.4.0...dev">Unreleased</a></h2>
+      <p class="note">Nothing yet.</p>
+    </section>
+
+    <section class="release">
+      <h2><a href="https://github.com/OverCapi/kyara-extension/releases/tag/v0.4.0">0.4.0</a> <time datetime="2026-11-13">2026-11-13</time></h2>
       <p class="tag added">Added</p>
       <ul>
+        <li>Profile page redesign: wide header over a backdrop of the focused card, stats as glass tiles, and a showcase in six designs (Stage, Ribbon, Fan, Orbit, Prism, Gallery) or the site's original look, picked next to "Choisir ma vitrine".</li>
+        <li>Collection and Trades sections under the profile showcase (rarity split, universe progress, wanted cards, doubles), reached from the site's Collection and Échanges tabs.</li>
         <li>Booster page: "×N" option in the count picker that opens only your free boosters, without spending chakra. The site's chakra warning is skipped while it is chosen. If the site changes its opening request, the opening is cancelled and nothing is spent.</li>
         <li>Wanted cards: list card names in the filter panel to highlight offers proposing them, with a toggle to hide the other offers.</li>
         <li>Adjustable tint scale: choose the gain (10 to 200 %, default 100 %) at which an offer's color reaches full intensity.</li>
@@ -40,6 +47,10 @@
       <ul>
         <li>Rarity ring: falls back to the "Rare · …" text when the card's color is unknown.</li>
         <li>More robust to site updates: every site element is found with a fallback, and the extension's CSS no longer targets the site's classes.</li>
+      </ul>
+      <p class="tag fixed">Fixed</p>
+      <ul>
+        <li>The filter panel no longer grabs a site modal's controls ("Choisir ma vitrine"), which could blank the page.</li>
       </ul>
     </section>
 

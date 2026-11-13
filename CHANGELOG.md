@@ -6,8 +6,12 @@ HTML version: [`docs/changelog.html`](docs/changelog.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-13
+
 ### Added
 
+- Profile page redesign: wide header over a backdrop of the focused card, stats as glass tiles, and a showcase in six designs (Stage, Ribbon, Fan, Orbit, Prism, Gallery) or the site's original look, picked next to "Choisir ma vitrine".
+- Collection and Trades sections under the profile showcase (rarity split, universe progress, wanted cards, doubles), reached from the site's Collection and Échanges tabs.
 - Booster page: "×N" option in the count picker that opens only your free boosters, without spending chakra. The site's chakra warning is skipped while it is chosen. If the site changes its opening request, the opening is cancelled and nothing is spent.
 - Wanted cards: list card names in the filter panel to highlight offers proposing them, with a toggle to hide the other offers.
 - Adjustable tint scale: choose the gain (10 to 200 %, default 100 %) at which an offer's color reaches full intensity.
@@ -19,6 +23,10 @@ HTML version: [`docs/changelog.html`](docs/changelog.html).
 
 - Rarity ring: falls back to the "Rare · …" text when the card's color is unknown.
 - More robust to site updates: every site element is found with a fallback, and the extension's CSS no longer targets the site's classes.
+
+### Fixed
+
+- The filter panel no longer grabs a site modal's controls ("Choisir ma vitrine"), which could blank the page.
 
 ## [0.3.0] - 2026-11-06
 
@@ -65,7 +73,8 @@ No GitHub release: shipped with 0.3.0.
 - First version: card values (`≈ G◆`, `G − W`), offer background tinted by profitability with an on/off pill, rarity ring, minimum market price on hover, "Gain min" filter.
 - Rewrite on WXT + TypeScript, with Vitest tests and Biome.
 
-[Unreleased]: https://github.com/OverCapi/kyara-extension/compare/v0.3.0...dev
+[Unreleased]: https://github.com/OverCapi/kyara-extension/compare/v0.4.0...dev
+[0.4.0]: https://github.com/OverCapi/kyara-extension/releases/tag/v0.4.0
 [0.3.0]: https://github.com/OverCapi/kyara-extension/releases/tag/v0.3.0
 [0.2.0]: https://github.com/OverCapi/kyara-extension/releases/tag/v0.2.0
 [0.1.0]: https://github.com/OverCapi/kyara-extension/releases/tag/v0.1.0

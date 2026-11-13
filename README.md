@@ -1,6 +1,6 @@
 # Kyara Extension
 
-Firefox extension for [kyara.games](https://kyara.games): in the **Marché → Échanges** (Market → Trades) tab, it shows card values and the profitability of each offer, and lets you filter and sort offers. On the booster page, it can open only your free boosters.
+Firefox extension for [kyara.games](https://kyara.games): in the **Marché → Échanges** (Market → Trades) tab, it shows card values and the profitability of each offer, and lets you filter and sort offers. On the booster page, it can open only your free boosters, and it redesigns profile pages.
 
 HTML version of this page: [`docs/index.html`](docs/index.html). Version history: [CHANGELOG.md](CHANGELOG.md).
 
@@ -47,12 +47,18 @@ Shortcuts are ignored while typing in a text field, or with Ctrl, Alt or Cmd hel
 - A "×N" option in the booster count picker opens exactly your free boosters, without spending chakra. The site's chakra warning is skipped while this option is chosen.
 - If the site changes its opening request, the extension cancels the opening instead of sending it as is: nothing is spent.
 
+### Profile page
+
+- Redesigned profile page: a wide header over a backdrop of the focused card, and stats shown as glass tiles (collection ring, rank bar).
+- Showcase in one of six designs (Stage, Ribbon, Fan, Orbit, Prism, Gallery) or the site's original look. The design is chosen in a compact row next to "Choisir ma vitrine" on your own profile, and applies to every profile you visit.
+- Collection and Trades sections under the showcase, from the player's public profile (one request per player): rarity split, universe progress, wanted cards and doubles. The site's Collection and Échanges tabs jump to these sections.
+
 ### General
 
 - Unknown values show nothing (never a `?`).
 - Texts in French and English, depending on the browser language.
 
-This is not a bot: the extension never acts on your behalf. It reads the responses the site already loads, and only makes a few grouped requests (`/api/fair-play/prices`, max 200 ids) limited to visible offers you can accept (paused 5 min after a failed response), plus one request per hovered card.
+This is not a bot: the extension never acts on your behalf. It reads the responses the site already loads, and only makes a few grouped requests (`/api/fair-play/prices`, max 200 ids) limited to visible offers you can accept (paused 5 min after a failed response), plus one request per hovered card and one per visited profile.
 
 Stack: [WXT](https://wxt.dev) + TypeScript. Project rules: [CLAUDE.md](CLAUDE.md).
 
